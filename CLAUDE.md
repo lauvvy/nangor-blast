@@ -21,7 +21,7 @@ The scaffold (`S-01`) exists. Game code starts with `C-01`.
 | Java | 21 LTS (Temurin 21.0.13 installed) |
 | Gradle | Wrapper 8.14.3 (`gradlew`), Kotlin DSL (`build.gradle.kts`). Gradle itself is not installed. |
 | Make | `Makefile` that calls `gradlew`. Required by the specification. On the lead's machine it is `mingw32-make` from WinLibs. |
-| JLine 3 | Raw keyboard input and terminal drawing. Unverified until spike `S-02`. Fallback: Lanterna. |
+| JLine 3.30.17 | Raw keyboard input and terminal drawing. Unverified until the `S-02` results table in `ARCHITECTURE.md` is filled. Fallback: Lanterna. |
 | libGDX with LWJGL3 | GUI for bonus B01. Version pinned in `G-01`. Used only in `view/gui` and `app`. |
 | SLF4J with Logback | Logging to `logs/nangor-blast.log` |
 | JUnit 5 | Unit tests |
@@ -157,6 +157,7 @@ All tests pass, with zero failures. For anything that draws or reads keys, also 
 ```bash
 make build      # compile and package
 make run        # start the CLI game
+make spike      # S-02 terminal spike: key echo and 20 FPS redraw
 make run-gui    # start the GUI, bonus B01
 make test       # run the unit tests
 make clean      # remove build output
