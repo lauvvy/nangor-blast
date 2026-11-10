@@ -96,11 +96,24 @@ class MvpZeroTest {
     }
 
     @Test
-    void steppingIntoAStandInEnemyCostsLivesUntilLose() {
+    void steppingIntoAStandInEnemyCostsALifeAndRespawnsAtTheSpawnPoint() {
         world.player().moveTo(new Position(1, 7)); // the enemy at (1, 8) is below
         tick(Action.CONFIRM);
+        tick(Action.MOVE_DOWN);
+
+        assertEquals(2, world.player().lives());
+        assertEquals(new Position(1, 1), world.player().position(), "back at the spawn point");
+        assertTrue(world.player().isInvulnerable());
+        assertEquals(GameState.PLAYING, world.state());
+    }
+
+    @Test
+    void threeContactsWithTimeToRecoverEndInLose() {
+        tick(Action.CONFIRM);
         for (int i = 0; i < 3; i++) {
+            world.player().moveTo(new Position(1, 7));
             tick(Action.MOVE_DOWN);
+            seconds(1.5); // invulnerability runs out
         }
         assertEquals(0, world.player().lives());
         assertEquals(GameState.LOSE, world.state());

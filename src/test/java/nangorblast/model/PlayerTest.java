@@ -65,9 +65,33 @@ class PlayerTest {
     }
 
     @Test
+    void aHitMakesThePlayerInvulnerableAndAsksForARespawn() {
+        assertTrue(player.takeDamage(hit()));
+        assertTrue(player.isInvulnerable());
+        assertEquals(Player.INVULNERABLE_SECONDS, player.invulnerableTime());
+        assertTrue(player.isRespawnPending());
+        assertFalse(player.takeDamage(hit()), "a second activation in the same moment is ignored");
+
+        player.respawnAt(new Position(3, 3));
+        assertEquals(new Position(3, 3), player.position());
+        assertFalse(player.isRespawnPending());
+    }
+
+    @Test
+    void theLastLifeAsksForNoRespawn() {
+        for (int i = 0; i < 3; i++) {
+            player.takeDamage(hit());
+            player.tickInvulnerability(Player.INVULNERABLE_SECONDS);
+        }
+        assertFalse(player.isAlive());
+        assertFalse(player.isRespawnPending());
+    }
+
+    @Test
     void livesNeverGoBelowZero() {
         for (int i = 0; i < 5; i++) {
             player.takeDamage(hit());
+            player.tickInvulnerability(Player.INVULNERABLE_SECONDS);
         }
         assertEquals(0, player.lives());
         assertFalse(player.isAlive());

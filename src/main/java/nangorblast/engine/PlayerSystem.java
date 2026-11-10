@@ -3,7 +3,6 @@ package nangorblast.engine;
 import java.util.Optional;
 import nangorblast.core.Direction;
 import nangorblast.core.GameState;
-import nangorblast.core.PlayerDamaged;
 import nangorblast.core.Position;
 import nangorblast.input.Command;
 import nangorblast.model.Damage;
@@ -85,7 +84,6 @@ public final class PlayerSystem implements CommandHandler, GameSystem {
                 if (player.takeDamage(contact)) {
                     LOG.info("Player {} stepped into {} at {}, {} lives left",
                             player.playerIndex(), other.kind(), target, player.lives());
-                    world.bus().publish(new PlayerDamaged(player.playerIndex(), player.lives()));
                 }
                 return;
             }

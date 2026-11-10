@@ -124,6 +124,7 @@ class WinLoseSystemTest {
         world.player().moveTo(new Position(2, 0));
         for (int i = 0; i < 3; i++) {
             world.player().takeDamage(new Damage(1, Damage.newActivationId(), DamageSource.HAZARD));
+            world.player().tickInvulnerability(2);
         }
         system.update(world, DT);
         assertEquals(GameState.LOSE, world.state());

@@ -6,6 +6,7 @@ import java.util.Random;
 import nangorblast.engine.CommandHandler;
 import nangorblast.engine.GameFlow;
 import nangorblast.engine.GameSystem;
+import nangorblast.engine.LifeSystem;
 import nangorblast.engine.PlayerSystem;
 import nangorblast.engine.TimerSystem;
 import nangorblast.engine.WinLoseSystem;
@@ -37,6 +38,7 @@ public final class GameFactory {
                 // 3. BombSystem, then ExplosionSystem
                 // 4. HazardSystem
                 // 5. PowerUpSystem
+                new LifeSystem(), // 5b, after every damage source
                 new TimerSystem(), // 6
                 new WinLoseSystem() // 7
         );

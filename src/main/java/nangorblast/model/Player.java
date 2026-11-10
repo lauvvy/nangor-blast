@@ -20,8 +20,10 @@ public final class Player extends Entity implements Damageable {
     public static final int MAX_BLAST_RANGE = 5;
     public static final double SPEED_UP_STEP = 0.5; // of base speed, per Speed Up
     public static final double MAX_SPEED_BONUS = 1.0; // of base speed, in total
+    public static final double INVULNERABLE_SECONDS = 1.5; // after losing a life (F01.2.4)
 
     private final int playerIndex;
+    private final Position spawn;
     private final double baseSpeed;
     private Direction direction = Direction.DOWN;
     private int lives = START_LIVES;
@@ -33,6 +35,7 @@ public final class Player extends Entity implements Damageable {
     private boolean remoteUnlocked;
     private BombType selectedBomb = BombType.NORMAL;
     private final Set<Long> hitBy = new HashSet<>();
+    private boolean respawnPending;
 
     /**
      * @param playerIndex 0 for the first player, 1 for the second (bonus B04)
@@ -44,6 +47,7 @@ public final class Player extends Entity implements Damageable {
             throw new IllegalArgumentException("Base speed must be positive, got " + baseSpeed);
         }
         this.playerIndex = playerIndex;
+        this.spawn = spawn;
         this.baseSpeed = baseSpeed;
         this.speed = baseSpeed;
     }
@@ -59,13 +63,37 @@ public final class Player extends Entity implements Damageable {
         return mover != this;
     }
 
+    /**
+     * Loses one life (F01.2.2). A hit also makes the player invulnerable at once, so two
+     * activations in the same tick cost one life, and marks a respawn while lives remain;
+     * the respawn itself needs the map and is done by {@code LifeSystem}.
+     */
     @Override
     public boolean takeDamage(Damage damage) {
         if (lives == 0 || isInvulnerable() || !hitBy.add(damage.activationId())) {
             return false;
         }
         lives--;
+        makeInvulnerable(INVULNERABLE_SECONDS);
+        respawnPending = lives > 0;
         return true;
+    }
+
+    /** Where the player starts and respawns. */
+    public Position spawn() {
+        return spawn;
+    }
+
+    /** True after a lost life until {@link #respawnAt} runs. */
+    public boolean isRespawnPending() {
+        return respawnPending;
+    }
+
+    /** Places the player back on the map with a fresh 1.5 seconds of invulnerability. */
+    public void respawnAt(Position tile) {
+        moveTo(tile);
+        respawnPending = false;
+        invulnerableTime = INVULNERABLE_SECONDS;
     }
 
     public int playerIndex() {

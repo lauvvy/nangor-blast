@@ -80,7 +80,7 @@ src/main/java/nangorblast/
   mapio/               MapLoader, MapValidator, EntityFactory,
                        GameConfig                                        Areli
   editor/              Map Maker (bonus B03)                             Areli
-  engine/              GameLoop, GameSystem, CommandHandler, RenderLoop, GameFlow,
+  engine/              GameLoop, GameSystem, CommandHandler, RenderLoop, GameFlow, LifeSystem,
                        TimerSystem, SnapshotBuilder, PlayerSystem,
                        WinLoseSystem                                     Laura
   engine/bomb/         BombSystem, ExplosionSystem, PowerUpSystem,
@@ -249,13 +249,20 @@ As built in `C-08`:
 - **For Marshall:** `WinLoseSystem` publishes `core/GameEnded` once, with the lives and the whole seconds left (rounded up, as the HUD shows them). `ScoreSystem` adds the F08 WIN bonus from it: 100 per life and 10 per second.
 - `app/StandInMap` makes the stand-in enemies and boss `Hostile`, so contact costs a life and the exit stays locked until C-09 brings real enemies and bombs.
 
+As built in `C-06`:
+
+- `Player.takeDamage` loses one life per activation, makes the player invulnerable for 1.5 seconds at once (so two activations in the same tick cost one life), and marks a respawn while lives remain. Every damage source only calls `takeDamage`; nothing else is needed.
+- `engine/LifeSystem` runs after every damage source (step 5). It publishes `PlayerDamaged` once per lost life, respawns the player at the spawn point or, if any entity stands there, the nearest tile by walking distance that holds no entity, and resets invulnerability to a full 1.5 seconds. Otherwise it counts invulnerability down by `dt`. At 0 lives there is no respawn, and `WinLoseSystem` sets LOSE.
+- `PlayerSystem` no longer publishes `PlayerDamaged`; `LifeSystem` does it for every source.
+- `WorldSnapshot.Hud` carries `invulnerable`, and the CLI draws the player dimmed (`#2A6F8E`, in `DESIGN.md`) while it is true.
+
 Order of work inside one tick:
 
 1. Drain the command queue and pass each command to every `CommandHandler`. Handlers run in every state, so the pause command works while paused. `PlayerSystem` is a handler and a system, and it ignores moves unless the state is `PLAYING`.
 2. `EnemySystem`, then `BossSystem`.
 3. `BombSystem`, then `ExplosionSystem`.
 4. `HazardSystem`.
-5. `PowerUpSystem`.
+5. `PowerUpSystem`, then `LifeSystem`, which handles a lost life from any of the systems above.
 6. Reduce the game timer.
 7. `WinLoseSystem`.
 8. Build and publish the `WorldSnapshot`.
