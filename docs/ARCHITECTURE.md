@@ -63,7 +63,7 @@ src/main/java/nangorblast/
   core/                Position, Direction, GameState, BombType, Grid<T>,
                        EntityKind, GameEvent, EventBus, events,
                        exceptions                                        Laura
-  model/               GameWorld, Entity, Damageable, Damage,
+  model/               GameWorld, Entity, Damageable, Damage, Hostile,
                        DamageSource, Player, Exit                        Laura
   model/bomb/          Bomb, NormalBomb, PumpedBomb, RemoteBomb,
                        BombFactory                                       Marshall
@@ -149,6 +149,7 @@ class GameException extends RuntimeException      // unchecked; InvalidMapExcept
 abstract class Entity { long id(); Position position(); void moveTo(Position); boolean isActive(); void deactivate();
                         abstract EntityKind kind(); boolean blocksMovementOf(Entity mover) /* default false */; }
 interface Damageable { boolean takeDamage(Damage damage); }   // true if the target was hurt
+interface Hostile {}                                          // marker: Normal Enemies and bosses; hurts the player on contact (C-04)
 record Damage(int amount, long activationId, DamageSource source) { static long newActivationId(); }
 enum DamageSource { EXPLOSION, BOSS_ATTACK, ENEMY_CONTACT, HAZARD }
 final class Player extends Entity implements Damageable { Player(Position spawn, int playerIndex, double baseSpeed); ... }
@@ -221,6 +222,13 @@ As built in `C-03`:
 - `view/cli/CliFrame` composes one screen from a snapshot as a grid of cells (character and color): HUD on row 0, an empty row, the map from row 2 with each tile two characters wide, and the message line below the map. It holds the glyph table from `DESIGN.md` as an exhaustive `switch`, so a new `EntityKind` does not compile until it has a glyph. It has no terminal access.
 - `view/cli/CliRenderer` diffs each frame against the last one and rewrites only the changed runs of cells. A resize clears and redraws everything. A terminal smaller than the frame (48 × 13 for the 14 × 10 map) shows one message with the needed and current size. Colors are given as RGB and JLine downgrades them to what the terminal supports.
 - Until `C-07` adds menu panels, the message line shows `Paused`, `You win`, or `Game over` for those states.
+
+As built in `C-04`:
+
+- `engine/PlayerSystem` is a `CommandHandler` and a `GameSystem`, so the same instance goes in both lists. A move command steps at once when the cooldown is over, otherwise it is kept for 0.15 seconds and a newer move replaces it. After a step the cooldown is `1 / speed`. The cooldown keeps at most one tick of credit below zero, so a speed that is not a whole number of ticks (6 tiles per second) still averages out exactly.
+- A blocked move turns the player and costs no cooldown. If the blocking tile holds a `model/Hostile` entity, it is contact: `takeDamage` with `ENEMY_CONTACT` and a new activation id, and a `PlayerDamaged` event when a life is lost.
+- **For Ilham:** `Enemy` and `Boss` implement `model/Hostile` and block the player in `blocksMovementOf`. That is all `PlayerSystem` needs to report contact.
+- Until `C-06` adds invulnerability after a hit, every new contact costs a life.
 
 Order of work inside one tick:
 
