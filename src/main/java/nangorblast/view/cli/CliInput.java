@@ -3,6 +3,7 @@ package nangorblast.view.cli;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Consumer;
+import nangorblast.input.Action;
 import nangorblast.input.Command;
 import nangorblast.input.InputSource;
 import nangorblast.input.KeyBindings;
@@ -53,7 +54,10 @@ public final class CliInput implements InputSource {
                 if (key == null) {
                     break;
                 }
-                bindings.commandFor(key).ifPresentOrElse(sink, () -> LOG.debug("Unbound key '{}'", key));
+                bindings.commandFor(key).ifPresentOrElse(sink, () -> {
+                    LOG.debug("Unbound key '{}'", key);
+                    sink.accept(new Command(0, Action.UNBOUND)); // menus report it as invalid input
+                });
             }
         } catch (IOException e) {
             LOG.warn("Terminal input stopped", e);

@@ -12,4 +12,11 @@ import nangorblast.model.GameWorld;
 public interface CommandHandler {
 
     void handle(GameWorld world, Command command);
+
+    /**
+     * Called once at the end of every tick in every state, after the systems. Lets a handler
+     * count time with {@code dt} while paused or in a menu, or react to a state a system set.
+     */
+    default void afterTick(GameWorld world, double dt) {
+    }
 }

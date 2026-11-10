@@ -7,13 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import nangorblast.core.EntityKind;
 import nangorblast.core.GameState;
 import nangorblast.core.Position;
-import nangorblast.input.KeyBindings;
 import nangorblast.view.WorldSnapshot;
 import nangorblast.view.WorldSnapshot.Sprite;
 import org.jline.terminal.Size;
@@ -36,7 +34,7 @@ class CliRendererTest {
         terminal = TerminalBuilder.builder().system(false).type("xterm-256color")
                 .streams(new ByteArrayInputStream(new byte[0]), out).build();
         terminal.setSize(new Size(80, 24));
-        renderer = new CliRenderer(terminal, KeyBindings.load(Path.of("config", "keybindings.properties")));
+        renderer = new CliRenderer(terminal);
     }
 
     @AfterEach
@@ -70,14 +68,6 @@ class CliRendererTest {
         assertFalse(move.contains(CLEAR), "a move never clears the screen");
         assertEquals(2, move.split("\033\\[\\d+;\\d+H", -1).length - 1, "two tiles rewritten: " + move);
         assertTrue(move.length() * 10 < first.length(), "a move writes a small fraction of a full frame");
-    }
-
-    @Test
-    void helpTextNamesKeysFromTheBindings() {
-        renderer.render(CliFrameTest.snapshot(List.of(), Set.of(), 300, GameState.MENU));
-        assertTrue(drain().contains("Nangor Blast. Enter to play, Backspace to quit"));
-        assertEquals("P", CliRenderer.displayName(List.of("p", "ESCAPE")));
-        assertEquals("?", CliRenderer.displayName(List.of()));
     }
 
     @Test

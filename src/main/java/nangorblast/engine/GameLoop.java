@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.LockSupport;
+import java.util.function.Function;
 import java.util.function.LongSupplier;
 import nangorblast.core.GameState;
 import nangorblast.input.Command;
@@ -40,6 +41,7 @@ public final class GameLoop implements Runnable {
     private final long dtNanos;
     private final int maxCatchUpTicks;
     private final LongSupplier clock;
+    private final Function<GameWorld, WorldSnapshot> snapshots;
 
     private volatile WorldSnapshot snapshot;
     private volatile boolean stopRequested;
@@ -52,6 +54,16 @@ public final class GameLoop implements Runnable {
     /** @param clock nanoseconds, {@code System::nanoTime} in the game and a fake in tests */
     public GameLoop(GameWorld world, BlockingQueue<Command> commands, List<CommandHandler> handlers,
                     List<GameSystem> systems, int ticksPerSecond, int maxCatchUpTicks, LongSupplier clock) {
+        this(world, commands, handlers, systems, ticksPerSecond, maxCatchUpTicks, clock, SnapshotBuilder::build);
+    }
+
+    /**
+     * @param snapshots builds the snapshot published at the end of each tick, for example
+     *     {@link SnapshotBuilder#build} plus the open menu
+     */
+    public GameLoop(GameWorld world, BlockingQueue<Command> commands, List<CommandHandler> handlers,
+                    List<GameSystem> systems, int ticksPerSecond, int maxCatchUpTicks, LongSupplier clock,
+                    Function<GameWorld, WorldSnapshot> snapshots) {
         if (ticksPerSecond <= 0) {
             throw new IllegalArgumentException("Ticks per second must be positive, got " + ticksPerSecond);
         }
@@ -66,7 +78,8 @@ public final class GameLoop implements Runnable {
         this.dtNanos = 1_000_000_000L / ticksPerSecond;
         this.maxCatchUpTicks = maxCatchUpTicks;
         this.clock = Objects.requireNonNull(clock, "clock");
-        this.snapshot = SnapshotBuilder.build(world);
+        this.snapshots = Objects.requireNonNull(snapshots, "snapshots");
+        this.snapshot = snapshots.apply(world);
     }
 
     /** The latest published snapshot. Safe to call from any thread. */
@@ -134,7 +147,10 @@ public final class GameLoop implements Runnable {
                 system.update(world, dt);
             }
         }
+        for (CommandHandler handler : handlers) {
+            handler.afterTick(world, dt);
+        }
         world.removeInactive();
-        snapshot = SnapshotBuilder.build(world);
+        snapshot = snapshots.apply(world);
     }
 }

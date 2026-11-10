@@ -2,11 +2,12 @@ package nangorblast.app;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import nangorblast.core.GameException;
+import nangorblast.core.GameState;
 import nangorblast.engine.GameLoop;
-import nangorblast.engine.PlayerSystem;
+import nangorblast.engine.GameFlow;
+import nangorblast.engine.GameFlow.Outcome;
 import nangorblast.engine.RenderLoop;
 import nangorblast.input.Command;
 import nangorblast.input.KeyBindings;
@@ -67,31 +68,44 @@ public final class Main {
         return status;
     }
 
-    /** Plays one game on {@code terminal} until the player quits. Package-private for tests. */
+    /**
+     * Plays on {@code terminal} until the player exits. Each session runs one world; restart
+     * and return to the menu start a new session with a new world, so nothing carries over.
+     * Package-private for tests.
+     */
     static void play(Terminal terminal, KeyBindings bindings) throws InterruptedException {
-        CountDownLatch quit = new CountDownLatch(1);
-        terminal.handle(Terminal.Signal.INT, signal -> quit.countDown());
+        BlockingQueue<Outcome> outcomes = new LinkedBlockingQueue<>();
+        terminal.handle(Terminal.Signal.INT, signal -> outcomes.offer(Outcome.QUIT));
         Attributes saved = terminal.enterRawMode();
         terminal.puts(Capability.enter_ca_mode);
         terminal.puts(Capability.cursor_invisible);
         terminal.flush();
         try {
-            GameWorld world = GameFactory.newWorld();
-            BlockingQueue<Command> commands = new LinkedBlockingQueue<>();
-            PlayerSystem players = new PlayerSystem();
-            GameLoop loop = new GameLoop(world, commands, GameFactory.handlers(players, quit::countDown),
-                    GameFactory.systems(players), GameLoop.DEFAULT_TICKS_PER_SECOND,
-                    GameLoop.DEFAULT_MAX_CATCH_UP_TICKS, System::nanoTime);
-            RenderLoop render = new RenderLoop(loop::snapshot, new CliRenderer(terminal, bindings), FRAMES_PER_SECOND);
-            try (GameSession session = new GameSession(loop, new CliInput(terminal, bindings), render, commands)) {
-                session.start();
-                quit.await();
+            Outcome next = Outcome.MENU;
+            while (next != Outcome.QUIT) {
+                GameWorld world = GameFactory.newWorld();
+                if (next == Outcome.RESTART) {
+                    world.setState(GameState.PLAYING);
+                }
+                next = session(terminal, bindings, world, outcomes);
             }
         } finally {
             terminal.puts(Capability.cursor_visible);
             terminal.puts(Capability.exit_ca_mode);
             terminal.setAttributes(saved);
             terminal.flush();
+        }
+    }
+
+    private static Outcome session(Terminal terminal, KeyBindings bindings, GameWorld world,
+                                   BlockingQueue<Outcome> outcomes) throws InterruptedException {
+        BlockingQueue<Command> commands = new LinkedBlockingQueue<>();
+        GameFlow flow = new GameFlow(bindings::label, outcomes::offer);
+        GameLoop loop = GameFactory.newLoop(world, commands, flow);
+        RenderLoop render = new RenderLoop(loop::snapshot, new CliRenderer(terminal), FRAMES_PER_SECOND);
+        try (GameSession session = new GameSession(loop, new CliInput(terminal, bindings), render, commands)) {
+            session.start();
+            return outcomes.take();
         }
     }
 

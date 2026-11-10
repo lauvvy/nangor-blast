@@ -11,6 +11,7 @@ import nangorblast.core.GameState;
 import nangorblast.core.Position;
 import nangorblast.view.WorldSnapshot;
 import nangorblast.view.WorldSnapshot.Hud;
+import nangorblast.view.WorldSnapshot.Panel;
 import nangorblast.view.WorldSnapshot.Sprite;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,7 @@ class CliFrameTest {
     }
 
     static CliFrame compose(WorldSnapshot snapshot) {
-        return CliFrame.compose(snapshot, action -> action.name());
+        return CliFrame.compose(snapshot);
     }
 
     private static char tile(CliFrame frame, int x, int y) {
@@ -79,15 +80,39 @@ class CliFrameTest {
     }
 
     @Test
-    void messageLineNamesStatesOtherThanPlaying() {
-        int messageRow = CliFrame.MAP_TOP + 10;
-        assertEquals("", compose(snapshot(List.of(), Set.of(), 300, GameState.PLAYING)).rowText(messageRow).strip());
-        assertEquals("Paused. PAUSE to resume, BACK to quit",
-                compose(snapshot(List.of(), Set.of(), 300, GameState.PAUSED)).rowText(messageRow).strip());
-        assertEquals("Game over. CONFIRM to exit",
-                compose(snapshot(List.of(), Set.of(), 0, GameState.LOSE)).rowText(messageRow).strip());
-        assertEquals("Nangor Blast. CONFIRM to play, BACK to quit",
-                compose(snapshot(List.of(), Set.of(), 300, GameState.MENU)).rowText(messageRow).strip());
+    void aPanelIsABoxedMenuWithTheSelectionMarkedAndItsMessageBelowTheMap() {
+        WorldSnapshot snapshot = snapshot(List.of(new Sprite(1, EntityKind.INDESTRUCTIBLE_BLOCK, new Position(0, 0))),
+                Set.of(), 300, GameState.MENU).withPanel(new Panel("NANGOR BLAST", List.of("Red Mountain"),
+                List.of("Start Game", "How to Play", "Exit"), 1, "Invalid key"));
+        CliFrame frame = compose(snapshot);
+        String text = String.join(System.lineSeparator(), java.util.stream.IntStream.range(0, frame.rows())
+                .mapToObj(frame::rowText).toList());
+
+        assertTrue(text.contains("|" + " ".repeat(15) + "NANGOR BLAST" + " ".repeat(15) + "|"), text);
+        assertTrue(text.contains("| Red Mountain"), text);
+        assertTrue(text.contains("|   1. Start Game"), text);
+        assertTrue(text.contains("| > 2. How to Play"), text);
+        assertTrue(text.contains("+" + "-".repeat(42) + "+"), text);
+        assertEquals("Invalid key", frame.rowText(CliFrame.MAP_TOP + 10).strip());
+        assertEquals(CliFrame.ERROR, frame.cell(CliFrame.MAP_TOP + 10, 0).fg());
+        assertEquals(CliFrame.dim(0x5C4A42), frame.cell(CliFrame.MAP_TOP, 0).fg(), "the map behind is dimmed");
+    }
+
+    @Test
+    void noPanelMeansAnEmptyMessageLineAndAnUndimmedMap() {
+        CliFrame frame = compose(snapshot(List.of(new Sprite(1, EntityKind.INDESTRUCTIBLE_BLOCK, new Position(0, 0))),
+                Set.of(), 300, GameState.PLAYING));
+        assertEquals("", frame.rowText(CliFrame.MAP_TOP + 10).strip());
+        assertEquals(0x5C4A42, frame.cell(CliFrame.MAP_TOP, 0).fg());
+    }
+
+    @Test
+    void theTallestMenuFitsAboveTheMessageLine() {
+        WorldSnapshot snapshot = snapshot(List.of(), Set.of(), 300, GameState.MENU).withPanel(new Panel("How to Play",
+                List.of("1", "2", "3", "4", "5", "6", "7"), List.of("Back"), 0, ""));
+        CliFrame frame = compose(snapshot);
+        assertTrue(frame.rowText(CliFrame.MAP_TOP + 9).contains("+---"), "the bottom border is on the last map row");
+        assertTrue(frame.rowText(CliFrame.MAP_TOP + 8).contains("> 1. Back"));
     }
 
     @Test

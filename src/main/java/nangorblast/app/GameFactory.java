@@ -3,13 +3,17 @@ package nangorblast.app;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 import nangorblast.engine.CommandHandler;
 import nangorblast.engine.GameFlow;
+import nangorblast.engine.GameLoop;
 import nangorblast.engine.GameSystem;
 import nangorblast.engine.LifeSystem;
 import nangorblast.engine.PlayerSystem;
+import nangorblast.engine.SnapshotBuilder;
 import nangorblast.engine.TimerSystem;
 import nangorblast.engine.WinLoseSystem;
+import nangorblast.input.Command;
 import nangorblast.model.GameWorld;
 
 /** The composition root. Each member registers a system with one line in {@link #systems}. */
@@ -25,9 +29,20 @@ public final class GameFactory {
         return StandInMap.redMountain(new Random());
     }
 
+    /**
+     * The game loop for one session: fresh systems with the menus of {@code flow}. Restart
+     * calls this again with a new world, so no system keeps state from the last game.
+     */
+    public static GameLoop newLoop(GameWorld world, BlockingQueue<Command> commands, GameFlow flow) {
+        PlayerSystem players = new PlayerSystem();
+        return new GameLoop(world, commands, handlers(players, flow), systems(players),
+                GameLoop.DEFAULT_TICKS_PER_SECOND, GameLoop.DEFAULT_MAX_CATCH_UP_TICKS, System::nanoTime,
+                w -> SnapshotBuilder.build(w).withPanel(flow.panel()));
+    }
+
     /** Every command handler. {@code players} is the same instance passed to {@link #systems}. */
-    public static List<CommandHandler> handlers(PlayerSystem players, Runnable onQuit) {
-        return List.of(new GameFlow(onQuit), players);
+    public static List<CommandHandler> handlers(PlayerSystem players, GameFlow flow) {
+        return List.of(flow, players);
     }
 
     /** Every system, in tick order (ARCHITECTURE.md, "Order of work inside one tick"). */
