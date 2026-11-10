@@ -59,7 +59,7 @@ One owner per package. A member changes another member's package only with that 
 
 ```text
 src/main/java/nangorblast/
-  app/                 Main, GameFactory (composition root)              Laura
+  app/                 Main, GameFactory (composition root), GameSession Laura
   core/                Position, Direction, GameState, BombType, Grid<T>,
                        EntityKind, GameEvent, EventBus, events,
                        exceptions                                        Laura
@@ -79,8 +79,9 @@ src/main/java/nangorblast/
   mapio/               MapLoader, MapValidator, EntityFactory,
                        GameConfig                                        Areli
   editor/              Map Maker (bonus B03)                             Areli
-  engine/              GameLoop, GameSystem, CommandQueue, TimerSystem,
-                       SnapshotBuilder, PlayerSystem, WinLoseSystem      Laura
+  engine/              GameLoop, GameSystem, CommandHandler, RenderLoop,
+                       TimerSystem, SnapshotBuilder, PlayerSystem,
+                       WinLoseSystem                                     Laura
   engine/bomb/         BombSystem, ExplosionSystem, PowerUpSystem,
                        ScoreSystem                                       Marshall
   engine/enemy/        EnemySystem, BossSystem                           Ilham
@@ -207,9 +208,17 @@ How the contracts remove cross-member dependencies:
 - **Pause** — When the state is not `PLAYING`, the loop skips the systems. Every timer freezes because nothing reduces it, which is exactly F09.5.
 - **Restart** — The composition root builds a new `GameWorld` from the map file. Nothing is reset field by field.
 
+As built in `C-02`:
+
+- `engine/GameLoop` takes the world, the `BlockingQueue<Command>`, a list of `CommandHandler`s, the systems from `GameFactory.systems()`, the tick rate, the catch-up limit, and a clock (`System::nanoTime`, or a fake in tests). `snapshot()` returns the latest snapshot from any thread.
+- `engine/RenderLoop` draws the latest snapshot on the `render` thread whenever it changes.
+- `app/GameSession` runs the three tasks on one `ExecutorService`, renames each pool thread to `input`, `game-loop`, or `render`, and `close()` stops all three and waits up to 2 seconds.
+- `view/cli/CliInput` polls the terminal every 100 ms, so `close()` takes effect without a key press.
+- `input/KeyBindings` reads `config/keybindings.properties`: `p<player>.<ACTION> = key, key`. A key is one printable character, with letters case-insensitive, or one of `UP`, `DOWN`, `LEFT`, `RIGHT`, `ENTER`, `ESCAPE`, `SPACE`, `BACKSPACE`, `TAB`. A key bound twice, an unknown action or key, or a `p1` action with no key is a `ConfigLoadException`.
+
 Order of work inside one tick:
 
-1. Drain the command queue and apply player actions (`PlayerSystem`).
+1. Drain the command queue and pass each command to every `CommandHandler`. Handlers run in every state, so the pause command works while paused. `PlayerSystem` is a handler and a system, and it ignores moves unless the state is `PLAYING`.
 2. `EnemySystem`, then `BossSystem`.
 3. `BombSystem`, then `ExplosionSystem`.
 4. `HazardSystem`.

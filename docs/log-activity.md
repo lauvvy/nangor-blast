@@ -17,6 +17,7 @@ Aturan pengisian:
 | 10 November 2026 | `S-01` scaffold Gradle, Makefile, folder `src`, `config`, `doc` | `make build`, `make test`, `make run`, dan `make clean` jalan di Windows (`mingw32-make`). Build memakai `-Xlint:all -Werror`. Log masuk ke `logs/nangor-blast.log`. Belum dicoba di macOS atau Linux. |
 | 10 November 2026 | `S-02` terminal spike dengan JLine 3.30.17 (`make spike`) | Spike membaca tombol tanpa Enter, menggambar peta 14 × 10 pada 20 FPS, dan mencatat jeda antar-tombol. Uji di terminal asli tiap anggota belum dilakukan. |
 | 10 November 2026 | `C-01` core types dan contracts | `Position`, `Grid<T>`, `EventBus`, exception, `Entity`, `Player`, `GameWorld`, `GameSystem`, `Command`, `WorldSnapshot`, dan `TestWorlds` selesai. 35 unit test lulus. Menunggu review dari anggota lain. |
+| 10 November 2026 | `C-02` game loop dan thread | Fixed timestep 20 tick/detik dengan batas 5 tick catch-up, tiga thread bernama (`input`, `game-loop`, `render`), key bindings dari `config/keybindings.properties`. 49 unit test lulus. Belum dicoba di terminal asli. |
 
 ## Marshall Farrell Attalla K / 18225062
 
