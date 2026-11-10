@@ -21,6 +21,8 @@ Aturan pengisian:
 | 10 November 2026 | `C-03` CLI renderer dan HUD | Peta tergambar dengan glyph dan warna dari `DESIGN.md`, dua karakter per tile, sesuai urutan prioritas gambar. HUD menampilkan nyawa, jenis bomb, skor, dan timer yang berubah merah di bawah 30 detik. Hanya sel yang berubah yang ditulis ulang, dan terminal yang terlalu kecil mendapat pesan untuk memperbesar. 58 unit test lulus. Belum dicoba di terminal asli. |
 | 10 November 2026 | `C-04` gerak player dan collision | Player bergerak satu tile per langkah sesuai speed, terhalang block, enemy, bomb aktif, dan tepi peta. Gerakan yang ditekan sedikit lebih awal disimpan 0,15 detik. Menabrak enemy mengurangi satu nyawa. 68 unit test lulus. Enemy dan bomb masih memakai pengganti di test. |
 | 11 November 2026 | `C-05` MVP-0 walking skeleton | `make run` menyambungkan semua komponen: menu, peta Red Mountain (sementara dari layout bawaan, belum dari file), player berjalan, timer berjalan, pause, dan LOSE saat waktu habis. 79 unit test lulus. Belum dicoba langsung di terminal asli. Format commit diganti ke Conventional Commits dengan ID task sebagai scope. |
+| 11 November 2026 | Uji manual `C-05` di Windows Terminal | Peta, HUD, dan prompt tampil tanpa berkedip. Player bergerak dengan WASD dan panah, timer berjalan, pause dan resume berfungsi, dan keluar dari game mengembalikan terminal seperti semula. |
+| 11 November 2026 | `C-08` cek WIN dan LOSE | Exit terkunci sampai 5 Normal Enemy dan boss dikalahkan. WIN hanya jika player berdiri di exit yang terbuka. LOSE saat nyawa atau waktu habis. Event `GameEnded` dikirim sekali untuk bonus skor. 84 unit test lulus. Enemy masih memakai pengganti. |
 
 ## Marshall Farrell Attalla K / 18225062
 
