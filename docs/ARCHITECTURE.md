@@ -10,12 +10,12 @@ The choices in this document were made by the team lead with Claude Code and hav
 | Area | Choice | Notes |
 | --- | --- | --- |
 | Language | Java 21 LTS | Temurin 21.0.13 is installed on the lead's machine. |
-| Build | Gradle with the wrapper (`gradlew`) | Members do not install Gradle. Created in `S-01`. |
-| Task runner | `Makefile` calling `gradlew` | Required by the specification. Each member installs `make`. Confirmation pending, PRD open question 6. |
+| Build | Gradle 8.14.3 with the wrapper (`gradlew`), Kotlin DSL | Members do not install Gradle. The wrapper checks the distribution's SHA-256. Compiles with `--release 21 -Xlint:all -Werror`. |
+| Task runner | `Makefile` calling `gradlew` | Required by the specification. Each member installs `make` (`mingw32-make` on Windows works). Targets: `build`, `run`, `test`, `clean`. `run` starts the installed distribution with `java` so the game gets a real terminal. Confirmation pending, PRD open question 6. |
 | Terminal I/O | JLine 3 | Raw key input and full-screen redraw. **Unverified on Windows.** `S-02` is the spike. Lanterna is the fallback. |
 | GUI | libGDX with the LWJGL3 desktop backend | Chosen by the team lead on 10 November 2026 for sprites, animation, and window scaling. It replaces Swing. It adds dependencies from Maven Central: `gdx`, `gdx-backend-lwjgl3`, the desktop natives, and `gdx-freetype` for fonts. The version is pinned in `G-01`. On macOS the JVM needs `-XstartOnFirstThread`. |
-| Logging | SLF4J with Logback, to `logs/nangor-blast.log` | Never to standard output, which would corrupt the terminal screen. |
-| Tests | JUnit 5 | Run with `./gradlew test`. |
+| Logging | SLF4J 2.0.16 with Logback 1.5.12, to `logs/nangor-blast.log` | Never to standard output, which would corrupt the terminal screen. Configured in `src/main/resources/logback.xml`. |
+| Tests | JUnit 5.11.3 | Run with `make test`. |
 | Hosting | GitHub, `https://github.com/lauvvy/nangor-blast` | Private until the Milestone 2 release. |
 
 ## System Structure
@@ -80,8 +80,8 @@ src/test/java/nangorblast/   Mirrors the packages above. Each owner tests their 
 config/
   maps/red-mountain.txt      The map, in the F07.2 legend                Areli
   game.properties            Tunable values (timer, speeds, durations)   Areli
-assets/                      Sprites and the font for the GUI            Laura
   keybindings.properties     Keys for each action, per player            Laura
+assets/                      Sprites and the font for the GUI            Laura
 docs/                        Project documents, specification, activity log
 doc/                         Submission PDFs. The specification requires this
                              folder name. Created in S-01.

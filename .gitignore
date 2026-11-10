@@ -1,1 +1,9 @@
 /.claude
+/.gradle/
+/build/
+/logs/
+/bin/
+/out/
+/.idea/
+*.iml
+/.vscode/

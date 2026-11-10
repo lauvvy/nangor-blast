@@ -14,6 +14,7 @@ Aturan pengisian:
 | Waktu | Kegiatan | Hasil |
 | --- | --- | --- |
 | 10 November 2026 | Analisis spesifikasi dan penyusunan dokumen proyek | `PRD.md`, `ARCHITECTURE.md`, `TODO.md`, `WORKFLOW.md`, `DESIGN.md`, `CLAUDE.md`, dan `README.md` dibuat. Belum ada kode. |
+| 10 November 2026 | `S-01` scaffold Gradle, Makefile, folder `src`, `config`, `doc` | `make build`, `make test`, `make run`, dan `make clean` jalan di Windows (`mingw32-make`). Build memakai `-Xlint:all -Werror`. Log masuk ke `logs/nangor-blast.log`. Belum dicoba di macOS atau Linux. |
 
 ## Marshall Farrell Attalla K / 18225062
 
