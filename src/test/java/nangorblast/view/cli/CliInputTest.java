@@ -31,7 +31,8 @@ class CliInputTest {
         assertEquals(List.of(
                 new Command(0, Action.MOVE_UP),     // W, case ignored
                 new Command(0, Action.MOVE_DOWN),   // down arrow
-                new Command(0, Action.PLACE_BOMB),  // space; x is unbound and skipped
+                new Command(0, Action.UNBOUND),     // x has no binding
+                new Command(0, Action.PLACE_BOMB),  // space
                 new Command(0, Action.MOVE_LEFT)),  // left arrow
                 received);
     }

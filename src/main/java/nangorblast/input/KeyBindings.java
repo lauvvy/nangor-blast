@@ -29,7 +29,7 @@ public final class KeyBindings {
     public static final List<String> NAMED_KEYS =
             List.of("UP", "DOWN", "LEFT", "RIGHT", "ENTER", "ESCAPE", "SPACE", "BACKSPACE", "TAB");
 
-    private static final Pattern PROPERTY = Pattern.compile("p([1-9])\\.([A-Za-z_]+)");
+    private static final Pattern PROPERTY = Pattern.compile("p([1-9])\\.([A-Za-z_][A-Za-z0-9_]*)");
 
     private final Map<String, Command> byKey;
     private final Map<Command, List<String>> keysByCommand = new HashMap<>();
@@ -66,6 +66,9 @@ public final class KeyBindings {
             } catch (IllegalArgumentException e) {
                 throw new ConfigLoadException("Unknown action '" + match.group(2) + "' in " + name);
             }
+            if (action == Action.UNBOUND) {
+                throw new ConfigLoadException(name + " cannot be bound: UNBOUND stands for keys with no binding");
+            }
             Command command = new Command(playerIndex, action);
             for (String raw : properties.getProperty(name).split(",")) {
                 String key = normalize(raw.strip(), name);
@@ -81,7 +84,7 @@ public final class KeyBindings {
             }
         }
         for (Action action : Action.values()) {
-            if (!firstPlayerBound.containsKey(action)) {
+            if (action != Action.UNBOUND && !firstPlayerBound.containsKey(action)) {
                 throw new ConfigLoadException("p1." + action + " has no key");
             }
         }
@@ -103,6 +106,17 @@ public final class KeyBindings {
     /** The command bound to a key name, as produced by an input source. */
     public Optional<Command> commandFor(String key) {
         return Optional.ofNullable(byKey.get(key));
+    }
+
+    /** The first key bound to a first-player action as a player reads it: "W", "Enter", "Backspace". */
+    public String label(Action action) {
+        List<String> keys = keysFor(new Command(0, action));
+        if (keys.isEmpty()) {
+            return "?";
+        }
+        String key = keys.get(0);
+        return key.length() == 1 ? key.toUpperCase(Locale.ROOT)
+                : key.charAt(0) + key.substring(1).toLowerCase(Locale.ROOT);
     }
 
     /** The key names bound to a command, in the order written in the file. For help text. */

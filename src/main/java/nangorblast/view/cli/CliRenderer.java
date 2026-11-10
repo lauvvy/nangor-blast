@@ -1,12 +1,6 @@
 package nangorblast.view.cli;
 
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Function;
-import nangorblast.input.Action;
-import nangorblast.input.Command;
-import nangorblast.input.KeyBindings;
 import nangorblast.view.Renderer;
 import nangorblast.view.WorldSnapshot;
 import nangorblast.view.cli.CliFrame.Cell;
@@ -28,30 +22,18 @@ import org.jline.utils.InfoCmp.Capability;
 public final class CliRenderer implements Renderer {
 
     private final Terminal terminal;
-    private final Function<Action, String> keyName;
 
     // Render thread only.
     private CliFrame shown;
     private Size shownSize;
 
-    public CliRenderer(Terminal terminal, KeyBindings bindings) {
+    public CliRenderer(Terminal terminal) {
         this.terminal = terminal;
-        this.keyName = action -> displayName(bindings.keysFor(new Command(0, action)));
-    }
-
-    /** The first key bound to an action, as a player reads it: "P", "Enter", "Backspace". */
-    static String displayName(List<String> keys) {
-        if (keys.isEmpty()) {
-            return "?";
-        }
-        String key = keys.get(0);
-        return key.length() == 1 ? key.toUpperCase(Locale.ROOT)
-                : key.charAt(0) + key.substring(1).toLowerCase(Locale.ROOT);
     }
 
     @Override
     public void render(WorldSnapshot snapshot) {
-        CliFrame frame = CliFrame.compose(snapshot, keyName);
+        CliFrame frame = CliFrame.compose(snapshot);
         Size size = terminal.getSize();
         if (size.getColumns() < frame.cols() || size.getRows() < frame.rows()) {
             showTooSmall(size, frame);

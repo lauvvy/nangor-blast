@@ -16,7 +16,9 @@ class KeyBindingsTest {
         Properties p = new Properties();
         char key = 'a';
         for (Action action : Action.values()) {
-            p.setProperty("p1." + action, String.valueOf(key++));
+            if (action != Action.UNBOUND) {
+                p.setProperty("p1." + action, String.valueOf(key++));
+            }
         }
         return p;
     }
@@ -30,6 +32,22 @@ class KeyBindingsTest {
         assertEquals(Optional.of(new Command(0, Action.PLACE_BOMB)), bindings.commandFor("SPACE"));
     }
 
+    @Test
+    void unboundCannotBeBound() {
+        Properties p = allActionsBound();
+        p.setProperty("p1.UNBOUND", "z");
+        assertThrows(ConfigLoadException.class, () -> KeyBindings.parse(p));
+    }
+
+    @Test
+    void labelShowsTheFirstKeyAsAPlayerReadsIt() {
+        KeyBindings bindings = KeyBindings.load(Path.of("config", "keybindings.properties"));
+        assertEquals("P", bindings.label(Action.PAUSE));
+        assertEquals("Enter", bindings.label(Action.CONFIRM));
+        assertEquals("1", bindings.label(Action.CHOICE_1));
+        assertEquals("?", bindings.label(Action.UNBOUND));
+    }
+
     @Test
     void keysForListsKeysInFileOrder() {
         KeyBindings bindings = KeyBindings.load(Path.of("config", "keybindings.properties"));

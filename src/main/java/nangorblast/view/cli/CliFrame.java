@@ -2,11 +2,10 @@ package nangorblast.view.cli;
 
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.function.Function;
 import nangorblast.core.EntityKind;
 import nangorblast.core.Position;
-import nangorblast.input.Action;
 import nangorblast.view.WorldSnapshot;
+import nangorblast.view.WorldSnapshot.Panel;
 import nangorblast.view.WorldSnapshot.Sprite;
 
 /**
@@ -15,7 +14,8 @@ import nangorblast.view.WorldSnapshot.Sprite;
  * the renderer can diff two frames and tests can read cells directly.
  *
  * <p>Layout: row 0 is the HUD, row 1 is empty, the map starts at row 2 with each tile two
- * characters wide, and the message line is the row below the map.
+ * characters wide, and the message line is the row below the map. An open menu is a boxed
+ * panel centered over the map, which stays visible and dimmed around it.
  */
 final class CliFrame {
 
@@ -84,12 +84,15 @@ final class CliFrame {
         return Math.max(MIN_COLS, snapshot.width() * 2);
     }
 
-    /** @param keyName the key to show for an action in help text, read from the key bindings */
-    static CliFrame compose(WorldSnapshot snapshot, Function<Action, String> keyName) {
+    static CliFrame compose(WorldSnapshot snapshot) {
         CliFrame frame = new CliFrame(rowsFor(snapshot), colsFor(snapshot));
         frame.drawHud(snapshot.hud());
         frame.drawMap(snapshot);
-        frame.put(MAP_TOP + snapshot.height(), 0, stateMessage(snapshot, keyName), SECONDARY_TEXT);
+        Panel panel = snapshot.panel();
+        if (panel != null) {
+            frame.drawPanel(panel, MAP_TOP + snapshot.height() - 1);
+            frame.put(MAP_TOP + snapshot.height(), 0, panel.message(), ERROR);
+        }
         return frame;
     }
 
@@ -115,10 +118,55 @@ final class CliFrame {
         for (Position warning : snapshot.warnings()) {
             raise(top, warning, WARNING);
         }
+        boolean dimmed = snapshot.panel() != null;
         for (int y = 0; y < top.length; y++) {
             for (int x = 0; x < top[y].length; x++) {
-                cells[MAP_TOP + y][2 * x] = new Cell(top[y][x].ch(), top[y][x].rgb());
+                int rgb = dimmed ? dim(top[y][x].rgb()) : top[y][x].rgb();
+                cells[MAP_TOP + y][2 * x] = new Cell(top[y][x].ch(), rgb);
             }
+        }
+    }
+
+    /** Halfway from the color to the background, for the map behind a menu. */
+    static int dim(int rgb) {
+        int r = ((rgb >> 16 & 0xFF) + (BACKGROUND >> 16 & 0xFF)) / 2;
+        int g = ((rgb >> 8 & 0xFF) + (BACKGROUND >> 8 & 0xFF)) / 2;
+        int b = ((rgb & 0xFF) + (BACKGROUND & 0xFF)) / 2;
+        return r << 16 | g << 8 | b;
+    }
+
+    /**
+     * A box two columns in from each side, centered between row 1 and {@code lastRow}: the
+     * title, the text lines, then the items numbered from 1 with {@code >} on the selected one.
+     */
+    private void drawPanel(Panel panel, int lastRow) {
+        int left = 2;
+        int width = cols() - 2 * left;
+        int height = 3 + panel.lines().size() + panel.items().size();
+        int top = Math.max(1, 1 + (lastRow - height + 1) / 2);
+        for (int row = top; row < top + height && row <= lastRow; row++) {
+            boolean edge = row == top || row == top + height - 1;
+            for (int col = left; col < left + width; col++) {
+                boolean side = col == left || col == left + width - 1;
+                char ch = edge ? (side ? '+' : '-') : (side ? '|' : ' ');
+                cells[row][col] = new Cell(ch, SECONDARY_TEXT);
+            }
+        }
+        int row = top + 1;
+        putClipped(row++, left + (width - panel.title().length()) / 2, panel.title(), TEXT, lastRow);
+        for (String line : panel.lines()) {
+            putClipped(row++, left + 2, line, TEXT, lastRow);
+        }
+        for (int i = 0; i < panel.items().size(); i++) {
+            boolean chosen = i == panel.selected();
+            String item = (chosen ? "> " : "  ") + (i + 1) + ". " + panel.items().get(i);
+            putClipped(row++, left + 2, item, chosen ? TEXT : SECONDARY_TEXT, lastRow);
+        }
+    }
+
+    private void putClipped(int row, int col, String text, int fg, int lastRow) {
+        if (row <= lastRow) {
+            put(row, col, text.substring(0, Math.min(text.length(), cols() - 3 - col)), fg);
         }
     }
 
@@ -129,19 +177,6 @@ final class CliFrame {
         if (candidate.priority() < top[at.row()][at.col()].priority()) {
             top[at.row()][at.col()] = candidate;
         }
-    }
-
-    /** MVP-0 prompts on the message line. C-07 replaces them with menu panels. */
-    private static String stateMessage(WorldSnapshot snapshot, Function<Action, String> key) {
-        return switch (snapshot.state()) {
-            case MENU -> "Nangor Blast. " + key.apply(Action.CONFIRM) + " to play, "
-                    + key.apply(Action.BACK) + " to quit";
-            case PAUSED -> "Paused. " + key.apply(Action.PAUSE) + " to resume, "
-                    + key.apply(Action.BACK) + " to quit";
-            case WIN -> "You win! " + key.apply(Action.CONFIRM) + " to exit";
-            case LOSE -> "Game over. " + key.apply(Action.CONFIRM) + " to exit";
-            case PLAYING -> "";
-        };
     }
 
     private void put(int row, int col, String text, int fg) {

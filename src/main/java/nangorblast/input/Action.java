@@ -4,6 +4,9 @@ package nangorblast.input;
  * Every action a player can take. Keys are bound to actions in
  * {@code config/keybindings.properties}; game code reads actions, never keys.
  * Menus reuse the move actions for navigation.
+ *
+ * <p>{@link #UNBOUND} is never bound: input sources send it for a key with no binding, so a
+ * menu can report invalid input.
  */
 public enum Action {
     MOVE_UP,
@@ -17,5 +20,9 @@ public enum Action {
     DETONATE,
     PAUSE,
     CONFIRM,
-    BACK
+    BACK,
+    CHOICE_1,
+    CHOICE_2,
+    CHOICE_3,
+    UNBOUND
 }

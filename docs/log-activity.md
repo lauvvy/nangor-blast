@@ -24,6 +24,7 @@ Aturan pengisian:
 | 11 November 2026 | Uji manual `C-05` di Windows Terminal | Peta, HUD, dan prompt tampil tanpa berkedip. Player bergerak dengan WASD dan panah, timer berjalan, pause dan resume berfungsi, dan keluar dari game mengembalikan terminal seperti semula. |
 | 11 November 2026 | `C-08` cek WIN dan LOSE | Exit terkunci sampai 5 Normal Enemy dan boss dikalahkan. WIN hanya jika player berdiri di exit yang terbuka. LOSE saat nyawa atau waktu habis. Event `GameEnded` dikirim sekali untuk bonus skor. 84 unit test lulus. Enemy masih memakai pengganti. |
 | 11 November 2026 | `C-06` nyawa, invulnerability, dan respawn | Setiap sumber damage mengurangi satu nyawa per aktivasi. Player muncul kembali di titik spawn, atau tile kosong terdekat jika titik spawn ditempati, dan kebal selama 1,5 detik dengan tampilan redup. Saat nyawa habis, game menjadi LOSE. 94 unit test lulus. |
+| 11 November 2026 | `C-07` menu, pause, restart, dan game over | Menu utama (Start Game, How to Play, Exit), How to Play yang membaca tombol dari key bindings, pause menu (Resume, Restart, Main Menu), dan layar game over dengan skor akhir. Input yang tidak valid menampilkan pesan error. Restart membuat game baru dari awal. Menahan tombol pause hanya mengubah pause sekali. 106 unit test lulus. Belum dicoba di terminal asli. |
 
 ## Marshall Farrell Attalla K / 18225062
 

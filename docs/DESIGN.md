@@ -80,7 +80,7 @@ Each tile shows one thing. When several are on the same tile, the highest in thi
 ## Menus
 
 - Every screen opens with one choice selected. The selected choice is marked with `>` in the terminal and a highlighted background in the GUI.
-- Up and down move the selection, confirm chooses it, and back returns to the previous screen. In the terminal, typing a choice's number also selects it.
+- Up and down move the selection, confirm chooses it, and back returns to the previous screen. In the terminal, typing a choice's number chooses it at once.
 - An input that matches no choice shows an error on the message line and the menu stays open.
 - Controls shown in How to Play are read from the key bindings, so they are never out of date.
 

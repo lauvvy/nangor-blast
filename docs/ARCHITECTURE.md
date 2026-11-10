@@ -237,10 +237,10 @@ As built in `C-05`:
 - `app/Main` opens the system terminal, refuses a `dumb` one with a message and exit status 1, enters raw mode, the alternate screen, and a hidden cursor, runs one `GameSession`, and restores the terminal in a `finally` block. Ctrl+C quits the same way as the quit action.
 - `app/GameFactory` builds the world (`newWorld()`), the handlers (`handlers(players, onQuit)`: `GameFlow`, then `PlayerSystem`), and the systems (`systems(players)`). The same `PlayerSystem` instance goes in both lists.
 - `app/StandInMap` builds the F07.3.3 layout in the MENU state with stand-in entities: blocks, enemies, and the boss block movement and do nothing else, and Lava Tiles are walkable and never erupt. C-09 deletes it and loads `config/maps/red-mountain.txt` through `MapLoader`.
-- `engine/GameFlow` is the MVP-0 state handler. MENU: confirm starts, back quits. PLAYING: pause pauses. PAUSED: pause or confirm resumes, back quits. WIN and LOSE: confirm or back quits. `C-07` replaces quitting with the full menus.
+- `engine/GameFlow` is the MVP-0 state handler. MENU: confirm starts, back quits. PLAYING: pause pauses. PAUSED: pause or confirm resumes, back quits. WIN and LOSE: confirm or back quits. `C-07` replaced it with the full menus.
 - `engine/WinLoseSystem` sets LOSE when the timer reaches 0 or the player has no lives. `C-08` adds WIN.
 - The message line shows the MVP-0 prompts with keys read from `KeyBindings.keysFor`, for example `Nangor Blast. Enter to play, Backspace to quit`.
-- Not yet done: a repeat of the same discrete action within 0.2 seconds is not ignored. Terminal key repeat starts after about half a second, so a normal press toggles pause once.
+- A repeat of the same discrete action was not yet ignored. `C-07` added it.
 
 As built in `C-08`:
 
@@ -255,6 +255,15 @@ As built in `C-06`:
 - `engine/LifeSystem` runs after every damage source (step 5). It publishes `PlayerDamaged` once per lost life, respawns the player at the spawn point or, if any entity stands there, the nearest tile by walking distance that holds no entity, and resets invulnerability to a full 1.5 seconds. Otherwise it counts invulnerability down by `dt`. At 0 lives there is no respawn, and `WinLoseSystem` sets LOSE.
 - `PlayerSystem` no longer publishes `PlayerDamaged`; `LifeSystem` does it for every source.
 - `WorldSnapshot.Hud` carries `invulnerable`, and the CLI draws the player dimmed (`#2A6F8E`, in `DESIGN.md`) while it is true.
+
+As built in `C-07`:
+
+- `engine/GameFlow` is the screen stack: Main Menu (Start Game, How to Play, Exit), How to Play, Pause (Resume, Restart, Main Menu), and Game Over (Play Again, Main Menu, Exit, with the final score). It is a `CommandHandler`, so it runs in every state, and `panel()` gives the top screen to the snapshot as `WorldSnapshot.Panel`. While playing the stack is empty and only the pause action is read.
+- Menu input: up and down move the selection, confirm chooses, `CHOICE_1` to `CHOICE_3` (keys 1 to 3) choose that item, back returns to the screen below, and pause resumes from the pause menu. Any other key, including a key with no binding (`Action.UNBOUND`, sent by `CliInput`), puts an error on the message line and the menu stays open.
+- A discrete action (pause, confirm, back, a number) repeated within 0.6 seconds of its last press is ignored, so a held key toggles pause once. Time is counted with `dt` in `CommandHandler.afterTick`, which the loop calls for every handler at the end of every tick, in every state.
+- Restart, Main Menu, and Exit end the session through `GameFlow.Outcome`. `app/Main` runs sessions in a loop and builds a new world and new systems (`GameFactory.newLoop`) for each one, so every initial value comes back and no system keeps state from the last game. Restart starts the new world in PLAYING, Main Menu in MENU.
+- `GameLoop` takes an optional snapshot function; `GameFactory.newLoop` passes `SnapshotBuilder.build(world).withPanel(flow.panel())`.
+- `view/cli/CliFrame` draws the panel as a box over the map, which stays visible and dimmed halfway to the background color, with `>` on the selected item and the panel message on the message line in the error color.
 
 Order of work inside one tick:
 
@@ -282,7 +291,7 @@ Order of work inside one tick:
 - **The terminal reports key presses only.** There is no key-release event, and when two keys are held only the last one repeats. The CLI input source therefore sends one `Command` per key event, and a held key moves through the operating system's key repeat. `S-02` confirms this on the team's terminals.
 - **The GUI knows which keys are held**, because libGDX reports both key down and key up. Its input source sends a move `Command` every frame while a move key is down, and `PlayerSystem` keeps only the latest one. The engine treats both sources the same way.
 - **One buffered move.** If a move arrives while the cooldown is running, `PlayerSystem` keeps the latest one for up to 0.15 seconds and applies it when the cooldown ends, so a slightly early key press is not lost.
-- **Discrete actions fire once per press.** A repeat of the same discrete action within 0.2 seconds is ignored, so holding the pause key does not toggle pause repeatedly.
+- **Discrete actions fire once per press.** A repeat of the same discrete action within 0.6 seconds of its last press is ignored, so holding the pause key does not toggle pause repeatedly. The window is longer than the usual 0.5-second key-repeat delay of the operating system, because the terminal cannot tell a held key from a new press.
 
 ### Who blocks whom
 
@@ -313,7 +322,7 @@ One table for the collision rules, so four people implement the same behavior. R
 
 ### Screens
 
-Screens form a stack in `app`: Menu, How to Play, Game, Pause, and Game Over. The top screen receives input and is drawn. Opening How to Play or Pause pushes a screen, and going back pops it. `GameState` stays the model's state from the specification. How to Play is a screen and has no `GameState` value.
+Screens form a stack in `engine/GameFlow`, which runs on the game-loop thread: Menu, How to Play, Pause, and Game Over, with the game itself as the empty stack. The top screen receives input and is drawn. Opening How to Play or Pause pushes a screen, and going back pops it. `GameState` stays the model's state from the specification. How to Play is a screen and has no `GameState` value.
 
 ### Map file
 

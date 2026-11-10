@@ -3,19 +3,22 @@ package nangorblast.app;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 import nangorblast.core.EntityKind;
 import nangorblast.core.GameState;
 import nangorblast.core.Position;
 import nangorblast.engine.CommandHandler;
+import nangorblast.engine.GameFlow;
+import nangorblast.engine.GameFlow.Outcome;
 import nangorblast.engine.GameSystem;
 import nangorblast.engine.PlayerSystem;
 import nangorblast.input.Action;
 import nangorblast.input.Command;
 import nangorblast.model.Entity;
 import nangorblast.model.GameWorld;
+import nangorblast.model.Player;
 import org.junit.jupiter.api.Test;
 
 /** The C-05 walk-through on the real composition: menu, walk, pause, timer, LOSE, quit. */
@@ -23,10 +26,11 @@ class MvpZeroTest {
 
     private static final double DT = 0.05;
 
-    private final AtomicInteger quits = new AtomicInteger();
+    private final List<Outcome> outcomes = new ArrayList<>();
     private final GameWorld world = StandInMap.redMountain(new Random(42));
     private final PlayerSystem players = new PlayerSystem();
-    private final List<CommandHandler> handlers = GameFactory.handlers(players, quits::incrementAndGet);
+    private final List<CommandHandler> handlers =
+            GameFactory.handlers(players, new GameFlow(Action::name, outcomes::add));
     private final List<GameSystem> systems = GameFactory.systems(players);
 
     /** One tick in GameLoop's order. */
@@ -37,6 +41,7 @@ class MvpZeroTest {
         if (world.state() == GameState.PLAYING) {
             systems.forEach(s -> s.update(world, DT));
         }
+        handlers.forEach(h -> h.afterTick(world, DT));
         world.removeInactive();
     }
 
@@ -92,7 +97,25 @@ class MvpZeroTest {
         assertEquals(GameState.LOSE, world.state(), "LOSE at 0 seconds");
 
         tick(Action.CONFIRM);
-        assertEquals(1, quits.get(), "confirm on the end screen quits");
+        assertEquals(List.of(Outcome.RESTART), outcomes, "confirm on the game over screen plays again");
+    }
+
+    @Test
+    void restartStartsFromEveryInitialValue() {
+        tick(Action.CONFIRM);
+        world.player().moveTo(new Position(1, 7));
+        tick(Action.MOVE_DOWN); // lose a life
+        world.addScore(300);
+        seconds(5);
+
+        GameWorld fresh = GameFactory.newWorld(); // what Main builds for Restart and Main Menu
+        assertEquals(Player.START_LIVES, fresh.player().lives());
+        assertEquals(0, fresh.score());
+        assertEquals(StandInMap.TIME_LIMIT, fresh.timeLeft());
+        assertEquals(new Position(1, 1), fresh.player().position());
+        assertEquals(GameState.MENU, fresh.state());
+        assertEquals(world.entities().size(), fresh.entities().size(), "every block, enemy, and exit is back");
+        assertTrue(world.player().lives() < Player.START_LIVES && world.score() > 0, "the old world did change");
     }
 
     @Test
