@@ -60,11 +60,13 @@ One owner per package. A member changes another member's package only with that 
 ```text
 src/main/java/nangorblast/
   app/                 Main, GameFactory (composition root)              Laura
-  core/                Position, Direction, GameState, Grid<T>,
-                       EntityKind, GameEvent, EventBus, exceptions       Laura
-  model/               GameWorld, Entity, Damageable, Damage, Player     Laura
+  core/                Position, Direction, GameState, BombType, Grid<T>,
+                       EntityKind, GameEvent, EventBus, events,
+                       exceptions                                        Laura
+  model/               GameWorld, Entity, Damageable, Damage,
+                       DamageSource, Player, Exit                        Laura
   model/bomb/          Bomb, NormalBomb, PumpedBomb, RemoteBomb,
-                       BombType, BombFactory                             Marshall
+                       BombFactory                                       Marshall
   model/explosion/     Explosion                                         Marshall
   model/block/         Block, IndestructibleBlock, DestructibleBlock,
                        ReinforcedBlock                                   Marshall
@@ -77,13 +79,13 @@ src/main/java/nangorblast/
   mapio/               MapLoader, MapValidator, EntityFactory,
                        GameConfig                                        Areli
   editor/              Map Maker (bonus B03)                             Areli
-  engine/              GameLoop, GameSystem, CommandQueue,
+  engine/              GameLoop, GameSystem, CommandQueue, TimerSystem,
                        SnapshotBuilder, PlayerSystem, WinLoseSystem      Laura
   engine/bomb/         BombSystem, ExplosionSystem, PowerUpSystem,
                        ScoreSystem                                       Marshall
   engine/enemy/        EnemySystem, BossSystem                           Ilham
   engine/hazard/       HazardSystem                                      Areli
-  input/               Command, InputSource, KeyBindings                 Laura
+  input/               Action, Command, InputSource, KeyBindings         Laura
   view/                Renderer, WorldSnapshot                           Laura
   view/cli/            CliRenderer, CliInput, menu screens               Laura
   view/gui/            GuiRenderer, GuiInput, libGDX launcher (bonus B01) Laura
@@ -102,7 +104,7 @@ The only file every member edits is `app/GameFactory`. Each member adds one line
 
 ### Contracts
 
-`C-01` delivers these types first. Every other task is written against them, so no member waits for another member's implementation. The names are fixed here. `C-01` settles the exact method signatures and records them back in this section.
+`C-01` delivers these types first. Every other task is written against them, so no member waits for another member's implementation. The names are fixed here. The signatures settled in `C-01` follow the table.
 
 | Type | Package | Purpose |
 | --- | --- | --- |
@@ -118,10 +120,74 @@ The only file every member edits is `app/GameFactory`. Each member adds one line
 | `Player` | `model` | F01.1 attributes, plus capped mutators for power-ups. |
 | `GameWorld` | `model` | The F00.1 attributes, plus the warning tiles and the event bus. |
 | `GameSystem` | `engine` | `update(GameWorld world, double dt)`. One class per concern. |
-| `Command` | `input` | One player action. Carries the player index so Local Multiplayer needs no redesign. |
+| `Action`, `Command` | `input` | `Action` names every action. A `Command` is one action by one player. It carries the player index so Local Multiplayer needs no redesign. |
 | `InputSource` | `input` | Produces commands from a device. Implemented by CLI and GUI. |
 | `Renderer`, `WorldSnapshot` | `view` | The snapshot is an immutable copy of what to draw. |
 | `TestWorlds.fromAscii(String...)` | test | Builds a small world from legend characters. Every member's tests use it. |
+
+#### Signatures (settled in C-01)
+
+```java
+// core
+record Position(int col, int row) { Position translate(Direction); int manhattanDistance(Position); }
+enum Direction { UP, DOWN, LEFT, RIGHT; int dCol(); int dRow(); }
+enum GameState { MENU, PLAYING, PAUSED, WIN, LOSE }
+enum BombType { NORMAL, PUMPED, REMOTE }          // in core: Player, HUD, and bombs share it
+enum EntityKind { INDESTRUCTIBLE_BLOCK, ..., POWER_UP_HEART }   // one per row in DESIGN.md
+final class Grid<T> { Grid(int w, int h, Function<Position, ? extends T> initial);
+                      int width(); int height(); boolean inBounds(Position); T get(Position); void set(Position, T); }
+interface GameEvent {}
+interface EventListener<E extends GameEvent> { void onEvent(E event); }
+final class EventBus { <E extends GameEvent> void subscribe(Class<E>, EventListener<? super E>); void publish(GameEvent); }
+record EnemyDefeated(Position position, int scoreValue, boolean boss) implements GameEvent {}
+record PlayerDamaged(int playerIndex, int livesLeft) implements GameEvent {}
+record HudMessage(String text) implements GameEvent {}
+class GameException extends RuntimeException      // unchecked; InvalidMapException, ConfigLoadException, InvalidActionException
+
+// model
+abstract class Entity { long id(); Position position(); void moveTo(Position); boolean isActive(); void deactivate();
+                        abstract EntityKind kind(); boolean blocksMovementOf(Entity mover) /* default false */; }
+interface Damageable { boolean takeDamage(Damage damage); }   // true if the target was hurt
+record Damage(int amount, long activationId, DamageSource source) { static long newActivationId(); }
+enum DamageSource { EXPLOSION, BOSS_ATTACK, ENEMY_CONTACT, HAZARD }
+final class Player extends Entity implements Damageable { Player(Position spawn, int playerIndex, double baseSpeed); ... }
+final class Exit extends Entity { boolean isOpen(); void open(); }
+final class GameWorld {
+  GameWorld(String mapName, int width, int height, Player player, double timeLimit, Random random);
+  void add(Entity); List<Entity> entities(); <T extends Entity> List<T> entities(Class<T>);
+  List<Entity> entitiesAt(Position); <T extends Entity> Optional<T> firstAt(Position, Class<T>);
+  boolean inBounds(Position); boolean isBlockedFor(Entity mover, Position target); void removeInactive();
+  void setWarnings(Object source, Set<Position>); void clearWarnings(Object source); Set<Position> warningTiles();
+  Player player(); Random random(); EventBus bus(); int score(); void addScore(int);
+  double timeLeft(); void reduceTime(double); GameState state(); void setState(GameState);
+}
+
+// engine
+interface GameSystem { void update(GameWorld world, double dt); }
+final class SnapshotBuilder { static WorldSnapshot build(GameWorld); }
+
+// input
+enum Action { MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, PLACE_BOMB, SELECT_NORMAL, SELECT_PUMPED,
+              SELECT_REMOTE, DETONATE, PAUSE, CONFIRM, BACK }
+record Command(int playerIndex, Action action) {}
+interface InputSource extends AutoCloseable { void start(Consumer<Command> sink); void close(); }
+
+// view
+record WorldSnapshot(int width, int height, List<Sprite> sprites, Set<Position> warnings, Hud hud, GameState state) {
+  record Sprite(long id, EntityKind kind, Position position) {}
+  record Hud(int lives, int score, int secondsLeft, BombType selectedBomb) {}
+}
+interface Renderer { void render(WorldSnapshot snapshot); }
+```
+
+Rules that come with them:
+
+- **One entity list.** `GameWorld` keeps every entity in one list, and the F00.1 collections are typed queries: `world.entities(Bomb.class)`, `world.entities(Enemy.class)`, and so on. So `GameWorld` needs no import from another member's package. Queries return copies of the active entities, so a system may add entities while iterating.
+- **Blocks, lava, and the exit are entities too.** Each subclass answers `blocksMovementOf(mover)` according to the "Who blocks whom" table, and `GameWorld.isBlockedFor` asks every entity on the target tile. A new obstacle needs no change in `PlayerSystem` or `EnemySystem`.
+- **Warnings are owned by a source.** A boss attack or a Lava Tile calls `setWarnings(this, tiles)` and `clearWarnings(this)`. Renderers draw the union.
+- **Randomness** comes only from `world.random()`, which tests seed.
+- **Spec values** such as `Player.START_LIVES` are constants for now. `M-05` moves them into `config/game.properties`.
+- **`TestWorlds`** knows `.`, `P`, `X`, and `#` (a test wall). Pass a legend for your own characters, for example `TestWorlds.fromAscii(Map.of('D', DestructibleBlock::new), rows)`. When a real block class lands, its owner replaces the test wall in `TestWorlds`.
 
 How the contracts remove cross-member dependencies:
 
@@ -226,9 +292,9 @@ This table is the source for the demo explanation and the booklet. Update it whe
 | Requirement | Where |
 | --- | --- |
 | Inheritance | `Entity` → `Player`, `Enemy` → `NormalEnemy` and `Boss` → `Hades`. `Bomb` → three bomb types. `Block` → three block types. `Tile` → `FloorTile`, `LavaTile`. |
-| Abstract class or interface | Abstract `Entity`, `Bomb`, `Block`, `Boss`. Interfaces `GameSystem`, `Renderer`, `InputSource`, `Command`, `AttackPattern`, `MovementBehavior`, `Damageable`. |
+| Abstract class or interface | Abstract `Entity`, `Bomb`, `Block`, `Boss`. Interfaces `GameSystem`, `Renderer`, `InputSource`, `AttackPattern`, `MovementBehavior`, `Damageable`, `EventListener`. |
 | Polymorphism | The loop calls `update` on every `GameSystem`. `ExplosionSystem` calls `takeDamage` on any `Damageable`. `BossSystem` runs any `AttackPattern`. |
-| Generics | `Grid<T>`, `EventListener<E extends GameEvent>`, `EventBus.subscribe(Class<E>, EventListener<E>)`. |
+| Generics | `Grid<T>`, `EventListener<E extends GameEvent>`, `EventBus.subscribe(Class<E>, EventListener<? super E>)`, `GameWorld.entities(Class<T>)`. |
 | Exceptions | `GameException` hierarchy. `MapValidator` throws `InvalidMapException` and the menu shows the message. |
 | Collections | `List` for entities, `Map` and `EnumMap` for key bindings and glyphs, `Set<Position>` for explosion and warning tiles, `Deque` for breadth-first search, `BlockingQueue` for commands. |
 | Concurrency | The three threads, `ExecutorService`, `BlockingQueue`, and the `volatile` snapshot. |
@@ -239,7 +305,7 @@ This table is the source for the demo explanation and the booklet. Update it whe
 | Strategy | `MovementBehavior` for enemies. `AttackPattern` for Hades. | A new behavior or attack is a new class. |
 | Factory Method | `EntityFactory` from map characters. `BombFactory` from `BombType`. | Creation rules sit in one place. |
 | Observer | `EventBus` with `ScoreSystem`, the HUD, and the logger as listeners. | Systems stay unaware of each other. |
-| Command | `Command` objects from `InputSource`. | CLI, GUI, and a second player share the same actions. |
+| Command | `Command` records from `InputSource`, queued for the game loop, applied by `PlayerSystem`. | CLI, GUI, and a second player share the same actions. Input is decoupled from when and where it is applied. |
 
 MVC is the overall architecture and is described in the booklet beside these five.
 

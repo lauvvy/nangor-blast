@@ -44,7 +44,7 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| C-01 | Core types and contracts | Laura | `feat/C-01-core-contracts` | F00.1 | Pending | 12 Nov | Starts after S-01. Unblocks every `B`, `E`, and `M` task. |
+| C-01 | Core types and contracts | Laura | `feat/C-01-core-contracts` | F00.1 | Done | 12 Nov | 10 Nov: `make build` passes with `-Werror`, 35 tests green. Every contract except the plain interfaces `Renderer` and `InputSource` has a test. `TimerSystemTest` is the sample system test with no game loop. Signatures recorded in `ARCHITECTURE.md`. Needs review by Marshall, Ilham, and Areli. |
 | C-02 | Game loop and threads | Laura | `feat/C-02-game-loop` | F09.3 | Pending | 13 Nov | Starts after C-01. |
 | C-03 | CLI renderer and HUD | Laura | `feat/C-03-cli-renderer` | F09.3, F07.2 | Pending | 13 Nov | Starts after C-01 and S-02. |
 | C-04 | Player movement and collision | Laura | `feat/C-04-player-movement` | F01.2.1, F01.2.3 | Pending | 14 Nov | Starts after C-01. |
