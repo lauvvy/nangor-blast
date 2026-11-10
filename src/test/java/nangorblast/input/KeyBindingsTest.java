@@ -29,6 +29,14 @@ class KeyBindingsTest {
         assertEquals(Optional.of(new Command(0, Action.MOVE_UP)), bindings.commandFor("UP"));
         assertEquals(Optional.of(new Command(0, Action.PLACE_BOMB)), bindings.commandFor("SPACE"));
     }
+
+    @Test
+    void keysForListsKeysInFileOrder() {
+        KeyBindings bindings = KeyBindings.load(Path.of("config", "keybindings.properties"));
+
+        assertEquals(java.util.List.of("p", "ESCAPE"), bindings.keysFor(new Command(0, Action.PAUSE)));
+        assertEquals(java.util.List.of(), bindings.keysFor(new Command(1, Action.PAUSE)));
+    }
 
     @Test
     void lettersIgnoreCaseAndNamedKeysAreNormalised() {

@@ -20,13 +20,17 @@ class CliFrameTest {
         return new WorldSnapshot(14, 10, sprites, warnings, new Hud(3, 120, secondsLeft, BombType.PUMPED), state);
     }
 
+    static CliFrame compose(WorldSnapshot snapshot) {
+        return CliFrame.compose(snapshot, action -> action.name());
+    }
+
     private static char tile(CliFrame frame, int x, int y) {
         return frame.cell(CliFrame.MAP_TOP + y, 2 * x).ch();
     }
 
     @Test
     void drawsTheMapWithDesignGlyphsTwoCharactersPerTile() {
-        CliFrame frame = CliFrame.compose(snapshot(List.of(
+        CliFrame frame = compose(snapshot(List.of(
                 new Sprite(1, EntityKind.INDESTRUCTIBLE_BLOCK, new Position(0, 0)),
                 new Sprite(2, EntityKind.PLAYER, new Position(1, 1)),
                 new Sprite(3, EntityKind.LAVA_ERUPTING, new Position(13, 9))), Set.of(), 300, GameState.PLAYING));
@@ -42,7 +46,7 @@ class CliFrameTest {
     @Test
     void highestDrawPriorityWinsOnASharedTile() {
         Position shared = new Position(2, 2);
-        CliFrame frame = CliFrame.compose(snapshot(List.of(
+        CliFrame frame = compose(snapshot(List.of(
                 new Sprite(1, EntityKind.LAVA_DORMANT, shared),
                 new Sprite(2, EntityKind.EXPLOSION, shared),
                 new Sprite(3, EntityKind.PLAYER, shared),
@@ -65,8 +69,8 @@ class CliFrameTest {
 
     @Test
     void hudShowsLivesBombScoreAndTimerTurningRedBelow30Seconds() {
-        CliFrame calm = CliFrame.compose(snapshot(List.of(), Set.of(), 30, GameState.PLAYING));
-        CliFrame low = CliFrame.compose(snapshot(List.of(), Set.of(), 29, GameState.PLAYING));
+        CliFrame calm = compose(snapshot(List.of(), Set.of(), 30, GameState.PLAYING));
+        CliFrame low = compose(snapshot(List.of(), Set.of(), 29, GameState.PLAYING));
 
         assertEquals("Lives 3  Bomb Pumped  Score 120  Time 30", calm.rowText(0).strip());
         int timeCol = calm.rowText(0).indexOf("30");
@@ -77,14 +81,18 @@ class CliFrameTest {
     @Test
     void messageLineNamesStatesOtherThanPlaying() {
         int messageRow = CliFrame.MAP_TOP + 10;
-        assertEquals("", CliFrame.compose(snapshot(List.of(), Set.of(), 300, GameState.PLAYING)).rowText(messageRow).strip());
-        assertEquals("Paused", CliFrame.compose(snapshot(List.of(), Set.of(), 300, GameState.PAUSED)).rowText(messageRow).strip());
-        assertEquals("Game over", CliFrame.compose(snapshot(List.of(), Set.of(), 0, GameState.LOSE)).rowText(messageRow).strip());
+        assertEquals("", compose(snapshot(List.of(), Set.of(), 300, GameState.PLAYING)).rowText(messageRow).strip());
+        assertEquals("Paused. PAUSE to resume, BACK to quit",
+                compose(snapshot(List.of(), Set.of(), 300, GameState.PAUSED)).rowText(messageRow).strip());
+        assertEquals("Game over. CONFIRM to exit",
+                compose(snapshot(List.of(), Set.of(), 0, GameState.LOSE)).rowText(messageRow).strip());
+        assertEquals("Nangor Blast. CONFIRM to play, BACK to quit",
+                compose(snapshot(List.of(), Set.of(), 300, GameState.MENU)).rowText(messageRow).strip());
     }
 
     @Test
     void ignoresSpritesOffTheMap() {
-        CliFrame frame = CliFrame.compose(snapshot(List.of(new Sprite(1, EntityKind.PLAYER, new Position(14, 3))),
+        CliFrame frame = compose(snapshot(List.of(new Sprite(1, EntityKind.PLAYER, new Position(14, 3))),
                 Set.of(), 300, GameState.PLAYING));
         assertEquals('.', tile(frame, 13, 3));
     }

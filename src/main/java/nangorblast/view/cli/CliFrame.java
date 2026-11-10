@@ -2,8 +2,10 @@ package nangorblast.view.cli;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.function.Function;
 import nangorblast.core.EntityKind;
 import nangorblast.core.Position;
+import nangorblast.input.Action;
 import nangorblast.view.WorldSnapshot;
 import nangorblast.view.WorldSnapshot.Sprite;
 
@@ -81,11 +83,12 @@ final class CliFrame {
         return Math.max(MIN_COLS, snapshot.width() * 2);
     }
 
-    static CliFrame compose(WorldSnapshot snapshot) {
+    /** @param keyName the key to show for an action in help text, read from the key bindings */
+    static CliFrame compose(WorldSnapshot snapshot, Function<Action, String> keyName) {
         CliFrame frame = new CliFrame(rowsFor(snapshot), colsFor(snapshot));
         frame.drawHud(snapshot.hud());
         frame.drawMap(snapshot);
-        frame.put(MAP_TOP + snapshot.height(), 0, stateMessage(snapshot), SECONDARY_TEXT);
+        frame.put(MAP_TOP + snapshot.height(), 0, stateMessage(snapshot, keyName), SECONDARY_TEXT);
         return frame;
     }
 
@@ -125,12 +128,16 @@ final class CliFrame {
         }
     }
 
-    private static String stateMessage(WorldSnapshot snapshot) {
+    /** MVP-0 prompts on the message line. C-07 replaces them with menu panels. */
+    private static String stateMessage(WorldSnapshot snapshot, Function<Action, String> key) {
         return switch (snapshot.state()) {
-            case PAUSED -> "Paused";
-            case WIN -> "You win";
-            case LOSE -> "Game over";
-            case MENU, PLAYING -> "";
+            case MENU -> "Nangor Blast. " + key.apply(Action.CONFIRM) + " to play, "
+                    + key.apply(Action.BACK) + " to quit";
+            case PAUSED -> "Paused. " + key.apply(Action.PAUSE) + " to resume, "
+                    + key.apply(Action.BACK) + " to quit";
+            case WIN -> "You win! " + key.apply(Action.CONFIRM) + " to exit";
+            case LOSE -> "Game over. " + key.apply(Action.CONFIRM) + " to exit";
+            case PLAYING -> "";
         };
     }
 

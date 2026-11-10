@@ -42,7 +42,7 @@ A task is **Done** when all of these are true.
 - Start each branch from the latest `main`. Rebase on `main` before opening a pull request.
 - Open a pull request to `main`. One other member reviews it. Laura reviews changes to `app/GameFactory` and to any contract.
 - Keep pull requests small, ideally one task each. Merge often so integration problems appear early.
-- Commit messages start with the task ID, for example `C-04: stop player movement at active bombs`.
+- Commit messages follow Conventional Commits with the task ID as the scope: `<type>(<task-id>): <summary>`, for example `feat(C-04): stop player movement at active bombs`. Types: `feat` new behavior, `fix` a bug, `test` tests only, `refactor` no behavior change, `docs` documents only, `chore` build, dependencies, or tooling. Write the summary in English, in the imperative, and keep the line within 72 characters. Put details in the body. A task's code, tests, and document updates usually go in one `feat` commit.
 - If a merge breaks `main`, revert the merge commit first and fix on a branch.
 - Laura runs an integration build on `main` every evening from 15 November and reports failures to the owner.
 

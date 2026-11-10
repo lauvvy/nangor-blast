@@ -59,7 +59,8 @@ One owner per package. A member changes another member's package only with that 
 
 ```text
 src/main/java/nangorblast/
-  app/                 Main, GameFactory (composition root), GameSession Laura
+  app/                 Main, GameFactory (composition root), GameSession,
+                       StandInMap (MVP-0 only, removed in C-09)          Laura
   core/                Position, Direction, GameState, BombType, Grid<T>,
                        EntityKind, GameEvent, EventBus, events,
                        exceptions                                        Laura
@@ -79,7 +80,7 @@ src/main/java/nangorblast/
   mapio/               MapLoader, MapValidator, EntityFactory,
                        GameConfig                                        Areli
   editor/              Map Maker (bonus B03)                             Areli
-  engine/              GameLoop, GameSystem, CommandHandler, RenderLoop,
+  engine/              GameLoop, GameSystem, CommandHandler, RenderLoop, GameFlow,
                        TimerSystem, SnapshotBuilder, PlayerSystem,
                        WinLoseSystem                                     Laura
   engine/bomb/         BombSystem, ExplosionSystem, PowerUpSystem,
@@ -230,6 +231,16 @@ As built in `C-04`:
 - **For Ilham:** `Enemy` and `Boss` implement `model/Hostile` and block the player in `blocksMovementOf`. That is all `PlayerSystem` needs to report contact.
 - Until `C-06` adds invulnerability after a hit, every new contact costs a life.
 
+As built in `C-05`:
+
+- `app/Main` opens the system terminal, refuses a `dumb` one with a message and exit status 1, enters raw mode, the alternate screen, and a hidden cursor, runs one `GameSession`, and restores the terminal in a `finally` block. Ctrl+C quits the same way as the quit action.
+- `app/GameFactory` builds the world (`newWorld()`), the handlers (`handlers(players, onQuit)`: `GameFlow`, then `PlayerSystem`), and the systems (`systems(players)`). The same `PlayerSystem` instance goes in both lists.
+- `app/StandInMap` builds the F07.3.3 layout in the MENU state with stand-in entities: blocks, enemies, and the boss block movement and do nothing else, and Lava Tiles are walkable and never erupt. C-09 deletes it and loads `config/maps/red-mountain.txt` through `MapLoader`.
+- `engine/GameFlow` is the MVP-0 state handler. MENU: confirm starts, back quits. PLAYING: pause pauses. PAUSED: pause or confirm resumes, back quits. WIN and LOSE: confirm or back quits. `C-07` replaces quitting with the full menus.
+- `engine/WinLoseSystem` sets LOSE when the timer reaches 0 or the player has no lives. `C-08` adds WIN.
+- The message line shows the MVP-0 prompts with keys read from `KeyBindings.keysFor`, for example `Nangor Blast. Enter to play, Backspace to quit`.
+- Not yet done: a repeat of the same discrete action within 0.2 seconds is not ignored. Terminal key repeat starts after about half a second, so a normal press toggles pause once.
+
 Order of work inside one tick:
 
 1. Drain the command queue and pass each command to every `CommandHandler`. Handlers run in every state, so the pause command works while paused. `PlayerSystem` is a handler and a system, and it ignores moves unless the state is `PLAYING`.
@@ -369,7 +380,7 @@ After `C-01` on 12 November, the only tasks that depend on another member's work
 | C-02 | Game loop and the three threads | F09.3 | C-01 | 13 Nov | 300 game seconds take 300 real seconds within 1 second. A 2-second stall causes at most 5 catch-up ticks. Commands arrive through the queue from keys read out of `config/keybindings.properties`, and a key bound twice is refused. Threads are named, and the program exits cleanly with no thread left running. |
 | C-03 | CLI renderer and HUD | F09.3, F07.2 | C-01, S-02 | 13 Nov | The screen shows the map with the glyphs in `DESIGN.md` and a HUD with lives, score, timer, and selected bomb. Only changed cells are rewritten. A terminal too small for the map and HUD shows a message asking to enlarge it. |
 | C-04 | Player movement and collision | F01.2.1, F01.2.3 | C-01 | 14 Nov | Tests show that movement follows the player's speed, is stopped by blocks, enemies, active bombs, and the map edge, keeps one early move for 0.15 seconds, and reports contact when the player steps into an enemy. |
-| C-05 | MVP-0: a playable walking skeleton | F09 | C-02, C-03, C-04 | 14 Nov | From the menu, the Red Mountain map loads through `TestWorlds.fromAscii`, Deeper walks, the timer counts down, pause works, and the game ends in LOSE at 0 seconds. |
+| C-05 | MVP-0: a playable walking skeleton | F09 | C-02, C-03, C-04 | 14 Nov | From the menu, the Red Mountain map loads through a stand-in builder in `app` (`TestWorlds` is test code and cannot ship), Deeper walks, the timer counts down, pause works, and the game ends in LOSE at 0 seconds. |
 | C-06 | Lives, damage, invulnerability, and respawn | F01.2.2, F01.2.4 | C-04 | 19 Nov | Tests show one life lost per activation, 1.5 seconds of invulnerability, respawn at the spawn point or the nearest free tile, and LOSE at 0 lives. |
 | C-07 | Menu, How to Play, pause menu, restart, and the game over screen | F09.1, F09.5, F00.4 | C-02 | 20 Nov | Screens are a stack, and back returns to the previous screen. Invalid menu input shows an error and asks again. Pause offers resume, restart, and menu, and holding the pause key toggles once. Restart restores every initial value. The final score is shown at WIN and LOSE. |
 | C-08 | Win and lose check, with the exit locked until all enemies are defeated | F09.4 | C-01 | 16 Nov | Tests show WIN only when the 5 Normal Enemies and the boss are defeated and the player is on the exit, and LOSE at 0 lives or 0 seconds. |

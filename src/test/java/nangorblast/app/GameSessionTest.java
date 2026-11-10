@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import nangorblast.TestWorlds;
 import nangorblast.engine.GameLoop;
+import nangorblast.engine.PlayerSystem;
 import nangorblast.engine.RenderLoop;
 import nangorblast.input.Action;
 import nangorblast.input.Command;
@@ -59,7 +60,7 @@ class GameSessionTest {
         CountDownLatch threeFrames = new CountDownLatch(3);
 
         GameLoop loop = new GameLoop(world, commands, List.of((w, c) -> handled.add(c)),
-                GameFactory.systems(), 20, 5, System::nanoTime);
+                GameFactory.systems(new PlayerSystem()), 20, 5, System::nanoTime);
         RenderLoop render = new RenderLoop(loop::snapshot, s -> {
             drawn.add(s);
             threeFrames.countDown();
