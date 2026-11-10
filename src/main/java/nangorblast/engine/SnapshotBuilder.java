@@ -17,7 +17,8 @@ public final class SnapshotBuilder {
                 .map(e -> new Sprite(e.id(), e.kind(), e.position()))
                 .toList();
         Player player = world.player();
-        var hud = new Hud(player.lives(), world.score(), (int) Math.ceil(world.timeLeft()), player.selectedBomb());
+        var hud = new Hud(player.lives(), world.score(), (int) Math.ceil(world.timeLeft()), player.selectedBomb(),
+                player.isInvulnerable());
         return new WorldSnapshot(world.width(), world.height(), sprites, world.warningTiles(), hud, world.state());
     }
 }

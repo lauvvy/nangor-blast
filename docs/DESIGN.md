@@ -20,7 +20,7 @@ The first table is the legend from the specification (F07.2) for what exists on 
 | Destructible Block | `D` | `#A9713F` | |
 | Reinforced Block | `R` | `#7C7F86` | Not on the Red Mountain layout. Used by the Map Maker. |
 | Walkable space | `.` | `#3B2A24` | |
-| Player | `P` | `#4FC3F7` | Shown dimmed while invulnerable. |
+| Player | `P` | `#4FC3F7` | Shown dimmed, `#2A6F8E`, while invulnerable. |
 | Normal Enemy | `E` | `#B565D8` | |
 | Boss | `B` | `#E53935` | Shown brighter while vulnerable. |
 | Exit | `X` | `#6D6D6D` locked, `#66BB6A` open | Open once every enemy and the boss are defeated. |

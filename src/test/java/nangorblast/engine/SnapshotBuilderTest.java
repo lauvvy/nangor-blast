@@ -28,7 +28,7 @@ class SnapshotBuilderTest {
         assertEquals(3, snapshot.width());
         assertEquals(2, snapshot.sprites().size());
         assertEquals(EntityKind.EXIT_LOCKED, snapshot.sprites().get(1).kind());
-        assertEquals(new WorldSnapshot.Hud(Player.START_LIVES, 100, 300, BombType.NORMAL), snapshot.hud());
+        assertEquals(new WorldSnapshot.Hud(Player.START_LIVES, 100, 300, BombType.NORMAL, false), snapshot.hud());
         assertEquals(Set.of(new Position(1, 0)), snapshot.warnings());
         assertEquals(GameState.PLAYING, snapshot.state());
     }

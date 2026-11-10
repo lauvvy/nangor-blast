@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class CliFrameTest {
 
     static WorldSnapshot snapshot(List<Sprite> sprites, Set<Position> warnings, int secondsLeft, GameState state) {
-        return new WorldSnapshot(14, 10, sprites, warnings, new Hud(3, 120, secondsLeft, BombType.PUMPED), state);
+        return new WorldSnapshot(14, 10, sprites, warnings, new Hud(3, 120, secondsLeft, BombType.PUMPED, false), state);
     }
 
     static CliFrame compose(WorldSnapshot snapshot) {
@@ -88,6 +88,15 @@ class CliFrameTest {
                 compose(snapshot(List.of(), Set.of(), 0, GameState.LOSE)).rowText(messageRow).strip());
         assertEquals("Nangor Blast. CONFIRM to play, BACK to quit",
                 compose(snapshot(List.of(), Set.of(), 300, GameState.MENU)).rowText(messageRow).strip());
+    }
+
+    @Test
+    void invulnerablePlayerIsDimmed() {
+        WorldSnapshot snapshot = new WorldSnapshot(14, 10, List.of(new Sprite(1, EntityKind.PLAYER, new Position(1, 1))),
+                Set.of(), new Hud(2, 0, 300, BombType.NORMAL, true), GameState.PLAYING);
+        CliFrame.Cell cell = compose(snapshot).cell(CliFrame.MAP_TOP + 1, 2);
+        assertEquals('P', cell.ch());
+        assertEquals(0x2A6F8E, cell.fg());
     }
 
     @Test

@@ -23,7 +23,7 @@ public record WorldSnapshot(int width, int height, List<Sprite> sprites, Set<Pos
     public record Sprite(long id, EntityKind kind, Position position) {
     }
 
-    /** The HUD line. */
-    public record Hud(int lives, int score, int secondsLeft, BombType selectedBomb) {
+    /** The HUD line, and the player's state that changes how the player is drawn. */
+    public record Hud(int lives, int score, int secondsLeft, BombType selectedBomb, boolean invulnerable) {
     }
 }

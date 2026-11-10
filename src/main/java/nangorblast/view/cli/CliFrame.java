@@ -38,6 +38,7 @@ final class CliFrame {
 
     static final Glyph WARNING = new Glyph('!', 0xFFEB3B, 2);
     static final Glyph FLOOR = new Glyph('.', 0x3B2A24, 11);
+    static final Glyph PLAYER_INVULNERABLE = new Glyph('P', 0x2A6F8E, 3); // dimmed player, DESIGN.md
     private static final Cell BLANK = new Cell(' ', TEXT);
 
     /** The exhaustive switch makes a new {@link EntityKind} fail to compile until it has a glyph. */
@@ -107,7 +108,9 @@ final class CliFrame {
             Arrays.fill(row, FLOOR);
         }
         for (Sprite sprite : snapshot.sprites()) {
-            raise(top, sprite.position(), glyph(sprite.kind()));
+            Glyph glyph = sprite.kind() == EntityKind.PLAYER && snapshot.hud().invulnerable()
+                    ? PLAYER_INVULNERABLE : glyph(sprite.kind());
+            raise(top, sprite.position(), glyph);
         }
         for (Position warning : snapshot.warnings()) {
             raise(top, warning, WARNING);

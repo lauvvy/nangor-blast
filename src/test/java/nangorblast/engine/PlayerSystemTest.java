@@ -3,14 +3,11 @@ package nangorblast.engine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import nangorblast.TestWorlds;
 import nangorblast.core.Direction;
 import nangorblast.core.EntityKind;
 import nangorblast.core.GameState;
-import nangorblast.core.PlayerDamaged;
 import nangorblast.core.Position;
 import nangorblast.input.Action;
 import nangorblast.input.Command;
@@ -166,14 +163,12 @@ class PlayerSystemTest {
     @Test
     void steppingIntoAnEnemyIsContactAndCostsOneLife() {
         GameWorld world = world("EP.");
-        List<PlayerDamaged> events = new ArrayList<>();
-        world.bus().subscribe(PlayerDamaged.class, events::add);
 
         tick(world, Action.MOVE_LEFT);
 
         assertEquals(new Position(1, 0), at(world), "player and enemy never share a tile");
         assertEquals(2, world.player().lives());
-        assertEquals(List.of(new PlayerDamaged(0, 2)), events);
+        assertTrue(world.player().isRespawnPending(), "LifeSystem respawns the player later in the tick");
     }
 
     @Test
