@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jline:jline:3.30.17")
     implementation("org.slf4j:slf4j-api:2.0.16")
     runtimeOnly("ch.qos.logback:logback-classic:1.5.12")
 

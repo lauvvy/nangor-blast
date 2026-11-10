@@ -9,7 +9,7 @@ endif
 # the program a real terminal, which the game needs for raw key input.
 RUN_CP := "build/install/nangor-blast/lib/*"
 
-.PHONY: build run test clean
+.PHONY: build run spike test clean
 
 build:
 	$(GRADLEW) build
@@ -17,6 +17,11 @@ build:
 run:
 	$(GRADLEW) installDist
 	java -cp $(RUN_CP) nangorblast.app.Main
+
+# S-02 terminal spike: key echo and 20 FPS redraw. Every member runs it once.
+spike:
+	$(GRADLEW) installDist
+	java -cp $(RUN_CP) nangorblast.view.cli.TerminalSpike
 
 test:
 	$(GRADLEW) test
