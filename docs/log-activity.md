@@ -18,6 +18,7 @@ Aturan pengisian:
 | 10 November 2026 | `S-02` terminal spike dengan JLine 3.30.17 (`make spike`) | Spike membaca tombol tanpa Enter, menggambar peta 14 × 10 pada 20 FPS, dan mencatat jeda antar-tombol. Uji di terminal asli tiap anggota belum dilakukan. |
 | 10 November 2026 | `C-01` core types dan contracts | `Position`, `Grid<T>`, `EventBus`, exception, `Entity`, `Player`, `GameWorld`, `GameSystem`, `Command`, `WorldSnapshot`, dan `TestWorlds` selesai. 35 unit test lulus. Menunggu review dari anggota lain. |
 | 10 November 2026 | `C-02` game loop dan thread | Fixed timestep 20 tick/detik dengan batas 5 tick catch-up, tiga thread bernama (`input`, `game-loop`, `render`), key bindings dari `config/keybindings.properties`. 49 unit test lulus. Belum dicoba di terminal asli. |
+| 10 November 2026 | `C-03` CLI renderer dan HUD | Peta tergambar dengan glyph dan warna dari `DESIGN.md`, dua karakter per tile, sesuai urutan prioritas gambar. HUD menampilkan nyawa, jenis bomb, skor, dan timer yang berubah merah di bawah 30 detik. Hanya sel yang berubah yang ditulis ulang, dan terminal yang terlalu kecil mendapat pesan untuk memperbesar. 58 unit test lulus. Belum dicoba di terminal asli. |
 
 ## Marshall Farrell Attalla K / 18225062
 
