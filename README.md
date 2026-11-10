@@ -10,7 +10,7 @@ The course asks each group to show object-oriented design in a working program: 
 
 ## Key Features
 
-Nothing is implemented yet. The status column is updated as tasks in [`TODO.md`](TODO.md) are completed.
+Nothing is implemented yet. The status column is updated as tasks in [`TODO.md`](docs/TODO.md) are completed.
 
 | Feature | Description | Status |
 | --- | --- | --- |
@@ -45,18 +45,18 @@ A screenshot or demo is not yet available.
 - **SLF4J with Logback** — structured logging to a file, so logs do not disturb the game screen.
 - **JUnit 5** — unit tests for the game rules.
 
-The design is described in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+The design is described in [`ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Installation and Setup
 
-The build files are not in the repository yet (task `S-01`). These are the planned steps and will be confirmed when the scaffold lands.
-
-1. Install JDK 21 and `make`. Check them with:
+1. Install JDK 21 and `make`. Gradle is not needed: the wrapper downloads Gradle 8.14.3 on the first build. Check them with:
 
    ```bash
    java -version
    make --version
    ```
+
+   On Windows, `make` can come from MSYS2 or WinLibs, where it may be named `mingw32-make`. Use that name in place of `make` below.
 
 2. Clone the repository and enter it:
 
@@ -72,7 +72,9 @@ The build files are not in the repository yet (task `S-01`). These are the plann
    make run
    ```
 
-Other targets: `make run-gui` starts the GUI, `make test` runs the unit tests, and `make clean` removes build output.
+Other targets: `make test` runs the unit tests and `make clean` removes build output. `make run-gui` starts the GUI once bonus B01 is built (task `G-01`).
+
+Logs are written to `logs/nangor-blast.log`, never to the screen.
 
 ## Team and Task Division
 
@@ -83,17 +85,17 @@ Other targets: `make run-gui` starts the GUI, `make test` runs the unit tests, a
 | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, boss framework, Hades, creativity feature |
 | Areli Matthew Widodo | 18225102 | Map loading and validation, Lava Tile, configuration, Map Maker, booklet, activity log |
 
-Task-level detail is in [`TODO.md`](TODO.md).
+Task-level detail is in [`TODO.md`](docs/TODO.md).
 
 ## Project Documents
 
 | Document | Purpose |
 | --- | --- |
-| [`PRD.md`](PRD.md) | Scope, user stories, and acceptance criteria |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Stack, structure, contracts, and the implementation plan |
-| [`TODO.md`](TODO.md) | Task status for the whole team |
-| [`WORKFLOW.md`](WORKFLOW.md) | Working rules, Git workflow, and definition of done |
-| [`DESIGN.md`](DESIGN.md) | Terminal glyphs and GUI visual rules |
-| [`CLAUDE.md`](../CLAUDE.md) | Instructions for the coding agent |
-| [`IF2010 Spesifikasi Tugas Besar.md`](IF2010%20Spesifikasi%20Tugas%20Besar.md) | The course specification |
-| [`log-activity.md`](log-activity.md) | Activity log per member, for Milestone 2 |
+| [`PRD.md`](docs/PRD.md) | Scope, user stories, and acceptance criteria |
+| [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Stack, structure, contracts, and the implementation plan |
+| [`TODO.md`](docs/TODO.md) | Task status for the whole team |
+| [`WORKFLOW.md`](docs/WORKFLOW.md) | Working rules, Git workflow, and definition of done |
+| [`DESIGN.md`](docs/DESIGN.md) | Terminal glyphs and GUI visual rules |
+| [`CLAUDE.md`](CLAUDE.md) | Instructions for the coding agent |
+| [`IF2010 Spesifikasi Tugas Besar.md`](docs/IF2010%20Spesifikasi%20Tugas%20Besar.md) | The course specification |
+| [`log-activity.md`](docs/log-activity.md) | Activity log per member, for Milestone 2 |

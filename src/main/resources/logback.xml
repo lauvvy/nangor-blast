@@ -1,0 +1,16 @@
+<configuration>
+    <!-- File only: anything on standard output would corrupt the terminal game screen. -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/nangor-blast.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="nangorblast" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

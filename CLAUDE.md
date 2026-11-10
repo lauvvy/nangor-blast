@@ -14,13 +14,13 @@ This file is at the repository root. Every other project document is in `docs/`.
 
 ## Tech Stack
 
-No code exists yet. The scaffold is task `S-01`.
+The scaffold (`S-01`) exists. Game code starts with `C-01`.
 
 | Tool | Version or role |
 | --- | --- |
 | Java | 21 LTS (Temurin 21.0.13 installed) |
-| Gradle | Wrapper (`gradlew`), created in `S-01`. Gradle itself is not installed. |
-| Make | `Makefile` that calls `gradlew`. Required by the specification. Not installed on the lead's machine yet. |
+| Gradle | Wrapper 8.14.3 (`gradlew`), Kotlin DSL (`build.gradle.kts`). Gradle itself is not installed. |
+| Make | `Makefile` that calls `gradlew`. Required by the specification. On the lead's machine it is `mingw32-make` from WinLibs. |
 | JLine 3 | Raw keyboard input and terminal drawing. Unverified until spike `S-02`. Fallback: Lanterna. |
 | libGDX with LWJGL3 | GUI for bonus B01. Version pinned in `G-01`. Used only in `view/gui` and `app`. |
 | SLF4J with Logback | Logging to `logs/nangor-blast.log` |
@@ -146,8 +146,6 @@ Load the skill that matches the task before starting it.
 
 ## Testing
 
-Commands are available after `S-01`. Until then there is nothing to run.
-
 ```bash
 ./gradlew test
 ```
@@ -164,7 +162,7 @@ make test       # run the unit tests
 make clean      # remove build output
 ```
 
-A successful build compiles with zero errors and zero warnings from `javac -Xlint:all`. The exact targets are confirmed in `S-01`.
+A successful build compiles with zero errors and zero warnings from `javac -Xlint:all`. The build uses `-Werror`, so any warning fails it. `make run-gui` is added in `G-01`. `make run` starts the installed distribution with `java`, not `gradlew run`, because Gradle does not give the program a real terminal.
 
 ## Git Rules
 
