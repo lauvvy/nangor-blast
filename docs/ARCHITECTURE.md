@@ -12,11 +12,22 @@ The choices in this document were made by the team lead with Claude Code and hav
 | Language | Java 21 LTS | Temurin 21.0.13 is installed on the lead's machine. |
 | Build | Gradle 8.14.3 with the wrapper (`gradlew`), Kotlin DSL | Members do not install Gradle. The wrapper checks the distribution's SHA-256. Compiles with `--release 21 -Xlint:all -Werror`. |
 | Task runner | `Makefile` calling `gradlew` | Required by the specification. Each member installs `make` (`mingw32-make` on Windows works). Targets: `build`, `run`, `test`, `clean`. `run` starts the installed distribution with `java` so the game gets a real terminal. Confirmation pending, PRD open question 6. |
-| Terminal I/O | JLine 3 | Raw key input and full-screen redraw. **Unverified on Windows.** `S-02` is the spike. Lanterna is the fallback. |
+| Terminal I/O | JLine 3.30.17 (the `org.jline:jline` bundle) | Raw key input and full-screen redraw. Stays on 3.x: it supports Java 21 through its JNI provider. **Unverified on the team's terminals** until the `S-02` results table below is filled. Lanterna is the fallback. |
 | GUI | libGDX with the LWJGL3 desktop backend | Chosen by the team lead on 10 November 2026 for sprites, animation, and window scaling. It replaces Swing. It adds dependencies from Maven Central: `gdx`, `gdx-backend-lwjgl3`, the desktop natives, and `gdx-freetype` for fonts. The version is pinned in `G-01`. On macOS the JVM needs `-XstartOnFirstThread`. |
 | Logging | SLF4J 2.0.16 with Logback 1.5.12, to `logs/nangor-blast.log` | Never to standard output, which would corrupt the terminal screen. Configured in `src/main/resources/logback.xml`. |
 | Tests | JUnit 5.11.3 | Run with `make test`. |
 | Hosting | GitHub, `https://github.com/lauvvy/nangor-blast` | Private until the Milestone 2 release. |
+
+### Terminal spike results (S-02)
+
+Each member runs `make spike` in the terminal they will use, follows the three checks on screen, quits with `q`, and fills their row. The spike is `view/cli/TerminalSpike`, built on JLine 3.30.17. A terminal type of `dumb` means JLine could not take control of the terminal, and the game will not work there.
+
+| Member | OS and terminal | JLine type | Keys read without Enter | Flicker at 20 FPS | Key release reported | Two held keys both repeat |
+| --- | --- | --- | --- | --- | --- | --- |
+| Laura | | | | | | |
+| Marshall | | | | | | |
+| Ilham | | | | | | |
+| Areli | | | | | | |
 
 ## System Structure
 
