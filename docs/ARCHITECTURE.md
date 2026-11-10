@@ -88,7 +88,7 @@ src/main/java/nangorblast/
   engine/hazard/       HazardSystem                                      Areli
   input/               Action, Command, InputSource, KeyBindings         Laura
   view/                Renderer, WorldSnapshot                           Laura
-  view/cli/            CliRenderer, CliInput, menu screens               Laura
+  view/cli/            CliRenderer, CliFrame, CliInput, menu screens     Laura
   view/gui/            GuiRenderer, GuiInput, libGDX launcher (bonus B01) Laura
 src/test/java/nangorblast/   Mirrors the packages above. Each owner tests their own.
 config/
@@ -215,6 +215,12 @@ As built in `C-02`:
 - `app/GameSession` runs the three tasks on one `ExecutorService`, renames each pool thread to `input`, `game-loop`, or `render`, and `close()` stops all three and waits up to 2 seconds.
 - `view/cli/CliInput` polls the terminal every 100 ms, so `close()` takes effect without a key press.
 - `input/KeyBindings` reads `config/keybindings.properties`: `p<player>.<ACTION> = key, key`. A key is one printable character, with letters case-insensitive, or one of `UP`, `DOWN`, `LEFT`, `RIGHT`, `ENTER`, `ESCAPE`, `SPACE`, `BACKSPACE`, `TAB`. A key bound twice, an unknown action or key, or a `p1` action with no key is a `ConfigLoadException`.
+
+As built in `C-03`:
+
+- `view/cli/CliFrame` composes one screen from a snapshot as a grid of cells (character and color): HUD on row 0, an empty row, the map from row 2 with each tile two characters wide, and the message line below the map. It holds the glyph table from `DESIGN.md` as an exhaustive `switch`, so a new `EntityKind` does not compile until it has a glyph. It has no terminal access.
+- `view/cli/CliRenderer` diffs each frame against the last one and rewrites only the changed runs of cells. A resize clears and redraws everything. A terminal smaller than the frame (48 × 13 for the 14 × 10 map) shows one message with the needed and current size. Colors are given as RGB and JLine downgrades them to what the terminal supports.
+- Until `C-07` adds menu panels, the message line shows `Paused`, `You win`, or `Game over` for those states.
 
 Order of work inside one tick:
 
