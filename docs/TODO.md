@@ -30,7 +30,7 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | S-01 | Scaffold Gradle, Makefile, folders | Laura | `feat/S-01-scaffold` | Milestone 1 | Done | 11 Nov | 10 Nov: on Windows with `mingw32-make`, `make build`, `make test` (1 test), `make run` (prints placeholder), and `make clean` pass with `-Xlint:all -Werror`. Logs go to `logs/nangor-blast.log`. `src`, `config`, `doc`, and the root `README.md` exist. Not yet checked on macOS or Linux. |
-| S-02 | Terminal spike with JLine 3 | Laura | `feat/S-02-terminal-spike` | Pedoman 3 | Pending | 12 Nov | Write the key-echo demo and ask all members to run it. Record whether key release and two held keys are reported. |
+| S-02 | Terminal spike with JLine 3 | Laura | `feat/S-02-terminal-spike` | Pedoman 3 | In progress | 12 Nov | 10 Nov: `make spike` builds with no warnings, and a piped run reads 5 keys and exits cleanly. Waiting for all four members to run it in a real terminal and fill the results table in `ARCHITECTURE.md`. |
 | S-03 | Choose assistant, invite to repo, book Asistensi 1 | Laura | No branch | Asistensi | Pending | 11 Nov | Fill the assistant sheet before 20.10 WIB. |
 | S-04 | Hold Asistensi 1 | Laura | No branch | Asistensi | Pending | 16 Nov | Bring the twelve open questions in `PRD.md` section 8. |
 | S-05 | Milestone 1 PDFs | Laura | `docs/S-05-milestone-1` | Milestone 1 | Pending | 17 Nov | Each owner draws the class diagram for their packages by 15 Nov. |
