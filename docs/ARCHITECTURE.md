@@ -142,6 +142,7 @@ interface GameEvent {}
 interface EventListener<E extends GameEvent> { void onEvent(E event); }
 final class EventBus { <E extends GameEvent> void subscribe(Class<E>, EventListener<? super E>); void publish(GameEvent); }
 record EnemyDefeated(Position position, int scoreValue, boolean boss) implements GameEvent {}
+record GameEnded(GameState result, int livesLeft, int secondsLeft) implements GameEvent {}   // once, at WIN or LOSE (C-08)
 record PlayerDamaged(int playerIndex, int livesLeft) implements GameEvent {}
 record HudMessage(String text) implements GameEvent {}
 class GameException extends RuntimeException      // unchecked; InvalidMapException, ConfigLoadException, InvalidActionException
@@ -240,6 +241,13 @@ As built in `C-05`:
 - `engine/WinLoseSystem` sets LOSE when the timer reaches 0 or the player has no lives. `C-08` adds WIN.
 - The message line shows the MVP-0 prompts with keys read from `KeyBindings.keysFor`, for example `Nangor Blast. Enter to play, Backspace to quit`.
 - Not yet done: a repeat of the same discrete action within 0.2 seconds is not ignored. Terminal key repeat starts after about half a second, so a normal press toggles pause once.
+
+As built in `C-08`:
+
+- `engine/WinLoseSystem` runs last in the tick and only while PLAYING. LOSE at 0 lives or 0 seconds is checked first. Otherwise, once no active `model/Hostile` entity is left, every `Exit` opens, and WIN follows when the player stands on an open exit.
+- **For Ilham:** a defeated Normal Enemy or boss is deactivated by its system (`deactivate()`), and that is what counts as defeated here. A boss between phases stays active.
+- **For Marshall:** `WinLoseSystem` publishes `core/GameEnded` once, with the lives and the whole seconds left (rounded up, as the HUD shows them). `ScoreSystem` adds the F08 WIN bonus from it: 100 per life and 10 per second.
+- `app/StandInMap` makes the stand-in enemies and boss `Hostile`, so contact costs a life and the exit stays locked until C-09 brings real enemies and bombs.
 
 Order of work inside one tick:
 

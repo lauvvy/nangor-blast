@@ -9,12 +9,14 @@ import nangorblast.core.Position;
 import nangorblast.model.Entity;
 import nangorblast.model.Exit;
 import nangorblast.model.GameWorld;
+import nangorblast.model.Hostile;
 import nangorblast.model.Player;
 
 /**
  * MVP-0 only: builds the Red Mountain world from the F07.3.3 layout with stand-in entities,
- * so the game runs before the real classes exist. Blocks, enemies, and the boss are walls
- * that do nothing; Lava Tiles are walkable and never erupt.
+ * so the game runs before the real classes exist. Blocks are walls that do nothing. Enemies
+ * and the boss stand still, block, and are {@link Hostile}, so stepping into one costs a life
+ * and the exit stays locked. Lava Tiles are walkable and never erupt.
  *
  * <p>shortcut: layout hard-coded and stand-ins instead of real entities. C-09 deletes this
  * class and loads {@code config/maps/red-mountain.txt} through Areli's {@code MapLoader}.
@@ -65,8 +67,8 @@ final class StandInMap {
                 switch (rows.get(row).charAt(col)) {
                     case '#' -> world.add(new StandIn(at, EntityKind.INDESTRUCTIBLE_BLOCK, true));
                     case 'D' -> world.add(new StandIn(at, EntityKind.DESTRUCTIBLE_BLOCK, true));
-                    case 'E' -> world.add(new StandIn(at, EntityKind.NORMAL_ENEMY, true));
-                    case 'B' -> world.add(new StandIn(at, EntityKind.BOSS, true));
+                    case 'E' -> world.add(new HostileStandIn(at, EntityKind.NORMAL_ENEMY));
+                    case 'B' -> world.add(new HostileStandIn(at, EntityKind.BOSS));
                     case 'H' -> world.add(new StandIn(at, EntityKind.LAVA_DORMANT, false));
                     case 'X' -> world.add(new Exit(at));
                     case '.', 'P' -> { }
@@ -80,7 +82,7 @@ final class StandInMap {
     }
 
     /** An entity that is drawn and maybe blocks, and does nothing else. */
-    static final class StandIn extends Entity {
+    static class StandIn extends Entity {
         private final EntityKind kind;
         private final boolean blocks;
 
@@ -98,6 +100,13 @@ final class StandInMap {
         @Override
         public boolean blocksMovementOf(Entity mover) {
             return blocks;
+        }
+    }
+
+    /** An enemy or boss that stands still. */
+    static final class HostileStandIn extends StandIn implements Hostile {
+        HostileStandIn(Position position, EntityKind kind) {
+            super(position, kind, true);
         }
     }
 }

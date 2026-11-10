@@ -94,4 +94,24 @@ class MvpZeroTest {
         tick(Action.CONFIRM);
         assertEquals(1, quits.get(), "confirm on the end screen quits");
     }
+
+    @Test
+    void steppingIntoAStandInEnemyCostsLivesUntilLose() {
+        world.player().moveTo(new Position(1, 7)); // the enemy at (1, 8) is below
+        tick(Action.CONFIRM);
+        for (int i = 0; i < 3; i++) {
+            tick(Action.MOVE_DOWN);
+        }
+        assertEquals(0, world.player().lives());
+        assertEquals(GameState.LOSE, world.state());
+    }
+
+    @Test
+    void theExitStaysLockedWhileStandInEnemiesRemain() {
+        world.player().moveTo(new Position(12, 1)); // the exit
+        tick(Action.CONFIRM);
+        seconds(1);
+        assertEquals(GameState.PLAYING, world.state());
+        assertEquals(1, count(EntityKind.EXIT_LOCKED));
+    }
 }
