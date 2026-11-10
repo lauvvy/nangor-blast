@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,9 +32,11 @@ public final class KeyBindings {
     private static final Pattern PROPERTY = Pattern.compile("p([1-9])\\.([A-Za-z_]+)");
 
     private final Map<String, Command> byKey;
+    private final Map<Command, List<String>> keysByCommand = new HashMap<>();
 
-    private KeyBindings(Map<String, Command> byKey) {
+    private KeyBindings(Map<String, Command> byKey, Map<Command, List<String>> keysByCommand) {
         this.byKey = Map.copyOf(byKey);
+        keysByCommand.forEach((command, keys) -> this.keysByCommand.put(command, List.copyOf(keys)));
     }
 
     public static KeyBindings load(Path file) {
@@ -48,6 +51,7 @@ public final class KeyBindings {
 
     public static KeyBindings parse(Properties properties) {
         Map<String, Command> byKey = new HashMap<>();
+        Map<Command, List<String>> keysByCommand = new HashMap<>();
         Map<Action, Boolean> firstPlayerBound = new HashMap<>();
         for (String name : new TreeSet<>(properties.stringPropertyNames())) {
             Matcher match = PROPERTY.matcher(name);
@@ -70,6 +74,7 @@ public final class KeyBindings {
                     throw new ConfigLoadException("Key '" + key + "' is bound twice: to p"
                             + (previous.playerIndex() + 1) + "." + previous.action() + " and to " + name);
                 }
+                keysByCommand.computeIfAbsent(command, c -> new ArrayList<>()).add(key);
             }
             if (playerIndex == 0) {
                 firstPlayerBound.put(action, true);
@@ -80,7 +85,7 @@ public final class KeyBindings {
                 throw new ConfigLoadException("p1." + action + " has no key");
             }
         }
-        return new KeyBindings(byKey);
+        return new KeyBindings(byKey, keysByCommand);
     }
 
     private static String normalize(String raw, String property) {
@@ -98,5 +103,10 @@ public final class KeyBindings {
     /** The command bound to a key name, as produced by an input source. */
     public Optional<Command> commandFor(String key) {
         return Optional.ofNullable(byKey.get(key));
+    }
+
+    /** The key names bound to a command, in the order written in the file. For help text. */
+    public List<String> keysFor(Command command) {
+        return keysByCommand.getOrDefault(command, List.of());
     }
 }

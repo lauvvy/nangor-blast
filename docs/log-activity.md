@@ -20,6 +20,7 @@ Aturan pengisian:
 | 10 November 2026 | `C-02` game loop dan thread | Fixed timestep 20 tick/detik dengan batas 5 tick catch-up, tiga thread bernama (`input`, `game-loop`, `render`), key bindings dari `config/keybindings.properties`. 49 unit test lulus. Belum dicoba di terminal asli. |
 | 10 November 2026 | `C-03` CLI renderer dan HUD | Peta tergambar dengan glyph dan warna dari `DESIGN.md`, dua karakter per tile, sesuai urutan prioritas gambar. HUD menampilkan nyawa, jenis bomb, skor, dan timer yang berubah merah di bawah 30 detik. Hanya sel yang berubah yang ditulis ulang, dan terminal yang terlalu kecil mendapat pesan untuk memperbesar. 58 unit test lulus. Belum dicoba di terminal asli. |
 | 10 November 2026 | `C-04` gerak player dan collision | Player bergerak satu tile per langkah sesuai speed, terhalang block, enemy, bomb aktif, dan tepi peta. Gerakan yang ditekan sedikit lebih awal disimpan 0,15 detik. Menabrak enemy mengurangi satu nyawa. 68 unit test lulus. Enemy dan bomb masih memakai pengganti di test. |
+| 11 November 2026 | `C-05` MVP-0 walking skeleton | `make run` menyambungkan semua komponen: menu, peta Red Mountain (sementara dari layout bawaan, belum dari file), player berjalan, timer berjalan, pause, dan LOSE saat waktu habis. 79 unit test lulus. Belum dicoba langsung di terminal asli. Format commit diganti ke Conventional Commits dengan ID task sebagai scope. |
 
 ## Marshall Farrell Attalla K / 18225062
 
