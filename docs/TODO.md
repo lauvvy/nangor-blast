@@ -58,7 +58,7 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| B-01 | Bomb base and Normal Bomb | Marshall | `feat/B-01-normal-bomb` | F02.1, F02.2.1, F02.3, F01.2.5 | Pending | 15 Nov | Until C-01 lands, draw the class diagram for the bomb packages. |
+| B-01 | Bomb base and Normal Bomb | Marshall | `feat/B-01-normal-bomb` | F02.1, F02.2.1, F02.3, F01.2.5 | Done | 15 Nov | 12 Nov: `make build` passes with `-Werror`, 114 tests green. `BombSystemTest` shows a 3-second fuse, placement refused at full capacity, on a tile with a bomb, and outside PLAYING, capacity returned, blast range fixed at placement, and the player leaving the bomb tile but not re-entering it. Capacity returns when the bomb goes off; B-02 moves it to the end of the explosion. Reviewed by Ilham in PR #11. |
 | B-02 | Explosion spread and damage | Marshall | `feat/B-02-explosion` | F03 | Pending | 16 Nov | Starts after B-01 and B-03. |
 | B-03 | Three block types | Marshall | `feat/B-03-blocks` | F04 | Pending | 15 Nov | Starts after C-01. Can be open alongside B-01. |
 | B-04 | Pumped Bomb and type selection | Marshall | `feat/B-04-pumped-bomb` | F02.2.2, F02.3.2 | Pending | 20 Nov | Starts after B-01, B-02, B-03. |

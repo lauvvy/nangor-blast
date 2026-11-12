@@ -30,7 +30,7 @@ Aturan pengisian:
 
 | Waktu | Kegiatan | Hasil |
 | --- | --- | --- |
-| | | |
+| 12 Nov 2026 | B-01 Bomb base dan Normal Bomb (`feat/B-01-normal-bomb`) | `Bomb`, `NormalBomb`, `BombFactory`, `BombSystem` selesai; 8 test lulus. Kapasitas masih kembali saat bom meledak, dipindah ke akhir Explosion di B-02. |
 
 ## Muhammad Ilham Malik Amrullah / 18225022
 
