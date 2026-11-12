@@ -9,6 +9,7 @@ import nangorblast.core.InvalidMapException;
 import nangorblast.core.Position;
 import nangorblast.model.Exit;
 import nangorblast.model.GameWorld;
+import nangorblast.model.block.IndestructibleBlock;
 import org.junit.jupiter.api.Test;
 
 class TestWorldsTest {
@@ -23,13 +24,13 @@ class TestWorldsTest {
         assertEquals(5, world.width());
         assertEquals(3, world.height());
         assertEquals(new Position(1, 1), world.player().position());
-        assertEquals(12, world.entities(TestWorlds.Wall.class).size());
+        assertEquals(12, world.entities(IndestructibleBlock.class).size());
         assertTrue(world.firstAt(new Position(3, 1), Exit.class).isPresent());
     }
 
     @Test
     void legendAddsCharacters() {
-        GameWorld world = TestWorlds.fromAscii(Map.of('W', TestWorlds.Wall::new), "PW");
+        GameWorld world = TestWorlds.fromAscii(Map.of('W', IndestructibleBlock::new), "PW");
 
         assertTrue(world.isBlockedFor(world.player(), new Position(1, 0)));
     }

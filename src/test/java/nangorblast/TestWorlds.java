@@ -3,13 +3,13 @@ package nangorblast;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
-import nangorblast.core.EntityKind;
 import nangorblast.core.InvalidMapException;
 import nangorblast.core.Position;
 import nangorblast.model.Entity;
 import nangorblast.model.Exit;
 import nangorblast.model.GameWorld;
 import nangorblast.model.Player;
+import nangorblast.model.block.IndestructibleBlock;
 
 /**
  * Builds small worlds for tests from rows in the F07.2 legend, for example:
@@ -22,7 +22,7 @@ import nangorblast.model.Player;
  * }</pre>
  *
  * Built in: {@code .} floor, {@code P} player (exactly one), {@code X} exit, and {@code #}
- * as a test wall. Pass a legend to add your own characters or to replace a built-in one,
+ * an Indestructible Block. Pass a legend to add your own characters or to replace a built-in one,
  * for example {@code Map.of('D', DestructibleBlock::new)}. The world uses a seeded random
  * source, a 300-second timer, and a player speed of 4 tiles per second.
  */
@@ -72,7 +72,7 @@ public final class TestWorlds {
                 if (factory != null) {
                     world.add(factory.apply(position));
                 } else if (c == '#') {
-                    world.add(new Wall(position));
+                    world.add(new IndestructibleBlock(position));
                 } else if (c == 'X') {
                     world.add(new Exit(position));
                 } else if (c != '.' && c != 'P') {
@@ -82,23 +82,5 @@ public final class TestWorlds {
             }
         }
         return world;
-    }
-
-    /** A test stand-in for the Indestructible Block until model/block exists. */
-    public static final class Wall extends Entity {
-
-        public Wall(Position position) {
-            super(position);
-        }
-
-        @Override
-        public EntityKind kind() {
-            return EntityKind.INDESTRUCTIBLE_BLOCK;
-        }
-
-        @Override
-        public boolean blocksMovementOf(Entity mover) {
-            return true;
-        }
     }
 }

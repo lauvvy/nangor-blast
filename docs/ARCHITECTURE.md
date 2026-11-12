@@ -191,7 +191,7 @@ Rules that come with them:
 - **Warnings are owned by a source.** A boss attack or a Lava Tile calls `setWarnings(this, tiles)` and `clearWarnings(this)`. Renderers draw the union.
 - **Randomness** comes only from `world.random()`, which tests seed.
 - **Spec values** such as `Player.START_LIVES` are constants for now. `M-05` moves them into `config/game.properties`.
-- **`TestWorlds`** knows `.`, `P`, `X`, and `#` (a test wall). Pass a legend for your own characters, for example `TestWorlds.fromAscii(Map.of('D', DestructibleBlock::new), rows)`. When a real block class lands, its owner replaces the test wall in `TestWorlds`.
+- **`TestWorlds`** knows `.`, `P`, `X`, and `#` (an Indestructible Block). Pass a legend for your own characters, for example `TestWorlds.fromAscii(Map.of('D', DestructibleBlock::new), rows)`.
 
 How the contracts remove cross-member dependencies:
 
