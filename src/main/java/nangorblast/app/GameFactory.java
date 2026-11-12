@@ -13,6 +13,7 @@ import nangorblast.engine.PlayerSystem;
 import nangorblast.engine.SnapshotBuilder;
 import nangorblast.engine.TimerSystem;
 import nangorblast.engine.WinLoseSystem;
+import nangorblast.engine.bomb.BombSystem;
 import nangorblast.input.Command;
 import nangorblast.model.GameWorld;
 
@@ -42,7 +43,7 @@ public final class GameFactory {
 
     /** Every command handler. {@code players} is the same instance passed to {@link #systems}. */
     public static List<CommandHandler> handlers(PlayerSystem players, GameFlow flow) {
-        return List.of(flow, players);
+        return List.of(flow, players, new BombSystem());
     }
 
     /** Every system, in tick order (ARCHITECTURE.md, "Order of work inside one tick"). */
@@ -50,7 +51,7 @@ public final class GameFactory {
         return List.of(
                 players, // 1
                 // 2. EnemySystem, then BossSystem
-                // 3. BombSystem, then ExplosionSystem
+                new BombSystem(), // 3, then ExplosionSystem
                 // 4. HazardSystem
                 // 5. PowerUpSystem
                 new LifeSystem(), // 5b, after every damage source
