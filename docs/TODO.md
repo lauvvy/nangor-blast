@@ -71,7 +71,7 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| E-01 | Enemy base and Patrol Enemy | Ilham | `feat/E-01-patrol-enemy` | F05.1, F05.2 | Pending | 15 Nov | Until C-01 lands, draw the class diagram for the enemy and boss packages. |
+| E-01 | Enemy base and Patrol Enemy | Ilham | `feat/E-01-patrol-enemy` | F05.1, F05.2 | In Progress | 15 Nov | 15 Nov: `make build` lolos dengan `-Werror`. `EnemySystemTest` berisi 3 tes yang hijau: musuh mengikuti jalur dan berbalik di ujung, berbalik saat tile berikutnya tembok, dan tidak berbagi tile dengan musuh lain. Asumsi kerja: patroli bolak-balik, berbalik saat terblokir. Belum direview dan belum dilihat di terminal sungguhan. |
 | E-02 | Chase Enemy | Ilham | `feat/E-02-chase-enemy` | F05.2 | Pending | 19 Nov | Starts after E-01. |
 | E-03 | Contact damage and enemy defeat | Ilham | `feat/E-03-enemy-contact` | F01.2.2, F03.2.5 | Pending | 20 Nov | Starts after E-01. |
 | E-04 | Boss framework | Ilham | `feat/E-04-boss-framework` | F05.3.1 | Pending | 22 Nov | Starts after C-01. Can run in parallel with E-02. |
