@@ -34,6 +34,7 @@ Aturan pengisian:
 | 12 Nov 2026 | B-03 tiga jenis Block (`feat/B-03-blocks`) | `Block`, `IndestructibleBlock`, `DestructibleBlock`, `ReinforcedBlock` selesai; 8 test lulus. `#` di `TestWorlds` sekarang `IndestructibleBlock`. Drop Power-Up dari Destructible Block menyusul di B-07. |
 | 15 Nov 2026 | S-02 terminal spike dan class diagram S-05 (`docs/marshall-spike-class-diagram`) | Spike jalan di terminal Claude desktop (`xterm-256color`): key terbaca tanpa Enter, tidak flicker, key release tidak dilaporkan, dua key ditahan hanya key terakhir yang berulang. Class diagram package bomb, explosion, block, power-up ditulis di `docs/class-diagram-marshall.md`. |
 | 15 Nov 2026 | B-02 Explosion (`feat/B-02-explosion`) | `Explosion` dan `ExplosionSystem` selesai: pusat dan empat lengan, durasi 0,5 detik, berhenti di block, damage sekali per target, bomb lain ikut terpicu. Kapasitas bomb sekarang kembali saat ledakan selesai. 12 test lulus. |
+| 15 Nov 2026 | Update progres dokumen (`docs/marshall-progress`) | B-02 ditandai Done setelah merge PR #15. F04 dicentang di `CLAUDE.md`. Catatan "As built" untuk B-01, B-03, dan B-02 ditambahkan di `ARCHITECTURE.md`. |
 
 ## Muhammad Ilham Malik Amrullah / 18225022
 
