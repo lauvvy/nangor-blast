@@ -48,15 +48,9 @@ public final class BombSystem implements CommandHandler, GameSystem {
 
     @Override
     public void update(GameWorld world, double dt) {
+        // A due bomb is turned into an explosion by ExplosionSystem, later in the same tick.
         for (Bomb bomb : world.entities(Bomb.class)) {
             bomb.tickFuse(dt);
-            if (bomb.isDue()) {
-                bomb.deactivate();
-                // shortcut: capacity comes back when the bomb goes off; B-02 moves this to the end
-                // of its explosion, 0.5 seconds later (F01.2.5).
-                bomb.owner().bombFinished();
-                LOG.debug("{} bomb at {} exploded", bomb.type(), bomb.position());
-            }
         }
     }
 }
