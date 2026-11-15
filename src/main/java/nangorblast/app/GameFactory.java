@@ -14,6 +14,7 @@ import nangorblast.engine.SnapshotBuilder;
 import nangorblast.engine.TimerSystem;
 import nangorblast.engine.WinLoseSystem;
 import nangorblast.engine.bomb.BombSystem;
+import nangorblast.engine.bomb.ExplosionSystem;
 import nangorblast.input.Command;
 import nangorblast.model.GameWorld;
 
@@ -51,7 +52,8 @@ public final class GameFactory {
         return List.of(
                 players, // 1
                 // 2. EnemySystem, then BossSystem
-                new BombSystem(), // 3, then ExplosionSystem
+                new BombSystem(), // 3
+                new ExplosionSystem(), // 3b
                 // 4. HazardSystem
                 // 5. PowerUpSystem
                 new LifeSystem(), // 5b, after every damage source
