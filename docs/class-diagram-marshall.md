@@ -41,6 +41,7 @@ classDiagram
         +owner() Player
         +blastRange() int
         +fuseTime() double
+        +damage() int
         +tickFuse(double dt) void
         +trigger() void
         +isDue() boolean
@@ -64,13 +65,19 @@ classDiagram
 
     %% model/explosion
     class Explosion {
-        <<planned B-02>>
+        +DURATION_SECONDS = 0.5
+        -Position center
+        -int blastRange
         -Player owner
         -BombType bombType
+        -int damage
         -long activationId
-        -double timeLeft
+        -double duration
+        +isCenter() boolean
         +tick(double dt) void
         +isFinished() boolean
+        +hasHurt(Entity target) boolean
+        +markHurt(Entity target) void
     }
 
     %% model/block
@@ -104,7 +111,7 @@ classDiagram
         +update(GameWorld world, double dt) void
     }
     class ExplosionSystem {
-        <<planned B-02>>
+        +update(GameWorld world, double dt) void
     }
     class PowerUpSystem {
         <<planned B-07>>
@@ -135,6 +142,7 @@ classDiagram
     GameSystem <|.. ExplosionSystem
     GameSystem <|.. PowerUpSystem
     BombSystem ..> BombFactory : places
+    ExplosionSystem ..> Bomb : detonates
     ExplosionSystem ..> Explosion : creates
     ExplosionSystem ..> Block : isDestroyedBy
     ExplosionSystem ..> Damageable : takeDamage
