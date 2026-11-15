@@ -25,7 +25,7 @@ Each member runs `make spike` in the terminal they will use, follows the three c
 | Member | OS and terminal | JLine type | Keys read without Enter | Flicker at 20 FPS | Key release reported | Two held keys both repeat |
 | --- | --- | --- | --- | --- | --- | --- |
 | Laura | | | | | | |
-| Marshall | | | | | | |
+| Marshall | Windows 11, Claude desktop Terminal panel (PowerShell 5.1) | `xterm-256color` | Yes | No | No | No, only the last key (D) repeats |
 | Ilham | | | | | | |
 | Areli | | | | | | |
 
