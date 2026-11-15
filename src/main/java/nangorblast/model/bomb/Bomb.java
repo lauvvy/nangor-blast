@@ -39,6 +39,11 @@ public abstract class Bomb extends Entity {
         return blastRange;
     }
 
+    /** Damage its explosion deals to each target. A Pumped Bomb deals 2 (F02.2.2). */
+    public int damage() {
+        return 1;
+    }
+
     /** Seconds left before the bomb explodes. */
     public final double fuseTime() {
         return fuseTime;
