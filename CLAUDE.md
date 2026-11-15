@@ -96,7 +96,7 @@ Mandatory features. Check a box when the feature's tasks are **Done** in `TODO.m
 - [ ] F01 Player: movement, lives, respawn, bomb interaction
 - [ ] F02 Bomb: Normal, Pumped, Remote
 - [ ] F03 Explosion
-- [ ] F04 Block: Indestructible, Destructible, Reinforced
+- [x] F04 Block: Indestructible, Destructible, Reinforced
 - [ ] F05 Enemy: Patrol, Chase, boss Hades
 - [ ] F06 Power-Up: Bomb Up, Fire Up, Speed Up, Remote Detonator, Heart
 - [ ] F07 Map: Red Mountain with Lava Tiles
