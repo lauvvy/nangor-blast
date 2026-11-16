@@ -20,7 +20,7 @@ The first table is the legend from the specification (F07.2) for what exists on 
 | Destructible Block | `D` | `#A9713F` | |
 | Reinforced Block | `R` | `#7C7F86` | Not on the Red Mountain layout. Used by the Map Maker. |
 | Walkable space | `.` | `#3B2A24` | |
-| Player | `P` | `#4FC3F7` | Shown dimmed while invulnerable. |
+| Player | `P` | `#4FC3F7` | Shown dimmed, `#2A6F8E`, while invulnerable. |
 | Normal Enemy | `E` | `#B565D8` | |
 | Boss | `B` | `#E53935` | Shown brighter while vulnerable. |
 | Exit | `X` | `#6D6D6D` locked, `#66BB6A` open | Open once every enemy and the boss are defeated. |
@@ -80,7 +80,7 @@ Each tile shows one thing. When several are on the same tile, the highest in thi
 ## Menus
 
 - Every screen opens with one choice selected. The selected choice is marked with `>` in the terminal and a highlighted background in the GUI.
-- Up and down move the selection, confirm chooses it, and back returns to the previous screen. In the terminal, typing a choice's number also selects it.
+- Up and down move the selection, confirm chooses it, and back returns to the previous screen. In the terminal, typing a choice's number chooses it at once.
 - An input that matches no choice shows an error on the message line and the menu stays open.
 - Controls shown in How to Play are read from the key bindings, so they are never out of date.
 

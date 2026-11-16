@@ -25,7 +25,7 @@ Each member runs `make spike` in the terminal they will use, follows the three c
 | Member | OS and terminal | JLine type | Keys read without Enter | Flicker at 20 FPS | Key release reported | Two held keys both repeat |
 | --- | --- | --- | --- | --- | --- | --- |
 | Laura | | | | | | |
-| Marshall | | | | | | |
+| Marshall | Windows 11, Claude desktop Terminal panel (PowerShell 5.1) | `xterm-256color` | Yes | No | No | No, only the last key (D) repeats |
 | Ilham | | | | | | |
 | Areli | | | | | | |
 
@@ -59,12 +59,15 @@ One owner per package. A member changes another member's package only with that 
 
 ```text
 src/main/java/nangorblast/
-  app/                 Main, GameFactory (composition root)              Laura
-  core/                Position, Direction, GameState, Grid<T>,
-                       EntityKind, GameEvent, EventBus, exceptions       Laura
-  model/               GameWorld, Entity, Damageable, Damage, Player     Laura
+  app/                 Main, GameFactory (composition root), GameSession,
+                       StandInMap (MVP-0 only, removed in C-09)          Laura
+  core/                Position, Direction, GameState, BombType, Grid<T>,
+                       EntityKind, GameEvent, EventBus, events,
+                       exceptions                                        Laura
+  model/               GameWorld, Entity, Damageable, Damage, Hostile,
+                       DamageSource, Player, Exit                        Laura
   model/bomb/          Bomb, NormalBomb, PumpedBomb, RemoteBomb,
-                       BombType, BombFactory                             Marshall
+                       BombFactory                                       Marshall
   model/explosion/     Explosion                                         Marshall
   model/block/         Block, IndestructibleBlock, DestructibleBlock,
                        ReinforcedBlock                                   Marshall
@@ -77,15 +80,16 @@ src/main/java/nangorblast/
   mapio/               MapLoader, MapValidator, EntityFactory,
                        GameConfig                                        Areli
   editor/              Map Maker (bonus B03)                             Areli
-  engine/              GameLoop, GameSystem, CommandQueue,
-                       SnapshotBuilder, PlayerSystem, WinLoseSystem      Laura
+  engine/              GameLoop, GameSystem, CommandHandler, RenderLoop, GameFlow, LifeSystem,
+                       TimerSystem, SnapshotBuilder, PlayerSystem,
+                       WinLoseSystem                                     Laura
   engine/bomb/         BombSystem, ExplosionSystem, PowerUpSystem,
                        ScoreSystem                                       Marshall
   engine/enemy/        EnemySystem, BossSystem                           Ilham
   engine/hazard/       HazardSystem                                      Areli
-  input/               Command, InputSource, KeyBindings                 Laura
+  input/               Action, Command, InputSource, KeyBindings         Laura
   view/                Renderer, WorldSnapshot                           Laura
-  view/cli/            CliRenderer, CliInput, menu screens               Laura
+  view/cli/            CliRenderer, CliFrame, CliInput, menu screens     Laura
   view/gui/            GuiRenderer, GuiInput, libGDX launcher (bonus B01) Laura
 src/test/java/nangorblast/   Mirrors the packages above. Each owner tests their own.
 config/
@@ -102,7 +106,7 @@ The only file every member edits is `app/GameFactory`. Each member adds one line
 
 ### Contracts
 
-`C-01` delivers these types first. Every other task is written against them, so no member waits for another member's implementation. The names are fixed here. `C-01` settles the exact method signatures and records them back in this section.
+`C-01` delivers these types first. Every other task is written against them, so no member waits for another member's implementation. The names are fixed here. The signatures settled in `C-01` follow the table.
 
 | Type | Package | Purpose |
 | --- | --- | --- |
@@ -118,10 +122,76 @@ The only file every member edits is `app/GameFactory`. Each member adds one line
 | `Player` | `model` | F01.1 attributes, plus capped mutators for power-ups. |
 | `GameWorld` | `model` | The F00.1 attributes, plus the warning tiles and the event bus. |
 | `GameSystem` | `engine` | `update(GameWorld world, double dt)`. One class per concern. |
-| `Command` | `input` | One player action. Carries the player index so Local Multiplayer needs no redesign. |
+| `Action`, `Command` | `input` | `Action` names every action. A `Command` is one action by one player. It carries the player index so Local Multiplayer needs no redesign. |
 | `InputSource` | `input` | Produces commands from a device. Implemented by CLI and GUI. |
 | `Renderer`, `WorldSnapshot` | `view` | The snapshot is an immutable copy of what to draw. |
 | `TestWorlds.fromAscii(String...)` | test | Builds a small world from legend characters. Every member's tests use it. |
+
+#### Signatures (settled in C-01)
+
+```java
+// core
+record Position(int col, int row) { Position translate(Direction); int manhattanDistance(Position); }
+enum Direction { UP, DOWN, LEFT, RIGHT; int dCol(); int dRow(); }
+enum GameState { MENU, PLAYING, PAUSED, WIN, LOSE }
+enum BombType { NORMAL, PUMPED, REMOTE }          // in core: Player, HUD, and bombs share it
+enum EntityKind { INDESTRUCTIBLE_BLOCK, ..., POWER_UP_HEART }   // one per row in DESIGN.md
+final class Grid<T> { Grid(int w, int h, Function<Position, ? extends T> initial);
+                      int width(); int height(); boolean inBounds(Position); T get(Position); void set(Position, T); }
+interface GameEvent {}
+interface EventListener<E extends GameEvent> { void onEvent(E event); }
+final class EventBus { <E extends GameEvent> void subscribe(Class<E>, EventListener<? super E>); void publish(GameEvent); }
+record EnemyDefeated(Position position, int scoreValue, boolean boss) implements GameEvent {}
+record GameEnded(GameState result, int livesLeft, int secondsLeft) implements GameEvent {}   // once, at WIN or LOSE (C-08)
+record PlayerDamaged(int playerIndex, int livesLeft) implements GameEvent {}
+record HudMessage(String text) implements GameEvent {}
+class GameException extends RuntimeException      // unchecked; InvalidMapException, ConfigLoadException, InvalidActionException
+
+// model
+abstract class Entity { long id(); Position position(); void moveTo(Position); boolean isActive(); void deactivate();
+                        abstract EntityKind kind(); boolean blocksMovementOf(Entity mover) /* default false */; }
+interface Damageable { boolean takeDamage(Damage damage); }   // true if the target was hurt
+interface Hostile {}                                          // marker: Normal Enemies and bosses; hurts the player on contact (C-04)
+record Damage(int amount, long activationId, DamageSource source) { static long newActivationId(); }
+enum DamageSource { EXPLOSION, BOSS_ATTACK, ENEMY_CONTACT, HAZARD }
+final class Player extends Entity implements Damageable { Player(Position spawn, int playerIndex, double baseSpeed); ... }
+final class Exit extends Entity { boolean isOpen(); void open(); }
+final class GameWorld {
+  GameWorld(String mapName, int width, int height, Player player, double timeLimit, Random random);
+  void add(Entity); List<Entity> entities(); <T extends Entity> List<T> entities(Class<T>);
+  List<Entity> entitiesAt(Position); <T extends Entity> Optional<T> firstAt(Position, Class<T>);
+  boolean inBounds(Position); boolean isBlockedFor(Entity mover, Position target); void removeInactive();
+  void setWarnings(Object source, Set<Position>); void clearWarnings(Object source); Set<Position> warningTiles();
+  Player player(); Random random(); EventBus bus(); int score(); void addScore(int);
+  double timeLeft(); void reduceTime(double); GameState state(); void setState(GameState);
+}
+
+// engine
+interface GameSystem { void update(GameWorld world, double dt); }
+final class SnapshotBuilder { static WorldSnapshot build(GameWorld); }
+
+// input
+enum Action { MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, PLACE_BOMB, SELECT_NORMAL, SELECT_PUMPED,
+              SELECT_REMOTE, DETONATE, PAUSE, CONFIRM, BACK }
+record Command(int playerIndex, Action action) {}
+interface InputSource extends AutoCloseable { void start(Consumer<Command> sink); void close(); }
+
+// view
+record WorldSnapshot(int width, int height, List<Sprite> sprites, Set<Position> warnings, Hud hud, GameState state) {
+  record Sprite(long id, EntityKind kind, Position position) {}
+  record Hud(int lives, int score, int secondsLeft, BombType selectedBomb) {}
+}
+interface Renderer { void render(WorldSnapshot snapshot); }
+```
+
+Rules that come with them:
+
+- **One entity list.** `GameWorld` keeps every entity in one list, and the F00.1 collections are typed queries: `world.entities(Bomb.class)`, `world.entities(Enemy.class)`, and so on. So `GameWorld` needs no import from another member's package. Queries return copies of the active entities, so a system may add entities while iterating.
+- **Blocks, lava, and the exit are entities too.** Each subclass answers `blocksMovementOf(mover)` according to the "Who blocks whom" table, and `GameWorld.isBlockedFor` asks every entity on the target tile. A new obstacle needs no change in `PlayerSystem` or `EnemySystem`.
+- **Warnings are owned by a source.** A boss attack or a Lava Tile calls `setWarnings(this, tiles)` and `clearWarnings(this)`. Renderers draw the union.
+- **Randomness** comes only from `world.random()`, which tests seed.
+- **Spec values** such as `Player.START_LIVES` are constants for now. `M-05` moves them into `config/game.properties`.
+- **`TestWorlds`** knows `.`, `P`, `X`, and `#` (an Indestructible Block). Pass a legend for your own characters, for example `TestWorlds.fromAscii(Map.of('D', DestructibleBlock::new), rows)`.
 
 How the contracts remove cross-member dependencies:
 
@@ -141,13 +211,88 @@ How the contracts remove cross-member dependencies:
 - **Pause** — When the state is not `PLAYING`, the loop skips the systems. Every timer freezes because nothing reduces it, which is exactly F09.5.
 - **Restart** — The composition root builds a new `GameWorld` from the map file. Nothing is reset field by field.
 
+As built in `C-02`:
+
+- `engine/GameLoop` takes the world, the `BlockingQueue<Command>`, a list of `CommandHandler`s, the systems from `GameFactory.systems()`, the tick rate, the catch-up limit, and a clock (`System::nanoTime`, or a fake in tests). `snapshot()` returns the latest snapshot from any thread.
+- `engine/RenderLoop` draws the latest snapshot on the `render` thread whenever it changes.
+- `app/GameSession` runs the three tasks on one `ExecutorService`, renames each pool thread to `input`, `game-loop`, or `render`, and `close()` stops all three and waits up to 2 seconds.
+- `view/cli/CliInput` polls the terminal every 100 ms, so `close()` takes effect without a key press.
+- `input/KeyBindings` reads `config/keybindings.properties`: `p<player>.<ACTION> = key, key`. A key is one printable character, with letters case-insensitive, or one of `UP`, `DOWN`, `LEFT`, `RIGHT`, `ENTER`, `ESCAPE`, `SPACE`, `BACKSPACE`, `TAB`. A key bound twice, an unknown action or key, or a `p1` action with no key is a `ConfigLoadException`.
+
+As built in `C-03`:
+
+- `view/cli/CliFrame` composes one screen from a snapshot as a grid of cells (character and color): HUD on row 0, an empty row, the map from row 2 with each tile two characters wide, and the message line below the map. It holds the glyph table from `DESIGN.md` as an exhaustive `switch`, so a new `EntityKind` does not compile until it has a glyph. It has no terminal access.
+- `view/cli/CliRenderer` diffs each frame against the last one and rewrites only the changed runs of cells. A resize clears and redraws everything. A terminal smaller than the frame (48 × 13 for the 14 × 10 map) shows one message with the needed and current size. Colors are given as RGB and JLine downgrades them to what the terminal supports.
+- Until `C-07` adds menu panels, the message line shows `Paused`, `You win`, or `Game over` for those states.
+
+As built in `C-04`:
+
+- `engine/PlayerSystem` is a `CommandHandler` and a `GameSystem`, so the same instance goes in both lists. A move command steps at once when the cooldown is over, otherwise it is kept for 0.15 seconds and a newer move replaces it. After a step the cooldown is `1 / speed`. The cooldown keeps at most one tick of credit below zero, so a speed that is not a whole number of ticks (6 tiles per second) still averages out exactly.
+- A blocked move turns the player and costs no cooldown. If the blocking tile holds a `model/Hostile` entity, it is contact: `takeDamage` with `ENEMY_CONTACT` and a new activation id, and a `PlayerDamaged` event when a life is lost.
+- **For Ilham:** `Enemy` and `Boss` implement `model/Hostile` and block the player in `blocksMovementOf`. That is all `PlayerSystem` needs to report contact.
+- Until `C-06` adds invulnerability after a hit, every new contact costs a life.
+
+As built in `C-05`:
+
+- `app/Main` opens the system terminal, refuses a `dumb` one with a message and exit status 1, enters raw mode, the alternate screen, and a hidden cursor, runs one `GameSession`, and restores the terminal in a `finally` block. Ctrl+C quits the same way as the quit action.
+- `app/GameFactory` builds the world (`newWorld()`), the handlers (`handlers(players, onQuit)`: `GameFlow`, then `PlayerSystem`), and the systems (`systems(players)`). The same `PlayerSystem` instance goes in both lists.
+- `app/StandInMap` builds the F07.3.3 layout in the MENU state with stand-in entities: blocks, enemies, and the boss block movement and do nothing else, and Lava Tiles are walkable and never erupt. C-09 deletes it and loads `config/maps/red-mountain.txt` through `MapLoader`.
+- `engine/GameFlow` is the MVP-0 state handler. MENU: confirm starts, back quits. PLAYING: pause pauses. PAUSED: pause or confirm resumes, back quits. WIN and LOSE: confirm or back quits. `C-07` replaced it with the full menus.
+- `engine/WinLoseSystem` sets LOSE when the timer reaches 0 or the player has no lives. `C-08` adds WIN.
+- The message line shows the MVP-0 prompts with keys read from `KeyBindings.keysFor`, for example `Nangor Blast. Enter to play, Backspace to quit`.
+- A repeat of the same discrete action was not yet ignored. `C-07` added it.
+
+As built in `C-08`:
+
+- `engine/WinLoseSystem` runs last in the tick and only while PLAYING. LOSE at 0 lives or 0 seconds is checked first. Otherwise, once no active `model/Hostile` entity is left, every `Exit` opens, and WIN follows when the player stands on an open exit.
+- **For Ilham:** a defeated Normal Enemy or boss is deactivated by its system (`deactivate()`), and that is what counts as defeated here. A boss between phases stays active.
+- **For Marshall:** `WinLoseSystem` publishes `core/GameEnded` once, with the lives and the whole seconds left (rounded up, as the HUD shows them). `ScoreSystem` adds the F08 WIN bonus from it: 100 per life and 10 per second.
+- `app/StandInMap` makes the stand-in enemies and boss `Hostile`, so contact costs a life and the exit stays locked until C-09 brings real enemies and bombs.
+
+As built in `C-06`:
+
+- `Player.takeDamage` loses one life per activation, makes the player invulnerable for 1.5 seconds at once (so two activations in the same tick cost one life), and marks a respawn while lives remain. Every damage source only calls `takeDamage`; nothing else is needed.
+- `engine/LifeSystem` runs after every damage source (step 5). It publishes `PlayerDamaged` once per lost life, respawns the player at the spawn point or, if any entity stands there, the nearest tile by walking distance that holds no entity, and resets invulnerability to a full 1.5 seconds. Otherwise it counts invulnerability down by `dt`. At 0 lives there is no respawn, and `WinLoseSystem` sets LOSE.
+- `PlayerSystem` no longer publishes `PlayerDamaged`; `LifeSystem` does it for every source.
+- `WorldSnapshot.Hud` carries `invulnerable`, and the CLI draws the player dimmed (`#2A6F8E`, in `DESIGN.md`) while it is true.
+
+As built in `C-07`:
+
+- `engine/GameFlow` is the screen stack: Main Menu (Start Game, How to Play, Exit), How to Play, Pause (Resume, Restart, Main Menu), and Game Over (Play Again, Main Menu, Exit, with the final score). It is a `CommandHandler`, so it runs in every state, and `panel()` gives the top screen to the snapshot as `WorldSnapshot.Panel`. While playing the stack is empty and only the pause action is read.
+- Menu input: up and down move the selection, confirm chooses, `CHOICE_1` to `CHOICE_3` (keys 1 to 3) choose that item, back returns to the screen below, and pause resumes from the pause menu. Any other key, including a key with no binding (`Action.UNBOUND`, sent by `CliInput`), puts an error on the message line and the menu stays open.
+- A discrete action (pause, confirm, back, a number) repeated within 0.6 seconds of its last press is ignored, so a held key toggles pause once. Time is counted with `dt` in `CommandHandler.afterTick`, which the loop calls for every handler at the end of every tick, in every state.
+- Restart, Main Menu, and Exit end the session through `GameFlow.Outcome`. `app/Main` runs sessions in a loop and builds a new world and new systems (`GameFactory.newLoop`) for each one, so every initial value comes back and no system keeps state from the last game. Restart starts the new world in PLAYING, Main Menu in MENU.
+- `GameLoop` takes an optional snapshot function; `GameFactory.newLoop` passes `SnapshotBuilder.build(world).withPanel(flow.panel())`.
+- `view/cli/CliFrame` draws the panel as a box over the map, which stays visible and dimmed halfway to the background color, with `>` on the selected item and the panel message on the message line in the error color.
+
+As built in `B-01`:
+
+- `model/bomb/Bomb` is the abstract base with F02.1's owner, blast range, and fuse. The fuse counts down by `dt` in `tickFuse`, `trigger()` sets it to 0, and `isDue()` reports it. The blast range is fixed when the bomb is placed.
+- `Bomb.blocksMovementOf` blocks every mover except one standing on the bomb's tile, so the player can step off a new bomb but not back onto it (F01.2.5). No state is kept for this.
+- `model/bomb/BombFactory.create(BombType, Position, Player)` is the only place a bomb class is chosen. Pumped and Remote throw `UnsupportedOperationException` until `B-04` and `B-05`.
+- `engine/bomb/BombSystem` is a `CommandHandler` and a `GameSystem` with no state, so `GameFactory` adds a separate instance to each list. `PLACE_BOMB` places the selected type on the player's tile while PLAYING; it is refused, with a DEBUG log line, at full capacity or on a tile that already holds a bomb. `update` only counts fuses down.
+
+As built in `B-03`:
+
+- `model/block/Block` blocks every mover while active and declares `isDestroyedBy(BombType)`. `IndestructibleBlock` returns false, `DestructibleBlock` true, `ReinforcedBlock` true only for `PUMPED`. A destroyed block is deactivated, so its tile is walkable once the loop removes it.
+- `TestWorlds` builds `#` as an `IndestructibleBlock`. The test `Wall` stand-in is gone.
+- **For Areli:** `EntityFactory` builds `#`, `D`, and a Reinforced character with these three constructors. The power-up a Destructible Block may release comes in `B-07`.
+
+As built in `B-02`:
+
+- `model/explosion/Explosion` is one entity per tile of the area, drawn as `EXPLOSION`. Every tile of one activation shares the center, owner, bomb type, damage, activation id, and one set of entities already hurt. It lasts 0.5 seconds.
+- `engine/bomb/ExplosionSystem` runs right after `BombSystem`. Each tick it first ends finished explosions (the center tile returns the owner's bomb capacity, F01.2.5), then turns every due bomb into the center and four arms, then hits what stands in the flames.
+- An arm stops at the map edge or at any `Block`, and the block's tile is not in the area. The block is deactivated if `isDestroyedBy` the bomb's type.
+- A `Damageable` in the flames gets `takeDamage` with `DamageSource.EXPLOSION` and the bomb's `damage()` (1, or 2 for a Pumped Bomb in `B-04`). It is marked hurt only when `takeDamage` returns true, so an invulnerable player or a boss that is not vulnerable is tried again each tick while the flames last. A bomb in the flames is triggered and explodes on the next tick. Power-ups are not `Damageable` and are left alone.
+- **For Ilham:** `NormalEnemy` and `Boss` only need `Damageable.takeDamage`; return true when the hit counts and false while the boss is not vulnerable.
+
 Order of work inside one tick:
 
-1. Drain the command queue and apply player actions (`PlayerSystem`).
+1. Drain the command queue and pass each command to every `CommandHandler`. Handlers run in every state, so the pause command works while paused. `PlayerSystem` is a handler and a system, and it ignores moves unless the state is `PLAYING`.
 2. `EnemySystem`, then `BossSystem`.
 3. `BombSystem`, then `ExplosionSystem`.
 4. `HazardSystem`.
-5. `PowerUpSystem`.
+5. `PowerUpSystem`, then `LifeSystem`, which handles a lost life from any of the systems above.
 6. Reduce the game timer.
 7. `WinLoseSystem`.
 8. Build and publish the `WorldSnapshot`.
@@ -167,7 +312,7 @@ Order of work inside one tick:
 - **The terminal reports key presses only.** There is no key-release event, and when two keys are held only the last one repeats. The CLI input source therefore sends one `Command` per key event, and a held key moves through the operating system's key repeat. `S-02` confirms this on the team's terminals.
 - **The GUI knows which keys are held**, because libGDX reports both key down and key up. Its input source sends a move `Command` every frame while a move key is down, and `PlayerSystem` keeps only the latest one. The engine treats both sources the same way.
 - **One buffered move.** If a move arrives while the cooldown is running, `PlayerSystem` keeps the latest one for up to 0.15 seconds and applies it when the cooldown ends, so a slightly early key press is not lost.
-- **Discrete actions fire once per press.** A repeat of the same discrete action within 0.2 seconds is ignored, so holding the pause key does not toggle pause repeatedly.
+- **Discrete actions fire once per press.** A repeat of the same discrete action within 0.6 seconds of its last press is ignored, so holding the pause key does not toggle pause repeatedly. The window is longer than the usual 0.5-second key-repeat delay of the operating system, because the terminal cannot tell a held key from a new press.
 
 ### Who blocks whom
 
@@ -198,7 +343,7 @@ One table for the collision rules, so four people implement the same behavior. R
 
 ### Screens
 
-Screens form a stack in `app`: Menu, How to Play, Game, Pause, and Game Over. The top screen receives input and is drawn. Opening How to Play or Pause pushes a screen, and going back pops it. `GameState` stays the model's state from the specification. How to Play is a screen and has no `GameState` value.
+Screens form a stack in `engine/GameFlow`, which runs on the game-loop thread: Menu, How to Play, Pause, and Game Over, with the game itself as the empty stack. The top screen receives input and is drawn. Opening How to Play or Pause pushes a screen, and going back pops it. `GameState` stays the model's state from the specification. How to Play is a screen and has no `GameState` value.
 
 ### Map file
 
@@ -226,9 +371,9 @@ This table is the source for the demo explanation and the booklet. Update it whe
 | Requirement | Where |
 | --- | --- |
 | Inheritance | `Entity` → `Player`, `Enemy` → `NormalEnemy` and `Boss` → `Hades`. `Bomb` → three bomb types. `Block` → three block types. `Tile` → `FloorTile`, `LavaTile`. |
-| Abstract class or interface | Abstract `Entity`, `Bomb`, `Block`, `Boss`. Interfaces `GameSystem`, `Renderer`, `InputSource`, `Command`, `AttackPattern`, `MovementBehavior`, `Damageable`. |
+| Abstract class or interface | Abstract `Entity`, `Bomb`, `Block`, `Boss`. Interfaces `GameSystem`, `Renderer`, `InputSource`, `AttackPattern`, `MovementBehavior`, `Damageable`, `EventListener`. |
 | Polymorphism | The loop calls `update` on every `GameSystem`. `ExplosionSystem` calls `takeDamage` on any `Damageable`. `BossSystem` runs any `AttackPattern`. |
-| Generics | `Grid<T>`, `EventListener<E extends GameEvent>`, `EventBus.subscribe(Class<E>, EventListener<E>)`. |
+| Generics | `Grid<T>`, `EventListener<E extends GameEvent>`, `EventBus.subscribe(Class<E>, EventListener<? super E>)`, `GameWorld.entities(Class<T>)`. |
 | Exceptions | `GameException` hierarchy. `MapValidator` throws `InvalidMapException` and the menu shows the message. |
 | Collections | `List` for entities, `Map` and `EnumMap` for key bindings and glyphs, `Set<Position>` for explosion and warning tiles, `Deque` for breadth-first search, `BlockingQueue` for commands. |
 | Concurrency | The three threads, `ExecutorService`, `BlockingQueue`, and the `volatile` snapshot. |
@@ -239,7 +384,7 @@ This table is the source for the demo explanation and the booklet. Update it whe
 | Strategy | `MovementBehavior` for enemies. `AttackPattern` for Hades. | A new behavior or attack is a new class. |
 | Factory Method | `EntityFactory` from map characters. `BombFactory` from `BombType`. | Creation rules sit in one place. |
 | Observer | `EventBus` with `ScoreSystem`, the HUD, and the logger as listeners. | Systems stay unaware of each other. |
-| Command | `Command` objects from `InputSource`. | CLI, GUI, and a second player share the same actions. |
+| Command | `Command` records from `InputSource`, queued for the game loop, applied by `PlayerSystem`. | CLI, GUI, and a second player share the same actions. Input is decoupled from when and where it is applied. |
 
 MVC is the overall architecture and is described in the booklet beside these five.
 
@@ -280,7 +425,7 @@ After `C-01` on 12 November, the only tasks that depend on another member's work
 | C-02 | Game loop and the three threads | F09.3 | C-01 | 13 Nov | 300 game seconds take 300 real seconds within 1 second. A 2-second stall causes at most 5 catch-up ticks. Commands arrive through the queue from keys read out of `config/keybindings.properties`, and a key bound twice is refused. Threads are named, and the program exits cleanly with no thread left running. |
 | C-03 | CLI renderer and HUD | F09.3, F07.2 | C-01, S-02 | 13 Nov | The screen shows the map with the glyphs in `DESIGN.md` and a HUD with lives, score, timer, and selected bomb. Only changed cells are rewritten. A terminal too small for the map and HUD shows a message asking to enlarge it. |
 | C-04 | Player movement and collision | F01.2.1, F01.2.3 | C-01 | 14 Nov | Tests show that movement follows the player's speed, is stopped by blocks, enemies, active bombs, and the map edge, keeps one early move for 0.15 seconds, and reports contact when the player steps into an enemy. |
-| C-05 | MVP-0: a playable walking skeleton | F09 | C-02, C-03, C-04 | 14 Nov | From the menu, the Red Mountain map loads through `TestWorlds.fromAscii`, Deeper walks, the timer counts down, pause works, and the game ends in LOSE at 0 seconds. |
+| C-05 | MVP-0: a playable walking skeleton | F09 | C-02, C-03, C-04 | 14 Nov | From the menu, the Red Mountain map loads through a stand-in builder in `app` (`TestWorlds` is test code and cannot ship), Deeper walks, the timer counts down, pause works, and the game ends in LOSE at 0 seconds. |
 | C-06 | Lives, damage, invulnerability, and respawn | F01.2.2, F01.2.4 | C-04 | 19 Nov | Tests show one life lost per activation, 1.5 seconds of invulnerability, respawn at the spawn point or the nearest free tile, and LOSE at 0 lives. |
 | C-07 | Menu, How to Play, pause menu, restart, and the game over screen | F09.1, F09.5, F00.4 | C-02 | 20 Nov | Screens are a stack, and back returns to the previous screen. Invalid menu input shows an error and asks again. Pause offers resume, restart, and menu, and holding the pause key toggles once. Restart restores every initial value. The final score is shown at WIN and LOSE. |
 | C-08 | Win and lose check, with the exit locked until all enemies are defeated | F09.4 | C-01 | 16 Nov | Tests show WIN only when the 5 Normal Enemies and the boss are defeated and the player is on the exit, and LOSE at 0 lives or 0 seconds. |

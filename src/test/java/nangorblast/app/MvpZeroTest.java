@@ -1,0 +1,153 @@
+package nangorblast.app;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import nangorblast.core.EntityKind;
+import nangorblast.core.GameState;
+import nangorblast.core.Position;
+import nangorblast.engine.CommandHandler;
+import nangorblast.engine.GameFlow;
+import nangorblast.engine.GameFlow.Outcome;
+import nangorblast.engine.GameSystem;
+import nangorblast.engine.PlayerSystem;
+import nangorblast.input.Action;
+import nangorblast.input.Command;
+import nangorblast.model.Entity;
+import nangorblast.model.GameWorld;
+import nangorblast.model.Player;
+import org.junit.jupiter.api.Test;
+
+/** The C-05 walk-through on the real composition: menu, walk, pause, timer, LOSE, quit. */
+class MvpZeroTest {
+
+    private static final double DT = 0.05;
+
+    private final List<Outcome> outcomes = new ArrayList<>();
+    private final GameWorld world = StandInMap.redMountain(new Random(42));
+    private final PlayerSystem players = new PlayerSystem();
+    private final List<CommandHandler> handlers =
+            GameFactory.handlers(players, new GameFlow(Action::name, outcomes::add));
+    private final List<GameSystem> systems = GameFactory.systems(players);
+
+    /** One tick in GameLoop's order. */
+    private void tick(Action... actions) {
+        for (Action action : actions) {
+            handlers.forEach(h -> h.handle(world, new Command(0, action)));
+        }
+        if (world.state() == GameState.PLAYING) {
+            systems.forEach(s -> s.update(world, DT));
+        }
+        handlers.forEach(h -> h.afterTick(world, DT));
+        world.removeInactive();
+    }
+
+    private void seconds(double seconds) {
+        for (int i = 0; i < Math.round(seconds / DT); i++) {
+            tick();
+        }
+    }
+
+    @Test
+    void redMountainLoadsWithTheF0733Layout() {
+        assertEquals(14, world.width());
+        assertEquals(10, world.height());
+        assertEquals(new Position(1, 1), world.player().position());
+        assertEquals(GameState.MENU, world.state());
+        assertEquals(5, count(EntityKind.NORMAL_ENEMY));
+        assertEquals(1, count(EntityKind.BOSS));
+        assertEquals(1, count(EntityKind.EXIT_LOCKED));
+        assertTrue(world.isBlockedFor(world.player(), new Position(0, 1)), "the border is solid");
+    }
+
+    private long count(EntityKind kind) {
+        return world.entities().stream().map(Entity::kind).filter(kind::equals).count();
+    }
+
+    @Test
+    void menuWalkPauseTimerLoseQuit() {
+        tick(Action.MOVE_RIGHT);
+        seconds(5);
+        assertEquals(new Position(1, 1), world.player().position(), "the menu ignores moves");
+        assertEquals(300.0, world.timeLeft(), "the timer waits in the menu");
+
+        tick(Action.CONFIRM);
+        tick(Action.MOVE_RIGHT);
+        seconds(0.5);
+        tick(Action.MOVE_RIGHT);
+        seconds(0.5);
+        tick(Action.MOVE_RIGHT); // Destructible Block at (4, 1)
+        assertEquals(new Position(3, 1), world.player().position(), "Deeper walks and stops at a block");
+
+        tick(Action.PAUSE);
+        double paused = world.timeLeft();
+        tick(Action.MOVE_LEFT);
+        seconds(10);
+        assertEquals(paused, world.timeLeft(), "pause freezes the timer");
+        assertEquals(new Position(3, 1), world.player().position(), "pause ignores moves");
+
+        tick(Action.PAUSE);
+        seconds(paused - 1);
+        assertEquals(GameState.PLAYING, world.state());
+        seconds(1.1);
+        assertEquals(0.0, world.timeLeft());
+        assertEquals(GameState.LOSE, world.state(), "LOSE at 0 seconds");
+
+        tick(Action.CONFIRM);
+        assertEquals(List.of(Outcome.RESTART), outcomes, "confirm on the game over screen plays again");
+    }
+
+    @Test
+    void restartStartsFromEveryInitialValue() {
+        tick(Action.CONFIRM);
+        world.player().moveTo(new Position(1, 7));
+        tick(Action.MOVE_DOWN); // lose a life
+        world.addScore(300);
+        seconds(5);
+
+        GameWorld fresh = GameFactory.newWorld(); // what Main builds for Restart and Main Menu
+        assertEquals(Player.START_LIVES, fresh.player().lives());
+        assertEquals(0, fresh.score());
+        assertEquals(StandInMap.TIME_LIMIT, fresh.timeLeft());
+        assertEquals(new Position(1, 1), fresh.player().position());
+        assertEquals(GameState.MENU, fresh.state());
+        assertEquals(world.entities().size(), fresh.entities().size(), "every block, enemy, and exit is back");
+        assertTrue(world.player().lives() < Player.START_LIVES && world.score() > 0, "the old world did change");
+    }
+
+    @Test
+    void steppingIntoAStandInEnemyCostsALifeAndRespawnsAtTheSpawnPoint() {
+        world.player().moveTo(new Position(1, 7)); // the enemy at (1, 8) is below
+        tick(Action.CONFIRM);
+        tick(Action.MOVE_DOWN);
+
+        assertEquals(2, world.player().lives());
+        assertEquals(new Position(1, 1), world.player().position(), "back at the spawn point");
+        assertTrue(world.player().isInvulnerable());
+        assertEquals(GameState.PLAYING, world.state());
+    }
+
+    @Test
+    void threeContactsWithTimeToRecoverEndInLose() {
+        tick(Action.CONFIRM);
+        for (int i = 0; i < 3; i++) {
+            world.player().moveTo(new Position(1, 7));
+            tick(Action.MOVE_DOWN);
+            seconds(1.5); // invulnerability runs out
+        }
+        assertEquals(0, world.player().lives());
+        assertEquals(GameState.LOSE, world.state());
+    }
+
+    @Test
+    void theExitStaysLockedWhileStandInEnemiesRemain() {
+        world.player().moveTo(new Position(12, 1)); // the exit
+        tick(Action.CONFIRM);
+        seconds(1);
+        assertEquals(GameState.PLAYING, world.state());
+        assertEquals(1, count(EntityKind.EXIT_LOCKED));
+    }
+}
