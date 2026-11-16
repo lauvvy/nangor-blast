@@ -14,6 +14,7 @@ import nangorblast.engine.SnapshotBuilder;
 import nangorblast.engine.TimerSystem;
 import nangorblast.engine.WinLoseSystem;
 import nangorblast.engine.bomb.BombSystem;
+import nangorblast.engine.bomb.ExplosionSystem;
 import nangorblast.input.Command;
 import nangorblast.model.GameWorld;
 import nangorblast.engine.enemy.EnemySystem;

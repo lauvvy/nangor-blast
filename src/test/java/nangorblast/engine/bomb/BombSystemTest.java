@@ -47,15 +47,15 @@ class BombSystemTest {
     }
 
     @Test
-    void normalBombExplodesAfterThreeSeconds() {
+    void normalBombIsDueAfterThreeSeconds() {
         GameWorld world = TestWorlds.fromAscii("P..");
         place(world);
         Bomb bomb = world.entities(Bomb.class).get(0);
 
         ticks(world, 59); // 2.95 s
-        assertTrue(bomb.isActive());
+        assertFalse(bomb.isDue());
         ticks(world, 1);  // 3.00 s
-        assertFalse(bomb.isActive());
+        assertTrue(bomb.isDue());
     }
 
     @Test
@@ -78,20 +78,6 @@ class BombSystemTest {
 
         assertEquals(1, world.entities(Bomb.class).size());
         assertEquals(1, world.player().activeBombs());
-    }
-
-    @Test
-    void capacityReturnsAfterTheBombExplodes() {
-        GameWorld world = TestWorlds.fromAscii("P..");
-        place(world);
-        assertFalse(world.player().canPlaceBomb());
-
-        ticks(world, 60);
-        world.removeInactive();
-
-        assertEquals(0, world.player().activeBombs());
-        place(world);
-        assertEquals(1, world.entities(Bomb.class).size());
     }
 
     @Test

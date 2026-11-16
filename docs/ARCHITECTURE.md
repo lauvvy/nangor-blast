@@ -25,7 +25,7 @@ Each member runs `make spike` in the terminal they will use, follows the three c
 | Member | OS and terminal | JLine type | Keys read without Enter | Flicker at 20 FPS | Key release reported | Two held keys both repeat |
 | --- | --- | --- | --- | --- | --- | --- |
 | Laura | | | | | | |
-| Marshall | | | | | | |
+| Marshall | Windows 11, Claude desktop Terminal panel (PowerShell 5.1) | `xterm-256color` | Yes | No | No | No, only the last key (D) repeats |
 | Ilham | | | | | | |
 | Areli | | | | | | |
 
@@ -264,6 +264,27 @@ As built in `C-07`:
 - Restart, Main Menu, and Exit end the session through `GameFlow.Outcome`. `app/Main` runs sessions in a loop and builds a new world and new systems (`GameFactory.newLoop`) for each one, so every initial value comes back and no system keeps state from the last game. Restart starts the new world in PLAYING, Main Menu in MENU.
 - `GameLoop` takes an optional snapshot function; `GameFactory.newLoop` passes `SnapshotBuilder.build(world).withPanel(flow.panel())`.
 - `view/cli/CliFrame` draws the panel as a box over the map, which stays visible and dimmed halfway to the background color, with `>` on the selected item and the panel message on the message line in the error color.
+
+As built in `B-01`:
+
+- `model/bomb/Bomb` is the abstract base with F02.1's owner, blast range, and fuse. The fuse counts down by `dt` in `tickFuse`, `trigger()` sets it to 0, and `isDue()` reports it. The blast range is fixed when the bomb is placed.
+- `Bomb.blocksMovementOf` blocks every mover except one standing on the bomb's tile, so the player can step off a new bomb but not back onto it (F01.2.5). No state is kept for this.
+- `model/bomb/BombFactory.create(BombType, Position, Player)` is the only place a bomb class is chosen. Pumped and Remote throw `UnsupportedOperationException` until `B-04` and `B-05`.
+- `engine/bomb/BombSystem` is a `CommandHandler` and a `GameSystem` with no state, so `GameFactory` adds a separate instance to each list. `PLACE_BOMB` places the selected type on the player's tile while PLAYING; it is refused, with a DEBUG log line, at full capacity or on a tile that already holds a bomb. `update` only counts fuses down.
+
+As built in `B-03`:
+
+- `model/block/Block` blocks every mover while active and declares `isDestroyedBy(BombType)`. `IndestructibleBlock` returns false, `DestructibleBlock` true, `ReinforcedBlock` true only for `PUMPED`. A destroyed block is deactivated, so its tile is walkable once the loop removes it.
+- `TestWorlds` builds `#` as an `IndestructibleBlock`. The test `Wall` stand-in is gone.
+- **For Areli:** `EntityFactory` builds `#`, `D`, and a Reinforced character with these three constructors. The power-up a Destructible Block may release comes in `B-07`.
+
+As built in `B-02`:
+
+- `model/explosion/Explosion` is one entity per tile of the area, drawn as `EXPLOSION`. Every tile of one activation shares the center, owner, bomb type, damage, activation id, and one set of entities already hurt. It lasts 0.5 seconds.
+- `engine/bomb/ExplosionSystem` runs right after `BombSystem`. Each tick it first ends finished explosions (the center tile returns the owner's bomb capacity, F01.2.5), then turns every due bomb into the center and four arms, then hits what stands in the flames.
+- An arm stops at the map edge or at any `Block`, and the block's tile is not in the area. The block is deactivated if `isDestroyedBy` the bomb's type.
+- A `Damageable` in the flames gets `takeDamage` with `DamageSource.EXPLOSION` and the bomb's `damage()` (1, or 2 for a Pumped Bomb in `B-04`). It is marked hurt only when `takeDamage` returns true, so an invulnerable player or a boss that is not vulnerable is tried again each tick while the flames last. A bomb in the flames is triggered and explodes on the next tick. Power-ups are not `Damageable` and are left alone.
+- **For Ilham:** `NormalEnemy` and `Boss` only need `Damageable.takeDamage`; return true when the hit counts and false while the boss is not vulnerable.
 
 Order of work inside one tick:
 
