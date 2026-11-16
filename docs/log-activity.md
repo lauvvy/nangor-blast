@@ -39,8 +39,8 @@ Aturan pengisian:
 ## Muhammad Ilham Malik Amrullah / 18225022
 
 | Waktu | Kegiatan | Hasil |
-| --- | --- | --- |
-| | | |
+| 11 November 2026 | E-01 Patrol Enemy | Enemy.java, MovementBehavior.java, Normal Enemy, PatrolBehavior.java|
+| 15 November 2026 | E-01 Patrol Enemy | EnemySytem.java, GameFactory.java |
 
 ## Areli Matthew Widodo / 18225102
 

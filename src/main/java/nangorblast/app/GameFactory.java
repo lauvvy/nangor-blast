@@ -17,6 +17,7 @@ import nangorblast.engine.bomb.BombSystem;
 import nangorblast.engine.bomb.ExplosionSystem;
 import nangorblast.input.Command;
 import nangorblast.model.GameWorld;
+import nangorblast.engine.enemy.EnemySystem;
 
 /** The composition root. Each member registers a system with one line in {@link #systems}. */
 public final class GameFactory {
@@ -51,9 +52,8 @@ public final class GameFactory {
     public static List<GameSystem> systems(PlayerSystem players) {
         return List.of(
                 players, // 1
-                // 2. EnemySystem, then BossSystem
-                new BombSystem(), // 3
-                new ExplosionSystem(), // 3b
+                new EnemySystem(), // 2 (BossSystem comes with E-04)
+                new BombSystem(), // 3, then ExplosionSystem
                 // 4. HazardSystem
                 // 5. PowerUpSystem
                 new LifeSystem(), // 5b, after every damage source
