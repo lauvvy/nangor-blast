@@ -19,191 +19,191 @@ Tim Asisten Lab Pemrograman 2023
 
 # Daftar Isi
 
-[**Daftar Revisi 2**](#_kgr7w4gbduqd)
+[**Daftar Revisi**](#daftar-revisi)
 
-[**Daftar Isi 3**](#_hx8m79idyn5e)
+[**Daftar Isi**](#daftar-isi)
 
-[**Overview 6**](#_b3ft2cjq8zlm)
+[**Overview**](#overview)
 
-[**Pedoman 7**](#_1hpht14jyggr)
+[**Pedoman**](#pedoman)
 
-[**Latar Belakang 9**](#_capwkk5qyjuy)
+[**Latar Belakang**](#latar-belakang)
 
-[**Spesifikasi Sistem 11**](#_c0r80oksdmj)
+[**Spesifikasi Sistem**](#spesifikasi-sistem)
 
-[Ketentuan Umum 11](#_4mb44mvt91yk)
+[Ketentuan Umum](#ketentuan-umum)
 
-[Ketentuan Teknis 11](#_72uaxpb7lwzh)
+[Ketentuan Teknis](#ketentuan-teknis)
 
-[**Spesifikasi Permainan 13**](#_6v9h6bmjung)
+[**Spesifikasi Permainan**](#spesifikasi-permainan)
 
-[F00 - Inisialisasi Permainan 13](#_vmmy32c8eq39)
+[F00 - Inisialisasi Permainan](#f00---inisialisasi-permainan)
 
-[F00.1. Atribut 13](#_t0d3957fzyio)
+[F00.1. Atribut](#f001-atribut)
 
-[F00.2. Proses Inisialisasi 14](#_gq9anjqyhc4d)
+[F00.2. Proses Inisialisasi](#f002-proses-inisialisasi)
 
-[F00.3. Validasi Map 14](#_mvwn7rday43n)
+[F00.3. Validasi Map](#f003-validasi-map)
 
-[F00.4. Restart 14](#_2661j6ki7f8t)
+[F00.4. Restart](#f004-restart)
 
-[F01 - Player 15](#_iyvbzpmtxlg4)
+[F01 - Player](#f01---player)
 
-[F01.1. Atribut 15](#_7z1vafo3xcs7)
+[F01.1. Atribut](#f011-atribut)
 
-[F01.2. Perilaku dan Aturan 16](#_22a3jjl0gso6)
+[F01.2. Perilaku dan Aturan](#f012-perilaku-dan-aturan)
 
-[F01.2.1. Pergerakan 16](#_ife7lw9dmqho)
+[F01.2.1. Pergerakan](#f0121-pergerakan)
 
-[F01.2.2. Nyawa 16](#_dbf1lcuxrx70)
+[F01.2.2. Nyawa](#f0122-nyawa)
 
-[F01.2.3. Aksi Player 16](#_v155ggq5qkg3)
+[F01.2.3. Aksi Player](#f0123-aksi-player)
 
-[F01.2.4. Respawn 17](#_py38r3afqh2v)
+[F01.2.4. Respawn](#f0124-respawn)
 
-[F01.2.5. Interaksi dengan Bomb 17](#_cp0w5bz4d00g)
+[F01.2.5. Interaksi dengan Bomb](#f0125-interaksi-dengan-bomb)
 
-[F02 - Bomb 19](#_nx0w7i2eg2iu)
+[F02 - Bomb](#f02---bomb)
 
-[F02.1. Atribut 19](#_jdd4arwtod81)
+[F02.1. Atribut](#f021-atribut)
 
-[F02.2. Jenis Bomb 19](#_r5en3v6uqycz)
+[F02.2. Jenis Bomb](#f022-jenis-bomb)
 
-[F02.2.1. Normal Bomb 19](#_8f9bczl6qndo)
+[F02.2.1. Normal Bomb](#f0221-normal-bomb)
 
-[F02.2.2. Pumped Bomb 20](#_qfeacgmq546p)
+[F02.2.2. Pumped Bomb](#f0222-pumped-bomb)
 
-[F02.2.3. Remote Bomb 20](#_mf92gbzcgkik)
+[F02.2.3. Remote Bomb](#f0223-remote-bomb)
 
-[F02.3. Aturan Bomb 21](#_n5uypb2mj6ua)
+[F02.3. Aturan Bomb](#f023-aturan-bomb)
 
-[F02.3.1. Aksi Player 21](#_if7ru7lrtlec)
+[F02.3.1. Aksi Player](#f0231-aksi-player)
 
-[F02.3.2. Aksi Pemilihan Pumped Bomb 22](#_c7d5mc6ppgfe)
+[F02.3.2. Aksi Pemilihan Pumped Bomb](#f0232-aksi-pemilihan-pumped-bomb)
 
-[F02.3.3. Aksi Remote Detonate 22](#_bxu7rljfc82s)
+[F02.3.3. Aksi Remote Detonate](#f0233-aksi-remote-detonate)
 
-[F03 - Explosion 24](#_1ncoxvdixu3l)
+[F03 - Explosion](#f03---explosion)
 
-[F03.1. Atribut 24](#_1t25qnd3qbp6)
+[F03.1. Atribut](#f031-atribut)
 
-[F03.2. Perilaku dan Aturan 24](#_suqhj74hzvt)
+[F03.2. Perilaku dan Aturan](#f032-perilaku-dan-aturan)
 
-[F04 - Block 26](#_q79phoe41xq5)
+[F04 - Block](#f04---block)
 
-[F04.1. Atribut 26](#_eql3wbeikj6)
+[F04.1. Atribut](#f041-atribut)
 
-[F04.2. Jenis Block 26](#_ipw3cdm1l0dg)
+[F04.2. Jenis Block](#f042-jenis-block)
 
-[F04.2.1. Indestructible Block 26](#_l7r5vy2j57jd)
+[F04.2.1. Indestructible Block](#f0421-indestructible-block)
 
-[F04.2.2. Destructible Block 26](#_h9c66k9k06lw)
+[F04.2.2. Destructible Block](#f0422-destructible-block)
 
-[F04.2.3. Reinforced Block 27](#_ecqnk770tjcv)
+[F04.2.3. Reinforced Block](#f0423-reinforced-block)
 
-[F05 - Enemy 28](#_ib0t0k4w2guc)
+[F05 - Enemy](#f05---enemy)
 
-[F05.1. Atribut 28](#_1gp53m8b5aj4)
+[F05.1. Atribut](#f051-atribut)
 
-[F05.2. Normal Enemy 28](#_f0oaabkmbarh)
+[F05.2. Normal Enemy](#f052-normal-enemy)
 
-[F05.3. Boss Enemy 29](#_wf5ldv5kqald)
+[F05.3. Boss Enemy](#f053-boss-enemy)
 
-[F05.3.1 Aturan Umum Boss Enemy 29](#_qy1pms53ugwx)
+[F05.3.1 Aturan Umum Boss Enemy](#f0531-aturan-umum-boss-enemy)
 
-[F05.3.2. Boss Green Garden - Draco 31](#_r2oh2cswuiuw)
+[F05.3.2. Boss Green Garden - Draco](#f0532-boss-green-garden---draco)
 
-[F05.3.3. Boss Blue Resort - Leviathan 32](#_grq4r53swcn8)
+[F05.3.3. Boss Blue Resort - Leviathan](#f0533-boss-blue-resort---leviathan)
 
-[F05.3.4. Boss Red Mountain - Hades 33](#_6gel89o7tl7q)
+[F05.3.4. Boss Red Mountain - Hades](#f0534-boss-red-mountain---hades)
 
-[F05.3.5. Boss White Glacier - Mantis 34](#_1fsg0wj1jkhq)
+[F05.3.5. Boss White Glacier - Mantis](#f0535-boss-white-glacier---mantis)
 
-[F05.3.6. Boss Black Fortress - Cerberus dan Altair 35](#_czoebbvjbwgf)
+[F05.3.6. Boss Black Fortress - Cerberus dan Altair](#f0536-boss-black-fortress---cerberus-dan-altair)
 
-[F06 - Power-Up 36](#_88jna9a6qzgw)
+[F06 - Power-Up](#f06---power-up)
 
-[F06.1. Atribut 36](#_3rzvicpukpi4)
+[F06.1. Atribut](#f061-atribut)
 
-[F06.2. Jenis Power-Up 37](#_5g2my5o1w03f)
+[F06.2. Jenis Power-Up](#f062-jenis-power-up)
 
-[F06.3. Aturan Power-Up 37](#_6xdjl77p0m5s)
+[F06.3. Aturan Power-Up](#f063-aturan-power-up)
 
-[F07 - Map 38](#_tc965mlt8lt0)
+[F07 - Map](#f07---map)
 
-[F07.1. Ketentuan Umum Map 38](#_t8z4rcpexbyp)
+[F07.1. Ketentuan Umum Map](#f071-ketentuan-umum-map)
 
-[F07.2. Legenda 38](#_qmfxgtyaw0dn)
+[F07.2. Legenda](#f072-legenda)
 
-[F07.3. Map dan Mekanisme Lingkungan 39](#_z8y0rxrre24x)
+[F07.3. Map dan Mekanisme Lingkungan](#f073-map-dan-mekanisme-lingkungan)
 
-[Aturan Umum Gate (Khusus Blue Resort dan Black Fortress) 39](#_2b25lwkcl0gu)
+[Aturan Umum Gate (Khusus Blue Resort dan Black Fortress)](#aturan-umum-gate-khusus-blue-resort-dan-black-fortress)
 
-[F07.3.1. MAP TYPE A: Green Garden 40](#_nd522l30ffbh)
+[F07.3.1. MAP TYPE A: Green Garden](#f0731-map-type-a-green-garden)
 
-[F07.3.2. MAP TYPE B: Blue Resort 41](#_63kvxcz5ur2x)
+[F07.3.2. MAP TYPE B: Blue Resort](#f0732-map-type-b-blue-resort)
 
-[F07.3.3. MAP TYPE C: Red Mountain 42](#_y1wgbccy8n4d)
+[F07.3.3. MAP TYPE C: Red Mountain](#f0733-map-type-c-red-mountain)
 
-[F07.3.4. MAP TYPE D: White Glacier 43](#_bn1zsq6s0l2w)
+[F07.3.4. MAP TYPE D: White Glacier](#f0734-map-type-d-white-glacier)
 
-[F07.3.5. MAP TYPE E: Black Fortress 44](#_qegh5mv2nubp)
+[F07.3.5. MAP TYPE E: Black Fortress](#f0735-map-type-e-black-fortress)
 
-[F08 - Score 46](#_gl5idsd36qam)
+[F08 - Score](#f08---score)
 
-[F08.1. Aturan Score 46](#_v5ee50dsvot7)
+[F08.1. Aturan Score](#f081-aturan-score)
 
-[F09 - Game Flow 47](#_xwhl0ak4mngf)
+[F09 - Game Flow](#f09---game-flow)
 
-[F09.1. Menu Utama 47](#_t8oi4ptvcwx)
+[F09.1. Menu Utama](#f091-menu-utama)
 
-[F09.1.1. Tampilan Menu 47](#_1vz2izcw21xs)
+[F09.1.1. Tampilan Menu](#f0911-tampilan-menu)
 
-[F09.1.2 Aturan Menu 47](#_hz6iyri0894d)
+[F09.1.2 Aturan Menu](#f0912-aturan-menu)
 
-[F09.2. Game State 48](#_bipzyeeexre9)
+[F09.2. Game State](#f092-game-state)
 
-[F09.3. Game Process 49](#_w4qanh2xwqfz)
+[F09.3. Game Process](#f093-game-process)
 
-[F09.4. Game Over 50](#_1mxribr1n86u)
+[F09.4. Game Over](#f094-game-over)
 
-[F09.5. Pause 51](#_sdcx9st2mty0)
+[F09.5. Pause](#f095-pause)
 
-[**Bonus 52**](#_3w87ayrq2soq)
+[**Bonus**](#bonus)
 
-[B01 - GUI 52](#_9x94hodyjhoz)
+[B01 - GUI](#b01---gui)
 
-[B02 - Bomb Kick 52](#_f3acy1nif0nl)
+[B02 - Bomb Kick](#b02---bomb-kick)
 
-[B03 - Map Maker 53](#_92sjiomyedbk)
+[B03 - Map Maker](#b03---map-maker)
 
-[B04 - Local Multiplayer 53](#_v47972oics8n)
+[B04 - Local Multiplayer](#b04---local-multiplayer)
 
-[B05 - Design Pattern 54](#_6zyjbtcy99np)
+[B05 - Design Pattern](#b05---design-pattern)
 
-[BXX - Kreativitas 54](#_1jbv3zqv5qal)
+[BXX - Kreativitas](#bxx---kreativitas)
 
-[**Ketentuan Umum 55**](#_mea1kc9ojcwe)
+[**Ketentuan Umum**](#ketentuan-umum-1)
 
-[A. Timeline Pengerjaan 56](#_qo1xquqcyka5)
+[A. Timeline Pengerjaan](#timeline-pengerjaan)
 
-[B. Asistensi 56](#_e7qcz0nrzomb)
+[B. Asistensi](#asistensi)
 
-[**Pengumpulan dan Deliverables 58**](#_rxm5c6p3rhj)
+[**Pengumpulan dan Deliverables**](#pengumpulan-dan-deliverables)
 
-[A. Milestone 1 58](#_ffaa3qwyuvbp)
+[A. Milestone 1](#milestone-1)
 
-[B. Milestone 2 58](#_88312j4fj5jq)
+[B. Milestone 2](#milestone-2)
 
-[Source Code 59](#_hr0fii97xdxv)
+[Source Code](#source-code)
 
-[Buklet 59](#_1qfx7pxbx22w)
+[Buklet](#buklet)
 
-[Log Activity 60](#_yw6nnxw224po)
+[Log Activity](#log-activity)
 
-[**Referensi 61**](#_s1ydygfksv2q)
+[**Referensi**](#referensi)
 
-[**Extras 62**](#_pis51b3yhq3h)
+[**Extras**](#extras)
 
 #
 
@@ -257,7 +257,7 @@ Kini, Deeper harus menyelesaikan penyelidikan sebelum seluruh wilayah Nangor Fal
 
 ## Ketentuan Umum
 
-Anda diminta untuk membuat permainan berbasis **Command Line Interface (CLI)** bernama **Nangor Blast** menggunakan bahasa pemrograman **Java**. Tuliskan tahapan untuk melakukan kompilasi dan menjalankan program pada file README.md yang dikumpulkan bersama dengan source code. **Nangor Blast** dimainkan oleh 1 pemain yang mengendalikan Deeper untuk melakukan investigasi di berbagai lokasi di Nangor Falls. Tujuan permainan adalah mengalahkan seluruh Normal Enemy dan Boss Enemy pada map serta mencapai pintu keluar. Untuk mewujudkan tujuan tersebut, terdapat beberapa aksi yang perlu dilakukan oleh pemain yang dijelaskan pada bagian [<u>ini</u>](#_iyvbzpmtxlg4). Penjelasan mengenai aksi dapat dibaca pada bagian Actions, sedangkan gambaran besar flow permainan dapat dibaca pada bagian [<u>ini</u>](#_xwhl0ak4mngf). Setiap kelompok mendapatkan **satu tipe dasar map** yang harus dikembangkan dan dimodifikasi sesuai pembagian kelompok. Pembagian tipe map dapat dilihat pada bagian [<u>ini</u>](#_tc965mlt8lt0), sedangkan penjelasan mengenai karakteristik dan ketentuan masing-masing tipe map juga dapat dibaca pada bagian tersebut.
+Anda diminta untuk membuat permainan berbasis **Command Line Interface (CLI)** bernama **Nangor Blast** menggunakan bahasa pemrograman **Java**. Tuliskan tahapan untuk melakukan kompilasi dan menjalankan program pada file README.md yang dikumpulkan bersama dengan source code. **Nangor Blast** dimainkan oleh 1 pemain yang mengendalikan Deeper untuk melakukan investigasi di berbagai lokasi di Nangor Falls. Tujuan permainan adalah mengalahkan seluruh Normal Enemy dan Boss Enemy pada map serta mencapai pintu keluar. Untuk mewujudkan tujuan tersebut, terdapat beberapa aksi yang perlu dilakukan oleh pemain yang dijelaskan pada bagian [<u>ini</u>](#f01---player). Penjelasan mengenai aksi dapat dibaca pada bagian Actions, sedangkan gambaran besar flow permainan dapat dibaca pada bagian [<u>ini</u>](#f09---game-flow). Setiap kelompok mendapatkan **satu tipe dasar map** yang harus dikembangkan dan dimodifikasi sesuai pembagian kelompok. Pembagian tipe map dapat dilihat pada bagian [<u>ini</u>](#f07---map), sedangkan penjelasan mengenai karakteristik dan ketentuan masing-masing tipe map juga dapat dibaca pada bagian tersebut.
 
 ## Ketentuan Teknis
 
@@ -304,7 +304,7 @@ Sistem permainan **setidaknya memiliki atribut sebagai berikut.**
 
 ### F00.2. Proses Inisialisasi
 
-1. Sistem memuat map yang ditentukan untuk kelompok pada [<u>F07 - Map</u>](#_tc965mlt8lt0).
+1. Sistem memuat map yang ditentukan untuk kelompok pada [<u>F07 - Map</u>](#f07---map).
 2. Sistem membuat entitas berdasarkan informasi pada map.
 3. Player dan Normal Enemy ditempatkan pada titik spawn masing-masing.
 4. Boss Enemy ditempatkan pada area boss yang ditentukan.
@@ -358,7 +358,7 @@ Player memulai permainan dengan 3 nyawa, kapasitas bomb 1, dan jangkauan ledakan
 2. Player tidak dapat melewati block, enemy, bomb aktif, Gate tertutup, atau batas map.
 3. Pergerakan dilakukan sesuai kecepatan player dan tidak dapat menembus penghalang.
 4. Player dapat bergerak pada tile yang dapat dilalui.
-5. Pergerakan pada Ice Tile mengikuti aturan [<u>F07.3.4 White Glacier</u>](#_bn1zsq6s0l2w) .
+5. Pergerakan pada Ice Tile mengikuti aturan [<u>F07.3.4 White Glacier</u>](#f0734-map-type-d-white-glacier) .
 
 ### F01.2.2. Nyawa
 
@@ -392,7 +392,7 @@ Player memulai permainan dengan 3 nyawa, kapasitas bomb 1, dan jangkauan ledakan
 1. Player dapat memasang bomb pada tile tempat ia berdiri jika kapasitas bomb masih tersedia.
 2. Player dapat meninggalkan tile bomb, tetapi tidak dapat memasuki kembali tile yang masih ditempati bomb aktif.
 3. Bomb yang telah selesai meledak mengembalikan kapasitasnya kepada player.
-4. Player dapat memilih Normal Bomb atau Pumped Bomb sesuai aturan [<u>F02 - Bomb</u>](#_79c85gow70ak).
+4. Player dapat memilih Normal Bomb atau Pumped Bomb sesuai aturan [<u>F02 - Bomb</u>](#f02---bomb).
 5. Player hanya dapat menggunakan Remote Bomb setelah memperoleh Remote Detonator.
 
 ###
@@ -456,7 +456,7 @@ Remote Bomb merupakan jenis bom yang dapat diledakkan secara manual oleh player.
 3. Sistem menampilkan jenis bomb yang sedang dipilih.
 4. Pemilihan jenis bomb tidak mengubah jenis bomb yang telah dipasang sebelumnya.
 5. Bomb hanya dapat ditempatkan pada tile yang dapat dilalui dan tidak ditempati bomb aktif lain.
-6. Bomb yang telah dipasang tidak dapat dipindahkan, kecuali melalui bonus [<u>Bomb Kick</u>](#_f3acy1nif0nl).
+6. Bomb yang telah dipasang tidak dapat dipindahkan, kecuali melalui bonus [<u>Bomb Kick</u>](#b02---bomb-kick).
 7. Bomb yang terkena Explosion dari bomb lain langsung terpicu.
 8. Bomb hanya menghasilkan satu Explosion dalam satu aktivasi.
 9. Fuse bomb berjalan secara real-time.
@@ -519,7 +519,7 @@ Explosion **setidaknya memiliki atribut sebagai berikut.**
 ### F03.2. Perilaku dan Aturan
 
 1. Explosion berlangsung selama 0,5 detik dan menyebar ke atas, bawah, kiri, kanan, dan tengah.
-2. Explosion berhenti ketika mengenai Indestructible Block sesuai aturan [<u>F04 - Block</u>](#_q79phoe41xq5).
+2. Explosion berhenti ketika mengenai Indestructible Block sesuai aturan [<u>F04 - Block</u>](#f04---block).
 3. Explosion dapat mengenai player, Normal Enemy, Boss Enemy, dan bomb aktif, kecuali Power-Up, yang berada dalam jangkauannya.
 4. Player tidak kebal terhadap ledakan bomb miliknya sendiri, kecuali sedang berada dalam kondisi invulnerable.
 5. Normal Enemy selalu menerima damage dari Explosion yang mengenainya, sedangkan Boss Enemy hanya menerima damage ketika rentan.
@@ -638,7 +638,7 @@ Setiap Boss Enemy menjalankan serangan melalui tahapan berikut.
 6. Boss tidak dapat melewati Indestructible Block atau batas area pertarungan.
 7. Boss dapat memberikan damage sebanyak 1 nyawa kepada player melalui serangan atau kontak.
 8. Serangan boss tidak merusak block jenis apapun sehingga serangan berbentuk garis lurus dan projectile akan berhenti ketika mengenai Block.
-9. Boss yang dikalahkan memberikan skor sesuai [<u>F08 - Score</u>](#_gl5idsd36qam).
+9. Boss yang dikalahkan memberikan skor sesuai [<u>F08 - Score</u>](#f08---score).
 10. Pola serangan boss berlangsung secara real-time.
 
 ### F05.3.2. Boss Green Garden - Draco
@@ -828,7 +828,7 @@ Blue Resort merupakan kawasan resort yang memiliki saluran air dan jembatan. Per
 5. Ketika player memasuki tile Switch, seluruh Gate berubah dari OPEN menjadi CLOSED atau sebaliknya.
 6. Kondisi Gate yang telah berubah akan tetap berlaku sampai player memasuki tile Switch kembali.
 7. Setiap Switch pada map memiliki fungsi yang sama terhadap seluruh Gate.
-8. Ketentuan perubahan kondisi Gate mengikuti [<u>Aturan Umum Gate</u>](#_2b25lwkcl0gu).
+8. Ketentuan perubahan kondisi Gate mengikuti [<u>Aturan Umum Gate</u>](#aturan-umum-gate-khusus-blue-resort-dan-black-fortress).
 
 ### F07.3.3. MAP TYPE C: Red Mountain
 
@@ -923,7 +923,7 @@ Ketika program dijalankan, sistem menampilkan menu utama Nangor Blast yang setid
 
 | **Pilihan** | **Keterangan** |
 | --- | --- |
-| Start Game | Memulai permainan dan menjalankan proses inisialisasi sesuai [<u>F00 – Inisialisasi Permainan</u>](#_vmmy32c8eq39). |
+| Start Game | Memulai permainan dan menjalankan proses inisialisasi sesuai [<u>F00 – Inisialisasi Permainan</u>](#f00---inisialisasi-permainan). |
 | How to Play | Menampilkan petunjuk permainan, tujuan permainan, serta daftar kontrol yang dapat digunakan pemain. |
 | Exit | Mengakhiri program permainan. |
 
@@ -960,7 +960,7 @@ Sistem menerima input dari pemain melalui keyboard, seperti perintah untuk berge
 
 1. **Player Action**
 
-Sistem memproses input pemain dan menjalankan aksi sesuai ketentuan pada [<u>F01 - Player</u>](#_iyvbzpmtxlg4) dan [<u>F02 - Bomb</u>](#_f3acy1nif0nl).
+Sistem memproses input pemain dan menjalankan aksi sesuai ketentuan pada [<u>F01 - Player</u>](#f01---player) dan [<u>F02 - Bomb</u>](#f02---bomb).
 
 1. **Enemy Loop**
 
@@ -1045,7 +1045,7 @@ Folder terpusat: [<u>Tugas Besar IF2010 26/27</u>](https://drive.google.com/driv
 
 [<u>QnA IF2010 2026/2027 - Tugas Besar 1</u>](https://docs.google.com/spreadsheets/d/1iO31PrJfTks09Yx7SjoOk0abn1PxKf4abTsmV15_Ohw/edit?usp=sharing)
 
-Mekanisme pengerjaan silakan perhatikan bagian [<u>Pengumpulan dan Deliverables</u>](#_rxm5c6p3rhj)
+Mekanisme pengerjaan silakan perhatikan bagian [<u>Pengumpulan dan Deliverables</u>](#pengumpulan-dan-deliverables)
 
 ## Timeline Pengerjaan
 
