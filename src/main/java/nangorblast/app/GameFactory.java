@@ -54,6 +54,7 @@ public final class GameFactory {
                 players, // 1
                 new EnemySystem(), // 2 (BossSystem comes with E-04)
                 new BombSystem(), // 3, then ExplosionSystem
+                new ExplosionSystem(),
                 // 4. HazardSystem
                 // 5. PowerUpSystem
                 new LifeSystem(), // 5b, after every damage source

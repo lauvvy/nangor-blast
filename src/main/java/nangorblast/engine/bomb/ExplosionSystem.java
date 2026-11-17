@@ -38,14 +38,23 @@ public final class ExplosionSystem implements GameSystem {
                 }
             }
         }
-        for (Bomb bomb : world.entities(Bomb.class)) {
-            if (bomb.isDue()) {
-                detonate(world, bomb);
-            }
-        }
+        // Resolve the whole chain in this tick, including bombs earlier in insertion order.
         for (Explosion explosion : world.entities(Explosion.class)) {
             hit(world, explosion);
         }
+        boolean detonated;
+        do {
+            detonated = false;
+            for (Bomb bomb : world.entities(Bomb.class)) {
+                if (bomb.isDue()) {
+                    detonate(world, bomb);
+                    detonated = true;
+                }
+            }
+            for (Explosion explosion : world.entities(Explosion.class)) {
+                hit(world, explosion);
+            }
+        } while (detonated);
     }
 
     private static void detonate(GameWorld world, Bomb bomb) {

@@ -13,8 +13,8 @@ public final class BombFactory {
     public static Bomb create(BombType type, Position position, Player owner) {
         return switch (type) {
             case NORMAL -> new NormalBomb(position, owner);
-            // shortcut: Pumped arrives in B-04 and Remote in B-05; until then they cannot be selected.
-            case PUMPED, REMOTE -> throw new UnsupportedOperationException(type + " bomb is not implemented yet");
+            case PUMPED -> new PumpedBomb(position, owner);
+            case REMOTE -> new RemoteBomb(position, owner);
         };
     }
 }

@@ -92,6 +92,7 @@ Task-level detail is in [`TODO.md`](docs/TODO.md).
 | Document | Purpose |
 | --- | --- |
 | [`PRD.md`](docs/PRD.md) | Scope, user stories, and acceptance criteria |
+| [`REVISION-1.2.md`](docs/REVISION-1.2.md) | Latest specification source, bomb revision behavior, and verification coverage |
 | [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Stack, structure, contracts, and the implementation plan |
 | [`TODO.md`](docs/TODO.md) | Task status for the whole team |
 | [`WORKFLOW.md`](docs/WORKFLOW.md) | Working rules, Git workflow, and definition of done |

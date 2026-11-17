@@ -1,6 +1,7 @@
 package nangorblast.engine;
 
 import java.util.Optional;
+import nangorblast.core.BombType;
 import nangorblast.core.Direction;
 import nangorblast.core.GameState;
 import nangorblast.core.Position;
@@ -11,6 +12,8 @@ import nangorblast.model.Entity;
 import nangorblast.model.GameWorld;
 import nangorblast.model.Hostile;
 import nangorblast.model.Player;
+import nangorblast.model.bomb.Bomb;
+import nangorblast.model.bomb.RemoteBomb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +40,41 @@ public final class PlayerSystem implements CommandHandler, GameSystem {
 
     @Override
     public void handle(GameWorld world, Command command) {
-        Optional<Direction> direction = directionOf(command);
         Player player = world.player();
-        if (direction.isEmpty() || world.state() != GameState.PLAYING
-                || command.playerIndex() != player.playerIndex() || !player.isAlive()) {
+        if (command.playerIndex() != player.playerIndex() || !player.isAlive()) {
+            return;
+        }
+
+        switch (command.action()) {
+            case SELECT_NORMAL -> {
+                if (world.state() == GameState.PLAYING) {
+                    player.selectBomb(BombType.NORMAL);
+                }
+                return;
+            }
+            case SELECT_PUMPED -> {
+                if (world.state() == GameState.PLAYING) {
+                    player.selectBomb(BombType.PUMPED);
+                }
+                return;
+            }
+            case SELECT_REMOTE -> {
+                if (world.state() == GameState.PLAYING && player.isRemoteUnlocked()) {
+                    player.selectBomb(BombType.REMOTE);
+                }
+                return;
+            }
+            case DETONATE -> {
+                if (world.state() == GameState.PLAYING) {
+                    detonateRemoteBombs(world, player);
+                }
+                return;
+            }
+            default -> { }
+        }
+
+        Optional<Direction> direction = directionOf(command);
+        if (direction.isEmpty() || world.state() != GameState.PLAYING) {
             return;
         }
         if (cooldown <= EPSILON) {
@@ -86,6 +120,14 @@ public final class PlayerSystem implements CommandHandler, GameSystem {
                             player.playerIndex(), other.kind(), target, player.lives());
                 }
                 return;
+            }
+        }
+    }
+
+    private static void detonateRemoteBombs(GameWorld world, Player player) {
+        for (Bomb bomb : world.entities(Bomb.class)) {
+            if (bomb instanceof RemoteBomb && bomb.owner() == player) {
+                bomb.trigger();
             }
         }
     }
