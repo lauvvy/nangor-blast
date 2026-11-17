@@ -96,7 +96,7 @@ Task-level detail is in [`TODO.md`](docs/TODO.md).
 | [`TODO.md`](docs/TODO.md) | Task status for the whole team |
 | [`WORKFLOW.md`](docs/WORKFLOW.md) | Working rules, Git workflow, and definition of done |
 | [`DESIGN.md`](docs/DESIGN.md) | Terminal glyphs and GUI visual rules |
-| [Class Diagram Nangor Blast](docs/diagram/Class%20Diagram%20Nangor%20Blast.drawio) | Integration of all four source diagrams, with one overview and six package detail pages; proposed additions are marked as planned |
+| [Class Diagram Nangor Blast](docs/diagram/Class%20Diagram%20Nangor%20Blast.drawio) | Full class diagram with attributes and operations, plus six package detail pages; proposed additions are marked as planned |
 | [`CLAUDE.md`](CLAUDE.md) | Instructions for the coding agent |
 | [`IF2010 Spesifikasi Tugas Besar.md`](docs/IF2010%20Spesifikasi%20Tugas%20Besar.md) | The course specification |
 | [`log-activity.md`](docs/log-activity.md) | Activity log per member, for Milestone 2 |
