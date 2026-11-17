@@ -4,7 +4,7 @@ Source: https://docs.google.com/document/d/11SiADQ6-lTOeH3joe7QI_XrsJZTnxrdqHmgr
 
 Checked on 17 November 2026 using the document's text export. Revision history:
 14 November adds responsible generative AI use; 15 November adds bomb rules.
-The original specification copy is preserved.
+The Markdown specification copy is synchronized with these version 1.2 revisions.
 
 ## Bomb behavior
 

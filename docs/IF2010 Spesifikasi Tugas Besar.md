@@ -3,7 +3,7 @@ IF2010 Pemrograman Berorientasi Objek 2026**
 
 Tim Asisten Lab Pemrograman 2023
 
-| Versi | : **1.0** |
+| Versi | : **1.2** |
 | --- | --- |
 | Tgl. Revisi Terakhir | : - |
 | Deadline | : 17 November 2026, 20.10 WIB (Milestone 1)  4 Desember 2026, 20.10 WIB (Milestone 2) |
@@ -14,7 +14,8 @@ Tim Asisten Lab Pemrograman 2023
 
 # Daftar Revisi
 
-1. -
+1. [14 November 2026 - 09:00 WIB] Penambahan Ketentuan Penggunaan Generative AI
+2. [15 November 2026 - 13:55 WIB] Penambahan Ketentuan Aturan Bomb
 
 # Daftar Isi
 
@@ -223,9 +224,10 @@ Berikut merupakan pedoman yang dapat Anda ikuti selama proses pengerjaan tugas b
 5. Dalam mengerjakan program, **lakukan asesmen untuk meninjau** bagian mana saja yang **perlu konkurensi** dan **tidak perlu konkurensi**. Tidak semua bagian perlu dikonkurensikan. Kalian cukup menerapkan konkurensi pada **aksi yang relevan**.
 6. Penggunaan ***lock*** harus **dilakukan secara hati-hati**, jangan sampai menyebabkan [*<u>deadlock</u>*](https://en.wikipedia.org/wiki/Deadlock_%28computer_science%29). Apabila tidak menggunakan *synchronized* maupun *lock*, hati-hati pula terhadap [*<u>race condition</u>*](https://en.wikipedia.org/wiki/Race_condition).
 7. Buat program Anda **mudah diobservasi** sejak awal. Lakukan *logging* secara terstruktur untuk bagian-bagian kode yang dianggap penting. Alih-alih hanya menggunakan println(), coba eksplorasi pustaka *logger* seperti **SLF4J**. Anda **dapat** **memberi nama *thread*** untuk memudahkan proses *debug* melalui *log* yang dihasilkan.
-8. Detail terkait atribut maupun *method* yang didefinisikan dalam spesifikasi ini bersifat **rekomendasi dan tidak saklek**(**dapat Anda modifikasi**) asalkan sesuai dengan tujuan permainan.
-9. **KERJAKAN SECARA TERSTRUKTUR DAN KOORDINASIKAN PEKERJAAN ANDA**. Terapkan ***Git workflow*** (misalnya gunakan skema *branching*) untuk memastikan *commit* bermasalah dapat di-*revert* dengan mudah.
-10. **Uji program kalian dengan saksama dan menyeluruh sebelum demo**. Hanya karena program kalian bisa di-*compile*, bukan berarti program kalian *foolproof*. Seluruh fitur juga harus diuji bersamaan (*integration test*), sebab fitur dapat saling mempengaruhi fitur lainnya. **GUNAKAN EMPATI DAN BERSIKAP INISIATIF, jangan hanya memedulikan pekerjaan Anda saja.**
+8. Ketentuan penggunaan Generative AI dalam tugas besar ini adalah bebas bertanggung jawab. Jika terdapat penggunaan Generative AI yang tidak bertanggung jawab (mis. tidak mampu menjelaskan kode yang dibuat ketika demo ataupun asistensi) dalam pengerjaan tugas besar ini, seluruh anggota kelompok akan menerima sanksi BERAT sesuai dengan aturan akademik.
+9. Detail terkait atribut maupun *method* yang didefinisikan dalam spesifikasi ini bersifat **rekomendasi dan tidak saklek**(**dapat Anda modifikasi**) asalkan sesuai dengan tujuan permainan.
+10. **KERJAKAN SECARA TERSTRUKTUR DAN KOORDINASIKAN PEKERJAAN ANDA**. Terapkan ***Git workflow*** (misalnya gunakan skema *branching*) untuk memastikan *commit* bermasalah dapat di-*revert* dengan mudah.
+11. **Uji program kalian dengan saksama dan menyeluruh sebelum demo**. Hanya karena program kalian bisa di-*compile*, bukan berarti program kalian *foolproof*. Seluruh fitur juga harus diuji bersamaan (*integration test*), sebab fitur dapat saling mempengaruhi fitur lainnya. **GUNAKAN EMPATI DAN BERSIKAP INISIATIF, jangan hanya memedulikan pekerjaan Anda saja.**
 
 #
 
@@ -458,6 +460,7 @@ Remote Bomb merupakan jenis bom yang dapat diledakkan secara manual oleh player.
 7. Bomb yang terkena Explosion dari bomb lain langsung terpicu.
 8. Bomb hanya menghasilkan satu Explosion dalam satu aktivasi.
 9. Fuse bomb berjalan secara real-time.
+10. Setiap jenis Bomb harus memiliki representasi visual yang dapat dibedakan pada tampilan permainan.
 
 ### F02.3.1. Aksi Player
 
