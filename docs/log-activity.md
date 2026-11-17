@@ -39,8 +39,10 @@ Aturan pengisian:
 ## Muhammad Ilham Malik Amrullah / 18225022
 
 | Waktu | Kegiatan | Hasil |
-| 11 November 2026 | E-01 Patrol Enemy | Enemy.java, MovementBehavior.java, Normal Enemy, PatrolBehavior.java|
-| 15 November 2026 | E-01 Patrol Enemy | EnemySytem.java, GameFactory.java |
+| --- | --- | --- |
+| 11 November 2026 | E-01 Patrol Enemy | `Enemy`, `MovementBehavior`, `Normal Enemy`, `PatrolBehavior` |
+| 15 November 2026 | E-01 Patrol Enemy | `EnemySytem`, `GameFactory` |
+| 17 November 2026 | `S-05` class diagram paket enemy dan boss | Membuat dua class diagram di draw.io. Paket enemy: `Enemy`, `NormalEnemy`, `MovementBehavior`, `PatrolBehavior`, `ChaseBehavior`, `EnemySystem`. Paket boss: `Boss`, `Hades`, `BossPhase`, `BossSystem`, `AttackPattern` dengan empat serangan. Kontrak dari C-01 yang dipakai ikut digambar. Nama serangan, field, dan method masih rancangan dan bisa berubah saat implementasi. |
 
 ## Areli Matthew Widodo / 18225102
 
