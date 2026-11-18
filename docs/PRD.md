@@ -2,8 +2,8 @@
 
 > **Status** Draft, pending Asistensi 1
 > **Author** Laura Paula Gosal (18225060), with Claude Code
-> **Last updated** 19 November 2026 (execution allocation; scope questions remain pending)
-> **Source** [`IF2010 Spesifikasi Tugas Besar.md`](IF2010%20Spesifikasi%20Tugas%20Besar.md), version 1.2
+> **Last updated** 10 November 2026
+> **Source** [`IF2010 Spesifikasi Tugas Besar.md`](IF2010%20Spesifikasi%20Tugas%20Besar.md), version 1.0
 
 This document condenses the course specification into the scope the team builds. When this file and the specification disagree, the specification wins and this file is corrected.
 
@@ -11,7 +11,7 @@ This document condenses the course specification into the scope the team builds.
 
 IF2010 Object-Oriented Programming requires each group to build **Nangor Blast**, a real-time Bomberman game for the command line in Java. The game has to show seven OOP concepts, at least two design patterns, and at least three SOLID principles, and the team has to explain each of them during assistance sessions and the demo.
 
-Four people build the game in 24 days, with a first submission after 7 days. Without a shared scope, a stable set of interfaces, and one tracker, members block each other, features interact in untested ways, and the mandatory features are not finished before the bonus work starts.
+The team builds the game in 24 days, with a first submission after 7 days. Without a shared scope, a stable set of interfaces, and one tracker, members block each other, features interact in untested ways, and the mandatory features are not finished before the bonus work starts.
 
 ## 2. Goals
 
@@ -30,14 +30,13 @@ Deliver a complete, demonstrable Nangor Blast for map type C (Red Mountain) and 
 
 - **Player** — One person who controls Deeper from the keyboard. During the demo this is a team member or a course assistant.
 - **Course assistants** — They grade the game, the booklet, and the team's explanation of the design. They also answer specification questions.
-- **Team** — The original four-person roster is retained. The execution allocation revised on 19 November assigns future work to Laura, Marshall, and Ilham, with file-level ownership for the redistributed map/config/hazard/editor work in `TODO.md`.
+- **Team** — Laura, Marshall, and Ilham. Ownership is by package, so each member can work without waiting for another.
 
   | Member | NIM | Area |
   | --- | --- | --- |
-  | Laura Paula Gosal | 18225060 | Core/CLI/integration/GUI; base map, loader, reachability, warnings, config wiring, booklet manual |
-  | Marshall Farrell Attalla K | 18225062 | Bomb/block/power-up/score and multiplayer; entity factory, structural validation, lava cycle, config parser, README, editor UI |
-  | Muhammad Ilham Malik Amrullah | 18225022 | Enemy/boss/creativity; lava damage, help, technical booklet/final PDFs, activity-log compilation, editor IO |
-  | Areli Matthew Widodo | 18225102 | Original roster/credits retained; future assignments redistributed in TODO.md |
+  | Laura Paula Gosal | 18225060 | Core contracts, game loop, input, CLI, game flow, MVP, integration, GUI; map loading and validation, configuration |
+  | Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer; Lava Tile, Map Maker |
+  | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, Boss framework, Hades, creativity feature; booklet, activity log, How to Play/README text |
 
 - **AI coding agent** — Claude Code, working from `CLAUDE.md`, `WORKFLOW.md`, and `TODO.md`.
 
