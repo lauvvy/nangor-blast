@@ -80,12 +80,12 @@ Logs are written to `logs/nangor-blast.log`, never to the screen.
 
 | Member | NIM | Responsibility |
 | --- | --- | --- |
-| Laura Paula Gosal | 18225060 | Core contracts, game loop and concurrency, input, CLI view, game flow, MVP, integration, GUI |
-| Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer |
-| Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, boss framework, Hades, creativity feature |
-| Areli Matthew Widodo | 18225102 | Map loading and validation, Lava Tile, configuration, Map Maker, booklet, activity log |
+| Laura Paula Gosal | 18225060 | Core, input/CLI, flow, integration, GUI; map/base tiles, loader, reachability, lava warnings, config wiring, booklet manual |
+| Marshall Farrell Attalla K | 18225062 | Bombs, blocks, power-ups, score, Bomb Kick, multiplayer; entity factory, structural validation, lava model, config parser, README, Map Maker editing |
+| Muhammad Ilham Malik Amrullah | 18225022 | Enemies, Hades, creativity; lava damage, How to Play, technical booklet/final PDFs, activity-log compilation, Map Maker save/load |
+| Areli Matthew Widodo | 18225102 | Original roster/credits retained; future map, environment, editor, and deliverable work redistributed in the current TODO plan |
 
-Task-level detail is in [`TODO.md`](docs/TODO.md).
+The execution plan revised on 19 November 2026 assigns future work to Laura, Marshall, and Ilham. [`TODO.md`](docs/TODO.md) lists the six reassigned packages per contributor, remaining-effort estimates, dependencies, and targets. Historical contributions remain credited to their authors.
 
 ## Project Documents
 

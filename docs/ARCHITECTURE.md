@@ -1,9 +1,9 @@
 # ARCHITECTURE — Nangor Blast
 
-> **Status** Initial plan, 10 November 2026. No code exists yet, so everything below is planned, not current.
+> **Status** Living design; initial plan 10 November 2026, task allocation revised 19 November 2026. See TODO.md for implementation/verification status; unimplemented types remain proposals.
 > **Scope source** [`PRD.md`](PRD.md). **Task status** [`TODO.md`](TODO.md).
 
-The choices in this document were made by the team lead with Claude Code and have not been reviewed by the whole team. Change them here first when the team agrees on something different.
+The initial design was prepared by the team lead with Claude Code. The 19 November execution revision redistributes pending work across Laura, Marshall, and Ilham; historical credits are preserved. Review shared API changes before implementation.
 
 ## Technical Stack
 
@@ -20,7 +20,7 @@ The choices in this document were made by the team lead with Claude Code and hav
 
 ### Terminal spike results (S-02)
 
-Each member runs `make spike` in the terminal they will use, follows the three checks on screen, quits with `q`, and fills their row. The spike is `view/cli/TerminalSpike`, built on JLine 3.30.17. A terminal type of `dumb` means JLine could not take control of the terminal, and the game will not work there.
+Each active contributor runs `make spike` in their terminal and records the checks for S-02. The historical four-member results below are preserved; the 19 November execution plan requires the remaining evidence from Laura, Marshall, and Ilham. The spike is `view/cli/TerminalSpike`, built on JLine 3.30.17. A terminal type of `dumb` means JLine could not take control of the terminal, and the game will not work there.
 
 | Member | OS and terminal | JLine type | Keys read without Enter | Flicker at 20 FPS | Key release reported | Two held keys both repeat |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ This is MVC: `model` is the model, `view` is the view, and `engine` with `input`
 
 ### Packages and owners
 
-One owner per package. A member changes another member's package only with that owner's agreement.
+Existing packages retain their domain owners. Redistributed map/mapio/hazard/editor work has one owner per file, with reviewed wiring seams as listed in TODO.md; the 19 November allocation supersedes the original Areli lane.
 
 ```text
 src/main/java/nangorblast/
@@ -76,25 +76,25 @@ src/main/java/nangorblast/
                        PatrolBehavior, ChaseBehavior                     Ilham
   model/boss/          Boss, Hades, AttackPattern and its four
                        implementations, BossPhase                        Ilham
-  model/map/           GameMap, Tile, FloorTile, LavaTile, LavaState     Areli
-  mapio/               MapLoader, MapValidator, EntityFactory,
-                       GameConfig                                        Areli
-  editor/              Map Maker (bonus B03)                             Areli
+  model/map/           GameMap, Tile, FloorTile (Laura), LavaTile, LavaState (Marshall)
+  mapio/               MapLoader, ReachabilityValidator                  Laura
+                       MapValidator, EntityFactory, GameConfig           Marshall
+  editor/              MapMaker editing (Marshall), MapMakerIO (Ilham), bonus B03
   engine/              GameLoop, GameSystem, CommandHandler, RenderLoop, GameFlow, LifeSystem,
                        TimerSystem, SnapshotBuilder, PlayerSystem,
                        WinLoseSystem                                     Laura
   engine/bomb/         BombSystem, ExplosionSystem, PowerUpSystem,
                        ScoreSystem                                       Marshall
   engine/enemy/        EnemySystem, BossSystem                           Ilham
-  engine/hazard/       HazardSystem                                      Areli
+  engine/hazard/       HazardSystem (Laura), LavaDamageSystem (Ilham)
   input/               Action, Command, InputSource, KeyBindings         Laura
   view/                Renderer, WorldSnapshot                           Laura
   view/cli/            CliRenderer, CliFrame, CliInput, menu screens     Laura
   view/gui/            GuiRenderer, GuiInput, libGDX launcher (bonus B01) Laura
 src/test/java/nangorblast/   Mirrors the packages above. Each owner tests their own.
 config/
-  maps/red-mountain.txt      The map, in the F07.2 legend                Areli
-  game.properties            Tunable values (timer, speeds, durations)   Areli
+  maps/red-mountain.txt      The map, in the F07.2 legend                Laura
+  game.properties            Tunable values (timer, speeds, durations)   Marshall
   keybindings.properties     Keys for each action, per player            Laura
 assets/                      Sprites and the font for the GUI            Laura
 docs/                        Project documents, specification, activity log
@@ -102,7 +102,7 @@ doc/                         Submission PDFs. The specification requires this
                              folder name. Created in S-01.
 ```
 
-The only file every member edits is `app/GameFactory`. Each member adds one line there to register their systems. Keep those edits to one line per system so merges stay trivial.
+Laura coordinates app/GameFactory; contributors make only the reviewed wiring needed by their task. M-02B may add one reviewed delegation call to Marshall's MapValidator. All algorithms remain in their named owner's file to avoid concurrent edits.
 
 ### Contracts
 
@@ -195,7 +195,7 @@ Rules that come with them:
 
 How the contracts remove cross-member dependencies:
 
-- **Damage** — `ExplosionSystem` (Marshall), `BossSystem` (Ilham), and `HazardSystem` (Areli) all call `Damageable.takeDamage(Damage)`. `Player` (Laura), `NormalEnemy`, and `Boss` (Ilham) implement it. Nobody needs the other side's code to test their own.
+- **Damage** — `ExplosionSystem` (Marshall), `BossSystem` (Ilham), and `LavaDamageSystem` (Ilham) all call `Damageable.takeDamage(Damage)`. `Player` (Laura), `NormalEnemy`, and `Boss` (Ilham) implement it. Nobody needs the other side's code to test their own.
 - **Drawing** — Every entity and tile reports an `EntityKind`. A new kind needs one enum constant and one entry in each renderer.
 - **Warnings** — Boss attacks and lava add warning tiles to `GameWorld`. Renderers draw them without knowing where they came from.
 - **Score and messages** — Systems publish events such as `EnemyDefeated`. `ScoreSystem` and the HUD subscribe.
@@ -276,7 +276,7 @@ As built in `B-03`:
 
 - `model/block/Block` blocks every mover while active and declares `isDestroyedBy(BombType)`. `IndestructibleBlock` returns false, `DestructibleBlock` true, `ReinforcedBlock` true only for `PUMPED`. A destroyed block is deactivated, so its tile is walkable once the loop removes it.
 - `TestWorlds` builds `#` as an `IndestructibleBlock`. The test `Wall` stand-in is gone.
-- **For Areli:** `EntityFactory` builds `#`, `D`, and a Reinforced character with these three constructors. The power-up a Destructible Block may release comes in `B-07`.
+- **For Marshall (M-01C):** `EntityFactory` builds `#`, `D`, and a Reinforced character with these three constructors. The power-up a Destructible Block may release comes in `B-07`.
 
 As built in `B-02`:
 
@@ -291,7 +291,7 @@ Order of work inside one tick:
 1. Drain the command queue and pass each command to every `CommandHandler`. Handlers run in every state, so the pause command works while paused. `PlayerSystem` is a handler and a system, and it ignores moves unless the state is `PLAYING`.
 2. `EnemySystem`, then `BossSystem`.
 3. `BombSystem`, then `ExplosionSystem`.
-4. `HazardSystem`.
+4. `HazardSystem` (advance/publish warnings), then `LavaDamageSystem` (apply eruption damage).
 5. `PowerUpSystem`, then `LifeSystem`, which handles a lost life from any of the systems above.
 6. Reduce the game timer.
 7. `WinLoseSystem`.
@@ -400,88 +400,97 @@ MVC is the overall architecture and is described in the booklet beside these fiv
 
 The same IDs are used in `TODO.md`. Prefixes: `S` setup and deliverables, `C` core and MVP, `B` bomb and related, `E` enemy and boss, `M` map and environment, `G` GUI, `X` other bonuses.
 
-After `C-01` on 12 November, the only tasks that depend on another member's work are `C-09`, `S-10`, and `X-04`.
+The 19 November recovery plan adds cross-owner dependencies for maps, validation, config, and lava. TODO.md records the leaf dependency graph and workload estimates. Split parent IDs are coverage groups, not extra branches; every child must close before its parent is complete. MANDATORY has the gate definition in TODO.md. Targets are internal forecasts, not changes to official course deadlines.
 
 ### Setup and deliverables
 
 | ID | Step | Owner | Spec | Depends on | Due | Completion criteria |
 | --- | --- | --- | --- | --- | --- | --- |
-| S-01 | Scaffold the Gradle project, `Makefile`, `.gitignore`, logging config, and the `src`, `config`, `doc` folders | Laura | Milestone 1 | — | 11 Nov | On a clean clone, `make build` and `make test` succeed and `make run` prints a placeholder. |
-| S-02 | Terminal spike: raw key input and full-screen redraw with JLine 3 | Laura | Pedoman 3 | S-01 | 12 Nov | A demo echoes keys without Enter and redraws 20 times per second without flicker on all four members' terminals. The result records whether key release and two keys held together are reported. If the demo fails, switch to Lanterna and update this file. |
-| S-03 | Choose the assistant, invite them to the repository, and book Asistensi 1 | Laura | Asistensi | — | 11 Nov | The assistant sheet is filled before 20.10 WIB, the assistant has repository access, and a session date is agreed at least 24 hours ahead. |
-| S-04 | Hold Asistensi 1 and resolve the PRD open questions | Laura | Asistensi | S-03 | 16 Nov | Each open question has an answer in `PRD.md`, and every attending member submitted the form within 1 hour. |
-| S-05 | Produce the two Milestone 1 PDFs: task division and class diagram | Laura | Milestone 1 | C-01 | 17 Nov | Both PDFs are in `doc/` and submitted with the repository link before 20.10 WIB. Each owner supplied the diagram for their packages. |
+| S-01 | Scaffold Gradle, Makefile, folders | Laura | Milestone 1 | — | 11 Nov | On a clean clone, `make build` and `make test` succeed and `make run` prints a placeholder. |
+| S-02 | Terminal spike with JLine 3 | Laura | Pedoman 3 | `S-01` | 20 Nov | A demo echoes keys without Enter and redraws 20 times per second without flicker on all three active contributors' terminals. The result records whether key release and two keys held together are reported. If the demo fails, switch to Lanterna and update this file. |
+| S-03 | Choose assistant, invite to repo, book Asistensi 1 | Laura | Asistensi | — | 11 Nov | The assistant sheet is filled before 20.10 WIB, the assistant has repository access, and a session date is agreed at least 24 hours ahead. |
+| S-04 | Hold Asistensi 1 | Laura | Asistensi | `S-03` | 16 Nov | Each open question has an answer in `PRD.md`, and every attending member submitted the form within 1 hour. |
+| S-05 | Milestone 1 PDFs | Laura | Milestone 1 | `C-01` | 17 Nov | Both PDFs are in `doc/` and submitted with the repository link before 20.10 WIB. Each owner supplied the diagram for their packages. |
 | S-06 | Hold Asistensi 2 | Laura | Asistensi | — | 3 Dec | Session held and every attending member's form submitted within 1 hour. |
-| S-07 | Write the booklet: A5, at most 15 pages, PDF | Areli | Buklet | S-05 | 3 Dec | The PDF has the cover, user manual, roles, final class diagram, design patterns, and development story, and every member reviewed their section. |
-| S-08 | Compile the activity log into one PDF | Areli | Log Activity | — | 4 Dec | `docs/log-activity.md` has entries for all four members and is exported to PDF. |
-| S-09 | Publish the release and make the repository public | Laura | Milestone 2 | S-07, S-08, S-10 | 4 Dec | A GitHub release containing the source, booklet, and activity log exists before 18.00 WIB, the repository is public, and the form is submitted. |
-| S-10 | Full integration test on `main` | All | Pedoman 10 | All `C`, `B`, `E`, `M` tasks | 2 Dec | Every acceptance criterion in `PRD.md` section 4 is checked by hand on the merged build, and each failure has a `TODO.md` row. |
+| S-07A | Booklet gameplay, controls, and screenshots | Laura | Buklet | `C-07`, `M-06A` | 29 Nov | Write the cover/roster, gameplay/user manual, and screenshots from the actual build. Include current controls and all four members' original credits; describe the three-person execution plan without rewriting earlier contributions. Hand editable material to Ilham. |
+| S-07B | Booklet technical content and final diagrams | Ilham | Buklet | `C-09`, `E-07` | 1 Dec | Collect each owner's explanation of OOP, at least two actual design patterns, at least three SOLID principles, task division, and development history. Refresh the final class diagram from implemented code; add the optional five-pattern result only if X-01 is complete. Do not invent contributions or block the mandatory booklet on that bonus. |
+| S-07C | Booklet assembly, team review, and final PDF | Ilham | Buklet | `S-07A`, `S-07B`, `S-10` | 3 Dec | Combine the drafts, apply A5 layout, keep at most 15 pages, and export the final PDF to doc/. Laura and Marshall review their sections and links/legibility; retain their review evidence before the release handoff. |
+| S-08 | Activity-log collection and final PDF | Ilham | Log Activity | `S-07C`, `S-10` | 3 Dec | Collect entries from every member, preserve historical Areli entries, and ask authors to fill their own missing evidence. Export one PDF to doc/ and verify its contents. Refresh the snapshot if work continues before the 4 Dec release; 3 Dec is the internal target, 4 Dec 20.10 WIB is the official submission deadline. |
+| S-09 | Release and public repository | Laura | Milestone 2 | `S-07C`, `S-08`, `S-10` | 4 Dec | A GitHub release containing the source, booklet, and activity log exists before 18.00 WIB, the repository is public, and the form is submitted. |
+| S-10 | Full integration test | Laura + Marshall + Ilham | Pedoman 10 | `MANDATORY` | 2 Dec | Every acceptance criterion in `PRD.md` section 4 is checked by hand on the merged build, and each failure has a `TODO.md` row. |
 
 ### Core and MVP (Laura)
 
 | ID | Step | Spec | Depends on | Due | Completion criteria |
 | --- | --- | --- | --- | --- | --- |
-| C-01 | Core types and contracts listed in the Contracts section, plus `TestWorlds.fromAscii` | F00.1 | S-01 | 12 Nov | Everything compiles, each contract has a unit test, and a sample `GameSystem` with a test runs without the game loop. Signatures are recorded in this file. |
-| C-02 | Game loop and the three threads | F09.3 | C-01 | 13 Nov | 300 game seconds take 300 real seconds within 1 second. A 2-second stall causes at most 5 catch-up ticks. Commands arrive through the queue from keys read out of `config/keybindings.properties`, and a key bound twice is refused. Threads are named, and the program exits cleanly with no thread left running. |
-| C-03 | CLI renderer and HUD | F09.3, F07.2 | C-01, S-02 | 13 Nov | The screen shows the map with the glyphs in `DESIGN.md` and a HUD with lives, score, timer, and selected bomb. Only changed cells are rewritten. A terminal too small for the map and HUD shows a message asking to enlarge it. |
-| C-04 | Player movement and collision | F01.2.1, F01.2.3 | C-01 | 14 Nov | Tests show that movement follows the player's speed, is stopped by blocks, enemies, active bombs, and the map edge, keeps one early move for 0.15 seconds, and reports contact when the player steps into an enemy. |
-| C-05 | MVP-0: a playable walking skeleton | F09 | C-02, C-03, C-04 | 14 Nov | From the menu, the Red Mountain map loads through a stand-in builder in `app` (`TestWorlds` is test code and cannot ship), Deeper walks, the timer counts down, pause works, and the game ends in LOSE at 0 seconds. |
-| C-06 | Lives, damage, invulnerability, and respawn | F01.2.2, F01.2.4 | C-04 | 19 Nov | Tests show one life lost per activation, 1.5 seconds of invulnerability, respawn at the spawn point or the nearest free tile, and LOSE at 0 lives. |
-| C-07 | Menu, How to Play, pause menu, restart, and the game over screen | F09.1, F09.5, F00.4 | C-02 | 20 Nov | Screens are a stack, and back returns to the previous screen. Invalid menu input shows an error and asks again. Pause offers resume, restart, and menu, and holding the pause key toggles once. Restart restores every initial value. The final score is shown at WIN and LOSE. |
-| C-08 | Win and lose check, with the exit locked until all enemies are defeated | F09.4 | C-01 | 16 Nov | Tests show WIN only when the 5 Normal Enemies and the boss are defeated and the player is on the exit, and LOSE at 0 lives or 0 seconds. |
-| C-09 | MVP-1: integrate the first slice from each member | F00.2 | C-05, C-08, B-01, B-02, M-01, E-01 | 17 Nov | On `main`, the map loads from `config/maps/red-mountain.txt`, a Normal Bomb destroys a Destructible Block and a Patrol Enemy, and both WIN and LOSE can be reached. |
+| C-01 | Core types and contracts | F00.1 | `S-01` | 12 Nov | Everything compiles, each contract has a unit test, and a sample `GameSystem` with a test runs without the game loop. Signatures are recorded in this file. |
+| C-02 | Game loop and threads | F09.3 | `C-01` | 13 Nov | 300 game seconds take 300 real seconds within 1 second. A 2-second stall causes at most 5 catch-up ticks. Commands arrive through the queue from keys read out of `config/keybindings.properties`, and a key bound twice is refused. Threads are named, and the program exits cleanly with no thread left running. |
+| C-03 | CLI renderer and HUD | F09.3, F07.2 | `C-01`, `S-02` | 13 Nov | The screen shows the map with the glyphs in `DESIGN.md` and a HUD with lives, score, timer, and selected bomb. Only changed cells are rewritten. A terminal too small for the map and HUD shows a message asking to enlarge it. |
+| C-04 | Player movement and collision | F01.2.1, F01.2.3 | `C-01` | 14 Nov | Tests show that movement follows the player's speed, is stopped by blocks, enemies, active bombs, and the map edge, keeps one early move for 0.15 seconds, and reports contact when the player steps into an enemy. |
+| C-05 | MVP-0 walking skeleton | F09 | `C-02`, `C-03`, `C-04` | 14 Nov | From the menu, the Red Mountain map loads through a stand-in builder in `app` (`TestWorlds` is test code and cannot ship), Deeper walks, the timer counts down, pause works, and the game ends in LOSE at 0 seconds. |
+| C-06 | Lives, invulnerability, respawn | F01.2.2, F01.2.4 | `C-04` | 19 Nov | Tests show one life lost per activation, 1.5 seconds of invulnerability, respawn at the spawn point or the nearest free tile, and LOSE at 0 lives. |
+| C-07 | Menu, pause, restart, game over | F09.1, F09.5, F00.4 | `C-02` | 20 Nov | Screens are a stack, and back returns to the previous screen. Invalid menu input shows an error and asks again. Pause offers resume, restart, and menu, and holding the pause key toggles once. Restart restores every initial value. The final score is shown at WIN and LOSE. |
+| C-08 | Win and lose check | F09.4 | `C-01` | 16 Nov | Tests show WIN only when the 5 Normal Enemies and the boss are defeated and the player is on the exit, and LOSE at 0 lives or 0 seconds. |
+| C-09 | MVP-1 integration | F00.2 | `C-05`, `C-08`, `B-01`, `B-02`, `E-01`, `E-03`, `M-01B`, `M-05B` | 26 Nov | On `main`, the map loads from `config/maps/red-mountain.txt`, a Normal Bomb destroys a Destructible Block and a Patrol Enemy, and both WIN and LOSE can be reached. |
 
 ### Bomb, Explosion, Block, Power-Up, Score (Marshall)
 
 | ID | Step | Spec | Depends on | Due | Completion criteria |
 | --- | --- | --- | --- | --- | --- |
-| B-01 | `Bomb` base, Normal Bomb, placement rules, and capacity | F02.1, F02.2.1, F02.3, F01.2.5 | C-01 | 15 Nov | Tests show a 3-second fuse, placement refused at full capacity or on an occupied tile, and capacity returned after the explosion ends. |
-| B-02 | Explosion spread, duration, and damage | F03 | B-01, B-03 | 16 Nov | Tests show the center and four arms, a 0.5-second duration, arms stopping at each block type as in F03.2, power-ups unaffected, and `takeDamage` called once per target. |
-| B-03 | The three block types | F04 | C-01 | 15 Nov | Tests show each type's movement and explosion rules and that a destroyed block's tile becomes walkable. |
-| B-04 | Pumped Bomb and bomb type selection | F02.2.2, F02.3.2 | B-01, B-02, B-03 | 20 Nov | Tests show a 4.5-second fuse, range `blastRange + 2` capped at 7, Reinforced Blocks destroyed, 2 damage, and that selection does not change bombs already placed. |
-| B-05 | Remote Bomb and detonate | F02.2.3, F02.3.3 | B-01 | 21 Nov | Tests show Remote Bomb refused before the Remote Detonator, no fuse, detonate exploding all of the player's Remote Bombs, and detonate failing safely with none active. |
-| B-06 | Bounded chain reactions | F02.3.7, F03.2.6 | B-02 | 23 Nov | A test with every walkable tile holding a bomb finishes in one pass, and each bomb explodes exactly once. |
-| B-07 | Power-ups: five types, drops, and the guaranteed Remote Detonator | F06 | B-03 | 25 Nov | Tests show the 30% drop with a seeded random source, each effect and its cap, pickup by the player only, and effects kept after losing a life. |
-| B-08 | Score | F08 | C-01 | 26 Nov | Tests show 100 per Normal Enemy, 500 for Hades, and on WIN only 100 per life and 10 per remaining second. |
+| B-01 | Bomb base and Normal Bomb | F02.1, F02.2.1, F02.3, F01.2.5 | `C-01` | 15 Nov | Tests show a 3-second fuse, placement refused at full capacity or on an occupied tile, and capacity returned after the explosion ends. |
+| B-02 | Explosion spread and damage | F03 | `B-01`, `B-03` | 16 Nov | Tests show the center and four arms, a 0.5-second duration, arms stopping at each block type as in F03.2, power-ups unaffected, and `takeDamage` called once per target. |
+| B-03 | Three block types | F04 | `C-01` | 15 Nov | Tests show each type's movement and explosion rules and that a destroyed block's tile becomes walkable. |
+| B-04 | Pumped Bomb and type selection | F02.2.2, F02.3.2 | `B-01`, `B-02`, `B-03`, `E-04` | 23 Nov | Tests show a 4.5-second fuse, range `blastRange + 2` capped at 7, Reinforced Blocks destroyed, 2 damage, and that selection does not change bombs already placed. |
+| B-05 | Remote Bomb and detonate | F02.2.3, F02.3.3 | `B-01`, `B-07` | 26 Nov | Tests show Remote Bomb refused before the Remote Detonator, no fuse, detonate exploding all of the player's Remote Bombs, and detonate failing safely with none active. |
+| B-06 | Bounded chain reactions | F02.3.7, F03.2.6 | `B-02` | 23 Nov | A dense-map test completes the chain within one update/tick with a bound based on the active bomb count. Every bomb explodes once, including mixed Normal/Pumped/Remote chains; no infinite trigger loop or repeated capacity return occurs. |
+| B-07 | Power-ups | F06 | `B-03`, `M-05A` | 25 Nov | Tests show the 30% drop with a seeded random source, each effect and its cap, pickup by the player only, and effects kept after losing a life. |
+| B-08 | Score | F08 | `C-01`, `C-08`, `E-03`, `E-05` | 26 Nov | Tests show 100 per Normal Enemy, 500 for Hades, and on WIN only 100 per life and 10 per remaining second. |
 
 ### Enemy and Boss (Ilham)
 
 | ID | Step | Spec | Depends on | Due | Completion criteria |
 | --- | --- | --- | --- | --- | --- |
-| E-01 | `Enemy` base and Patrol Enemy | F05.1, F05.2 | C-01 | 15 Nov | Tests show an enemy following its configured path, turning at obstacles, and never entering a blocked tile. |
-| E-02 | Chase Enemy | F05.2 | E-01 | 19 Nov | Tests show the switch to CHASE within 3 tiles, movement toward the player along a path around blocks, the path recomputed only when the player changes tile, the return to the patrol path beyond 3 tiles, and the return to patrol after 1 second with no path. |
-| E-03 | Contact damage and enemy defeat | F01.2.2, F03.2.5 | E-01 | 20 Nov | Tests show an enemy stepping into the player costing one life without the two sharing a tile, an explosion defeating a Normal Enemy, and an `EnemyDefeated` event published once. |
-| E-04 | Boss framework: health, phases, attack cycle, and vulnerability | F05.3.1 | C-01 | 22 Nov | Tests with a fake attack show warning 1 second, active, cooldown 5 seconds, vulnerability for the first 4 seconds after a designated attack only, phase 2 at half health, no repeated attack when another is usable, and 1 or 2 damage by bomb type. |
-| E-05 | Hades phase 1: Heavy Punch, Spin Attack, Beam Attack, Ground Slam | F05.3.4 | E-04 | 24 Nov | For each attack, a test compares the affected tiles and duration with the PRD table for every facing direction. |
-| E-06 | Hades phase 2 variants | F05.3.4 | E-05 | 26 Nov | For each attack, a test compares the phase 2 tiles with the PRD table. |
-| E-07 | Attacks stopped by blocks, and warning tiles published for drawing | F05.3.1 | E-05 | 26 Nov | Tests show a straight attack stopping at a block, no block damaged, and the warning tiles present in `GameWorld` for exactly 1 second. |
+| E-01 | Enemy base and Patrol Enemy | F05.1, F05.2 | `C-01` | 19 Nov | Tests show an enemy following its configured path, turning at obstacles, and never entering a blocked tile. |
+| E-02 | Chase Enemy | F05.2 | `E-01` | 21 Nov | Tests show the switch to CHASE within 3 tiles, movement toward the player along a path around blocks, the path recomputed only when the player changes tile, the return to the patrol path beyond 3 tiles, and the return to patrol after 1 second with no path. |
+| E-03 | Contact damage and enemy defeat | F01.2.2, F03.2.5 | `E-01` | 21 Nov | Tests show an enemy stepping into the player costing one life without the two sharing a tile, an explosion defeating a Normal Enemy, and an `EnemyDefeated` event published once. |
+| E-04 | Boss framework | F05.3.1 | `C-01` | 22 Nov | Tests with a fake attack show warning 1 second, active, cooldown 5 seconds, vulnerability for the first 4 seconds after a designated attack only, phase 2 at half health, no repeated attack when another is usable, and 1 or 2 damage by bomb type. |
+| E-05 | Hades phase 1 attacks | F05.3.4 | `E-04` | 24 Nov | For each attack, a test compares the affected tiles and duration with the PRD table for every facing direction. |
+| E-06 | Hades phase 2 variants | F05.3.4 | `E-05` | 26 Nov | For each attack, a test compares the phase 2 tiles with the PRD table. |
+| E-07 | Attacks stopped by blocks, warning tiles | F05.3.1 | `E-05` | 26 Nov | Tests show a straight attack stopping at a block, no block damaged, and the warning tiles present in `GameWorld` for exactly 1 second. |
 
-### Map and environment (Areli)
+### Map and environment (Laura, Marshall, Ilham)
 
-| ID | Step | Spec | Depends on | Due | Completion criteria |
-| --- | --- | --- | --- | --- | --- |
-| M-01 | Map file format, `MapLoader`, and `EntityFactory` | F00.2, F07.1, F07.2 | C-01 | 15 Nov | `config/maps/red-mountain.txt` loads into a `GameWorld` with every entity at the position in the layout. An unreadable file or unknown character gives a clear error. |
-| M-02 | `MapValidator` | F00.3 | M-01 | 19 Nov | One test per rule: size, the four counts, spawns on walkable tiles, no overlapping spawns, the player reaching the boss and the exit, and the map being completable. A failure names the rule. |
-| M-03 | Tiles and the Lava Tile cycle | F07.3.3 | C-01 | 21 Nov | Tests show DORMANT 3 seconds, WARNING 1 second, ERUPTING, then DORMANT again, with the cycle frozen while paused. |
-| M-04 | Lava damage and warning tiles | F07.3.3, F01.2.2 | M-03 | 23 Nov | Tests show at most one life lost per eruption, no damage while invulnerable, and warning tiles published during WARNING. |
-| M-05 | Configuration: `game.properties`, patrol paths, the Patrol and Chase split, and the guaranteed Remote Detonator | F05.2, F06.3 | M-01 | 24 Nov | Every tunable value is read from `config/`, an invalid value gives a `ConfigLoadException` with the key name, and a test shows the Remote Detonator is always obtainable. |
-| M-06 | How to Play text and the README feature table | F09.1.1 | — | 26 Nov | The How to Play screen lists the goal and every control in the key bindings, and `README.md` shows the current status of every feature. |
+| ID | Step | Owner | Spec | Depends on | Due | Completion criteria |
+| --- | --- | --- | --- | --- | --- | --- |
+| M-01A | Map contract, base tiles, and Red Mountain file | Laura | F00.2, F07.1, F07.2 | `C-01` | 20 Nov | Define the shared legend/row/position contract; create GameMap, Tile, FloorTile, and config/maps/red-mountain.txt. Use the existing 0-based Position API and 14 x 10 Red Mountain layout. Tests cover base-tile walkability and symbol/coordinate handling. Freeze factory/loader signatures with Marshall before their branches start. |
+| M-01B | MapLoader and file error handling | Laura | F00.2, F07.1, F07.2 | `M-01A`, `M-01C`, `M-02A`, `M-02B` | 25 Nov | Read UTF-8 rows, run both validation stages, then delegate to EntityFactory. Test a valid Red Mountain file, unreadable files, unknown symbols, malformed rows, and a useful error message. No world is started from invalid data. |
+| M-01C | EntityFactory and spawn/config integration | Marshall | F00.2, F07.2 | `M-01A`, `M-03`, `M-05A`, `B-03`, `E-02`, `E-03`, `E-05` | 24 Nov | Build Player, five configured Patrol/Chase enemies, Hades, blocks, lava, and Exit from the legend. Apply configured patrol paths and the enemy split. Verify every spawn/type/position on the 14 x 10 fixture. Coordinate Hades construction with E-05; do not ship test stand-ins. |
+| M-02A | MapValidator: dimensions, symbols, counts, and spawns | Marshall | F00.3 | `M-01A` | 21 Nov | Pure row validation: one test per size/count/spawn rule, overlapping or blocked spawns, and unknown symbols. InvalidMapException must name the broken rule. Own the MapValidator entry point; reserve one delegation seam for Laura's reachability helper. |
+| M-02B | ReachabilityValidator: boss/exit paths and completability | Laura | F00.3 | `M-02A` | 22 Nov | Implement the separate ReachabilityValidator helper. Test unreachable boss/exit and impossible layouts, accounting for destructible/reinforced blocks and passable lava under F00.3. Add one delegation call to MapValidator, reviewed by Marshall; keep the algorithm outside his file. |
+| M-03 | LavaTile/LavaState cycle | Marshall | F07.3.3 | `M-01A`, `M-05A` | 22 Nov | Build on Laura's base tiles. Test DORMANT 3 s, WARNING 1 s, configurable ERUPTING, and stable eruption IDs. Use dt only. PRD question 2 still has a working assumption of 1 s, synchronized tiles, player-only damage; keep it configurable until confirmed. |
+| M-04A | HazardSystem: advance lava and publish warnings | Laura | F07.3.3 | `M-03`, `C-03` | 23 Nov | Own HazardSystem for cycle advancement and GameWorld warning overlays. Test exact WARNING duration, removal of old warnings, and no cycle progress during PAUSED in a real GameLoop fixture. Register it before LavaDamageSystem and LifeSystem. |
+| M-04B | LavaDamageSystem: damage per eruption and respawn integration | Ilham | F07.3.3, F01.2.2 | `M-04A`, `E-03`, `C-06` | 24 Nov | Use a separate LavaDamageSystem file and the stable eruption ID from M-03. Test at most one life per eruption, invulnerable/no-damage cases, entering/leaving lava, and respawn via LifeSystem. Register after HazardSystem and before LifeSystem; agree the seam with Laura. |
+| M-05A | GameConfig parser, defaults, and validation | Marshall | F00.2, F05.2, F06.3, F07.3.3 | `C-01` | 20 Nov | Create validated config/game.properties loading and named defaults, including timing/speed/drop values, patrol paths, the Patrol/Chase split, and guaranteed-Remote settings. Test missing/invalid/out-of-range values; ConfigLoadException must name the key. Freeze keys with Laura and Ilham. |
+| M-05B | Inject config and verify guaranteed Remote obtainability | Laura | F00.2, F05.2, F06.3 | `M-05A`, `M-01C`, `B-07` | 26 Nov | Wire validated values through factories/systems and remove the covered runtime literals with each domain owner. Models must not import mapio or read files. Integration tests change config values and verify they take effect, and prove the guaranteed Remote Detonator remains obtainable. |
+| M-06A | How to Play goals and controls | Ilham | F09.1.1 | `C-07`, `B-07` | 26 Nov | Update help text for the goal, selected bomb, Pumped/Remote behavior, pause, and restart. Generate displayed keys from KeyBindings. Check help against real actions and the Remote unlock condition; update the screenshot/manual inputs for S-07A. Limit edits in Laura's GameFlow to the help-text section and obtain her review. |
+| M-06B | README setup and verified feature status | Marshall | README, F09.1.1 | `B-07`, `B-08`, `E-07` | 26 Nov | Reconcile every mandatory/bonus feature with merged code and recorded verification. Refresh build/run/config instructions. Keep incomplete or unverified features explicit; do not mark the whole game complete merely because code compiles. |
 
 ### GUI, bonus B01 (Laura)
 
 | ID | Step | Spec | Depends on | Due | Completion criteria |
 | --- | --- | --- | --- | --- | --- |
-| G-01 | libGDX window and `GuiRenderer` | B01 | C-05 | 22 Nov | `make run-gui` opens a window on all four members' machines and draws the same `WorldSnapshot` as the CLI with the colors in `DESIGN.md`. Resizing the window scales the map and keeps all of it visible. Closing the window stops every thread. The libGDX version is recorded in the stack table. The CLI still builds and runs. |
-| G-02 | GUI key input | B01 | G-01 | 24 Nov | Every action available in the CLI works in the GUI through the same `Command` objects, and two keys held together are both read. |
-| G-03 | GUI menu, HUD, pause, and game over screens | B01 | G-01, C-07 | 27 Nov | The full flow from menu to WIN or LOSE can be played without the terminal. Menus and the HUD are laid out with Scene2D tables, not fixed positions. |
-| G-04 | Sprites and animation for movement, explosions, warnings, and lava states | B01 | G-01 | 1 Dec | A step between tiles is drawn smoothly. Explosion, warning, and the three lava states are each distinguishable at a glance. The game holds 20 ticks per second. |
+| G-01 | libGDX window and renderer | B01 | `C-05`, `MANDATORY` | 27 Nov | `make run-gui` opens a window on all three active contributors' machines and draws the same `WorldSnapshot` as the CLI with the colors in `DESIGN.md`. Resizing the window scales the map and keeps all of it visible. Closing the window stops every thread. The libGDX version is recorded in the stack table. The CLI still builds and runs. |
+| G-02 | GUI key input | B01 | `G-01` | 28 Nov | Every action available in the CLI works in the GUI through the same `Command` objects, and two keys held together are both read. |
+| G-03 | GUI menu, HUD, pause, game over | B01 | `G-01`, `C-07` | 30 Nov | The full flow from menu to WIN or LOSE can be played without the terminal. Menus and the HUD are laid out with Scene2D tables, not fixed positions. |
+| G-04 | Animation | B01 | `G-01` | 1 Dec | A step between tiles is drawn smoothly. Explosion, warning, and the three lava states are each distinguishable at a glance. The game holds 20 ticks per second. |
 
 ### Other bonuses
 
 | ID | Step | Owner | Spec | Depends on | Due | Completion criteria |
 | --- | --- | --- | --- | --- | --- | --- |
-| X-01 | Document five design patterns with class names and reasons | Laura | B05 | — | 1 Dec | The pattern table in this file matches the code, and the booklet has the same table. |
-| X-02 | Bomb Kick | Marshall | B02 | B-01 | 29 Nov | Tests show a kicked bomb sliding until it meets an obstacle, the map edge, or an entity, with its fuse still running. |
-| X-03 | Map Maker with validation, save, and load | Areli | B03 | M-02 | 1 Dec | A map made in the editor is saved to `config/maps/`, passes `MapValidator`, and can be loaded and played. An invalid map is refused with the rule named. |
-| X-04 | Local Multiplayer, two-player co-op | Marshall | B04 | C-06, B-07 | 1 Dec | Two players with separate key bindings share the map, score, and timer. The eight rules in B04 each have a test or a recorded manual check. Both players moving at the same time is verified in the GUI. The terminal's limit is stated in How to Play. See PRD open question 12. |
-| X-05 | Creativity feature | Ilham | BXX | — | 1 Dec | **Pending.** The team picks the feature by 20 Nov and replaces this row with real criteria. |
+| X-01 | Five design patterns documented | Laura | B05 | `MANDATORY` | 1 Dec | The pattern table in this file matches the code, and the booklet has the same table. |
+| X-02 | Bomb Kick | Marshall | B02 | `B-01`, `MANDATORY` | 29 Nov | Tests show a kicked bomb sliding until it meets an obstacle, the map edge, or an entity, with its fuse still running. |
+| X-03A | Map Maker editing UI and validation feedback | Marshall | B03 | `M-02A`, `M-02B`, `MANDATORY` | 29 Nov | Implement cursor/paint/erase editing and reuse the validators for readable rule errors. Keep editing separate from a running GameWorld. Test edits and refusal of invalid maps. Agree the rows/validation handoff with Ilham before X-03B. |
+| X-03B | Map Maker save/load and playable round trip | Ilham | B03 | `X-03A`, `M-01B`, `MANDATORY` | 1 Dec | Own persistence in a separate MapMakerIO helper. Reuse MapLoader/validators; a saved valid map reloads with the same layout and can be played. Test invalid input, unreadable files, and save failures with useful messages; keep validation and IO outside Marshall's editor UI file. |
+| X-04 | Local Multiplayer | Marshall | B04 | `C-06`, `B-07`, `G-02`, `MANDATORY` | 1 Dec | Two players with separate key bindings share the map, score, and timer. The eight rules in B04 each have a test or a recorded manual check. Both players moving at the same time is verified in the GUI. The terminal's limit is stated in How to Play. See PRD open question 12. |
+| X-05 | Creativity feature | Ilham | BXX | `MANDATORY` | 1 Dec | **Pending.** The team picks the feature by 20 Nov and replaces this row with real criteria. |

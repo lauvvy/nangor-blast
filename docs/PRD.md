@@ -2,8 +2,8 @@
 
 > **Status** Draft, pending Asistensi 1
 > **Author** Laura Paula Gosal (18225060), with Claude Code
-> **Last updated** 10 November 2026
-> **Source** [`IF2010 Spesifikasi Tugas Besar.md`](IF2010%20Spesifikasi%20Tugas%20Besar.md), version 1.0
+> **Last updated** 19 November 2026 (execution allocation; scope questions remain pending)
+> **Source** [`IF2010 Spesifikasi Tugas Besar.md`](IF2010%20Spesifikasi%20Tugas%20Besar.md), version 1.2
 
 This document condenses the course specification into the scope the team builds. When this file and the specification disagree, the specification wins and this file is corrected.
 
@@ -30,14 +30,14 @@ Deliver a complete, demonstrable Nangor Blast for map type C (Red Mountain) and 
 
 - **Player** — One person who controls Deeper from the keyboard. During the demo this is a team member or a course assistant.
 - **Course assistants** — They grade the game, the booklet, and the team's explanation of the design. They also answer specification questions.
-- **Team** — Four developers. Ownership is by package, so each member can work without waiting for another.
+- **Team** — The original four-person roster is retained. The execution allocation revised on 19 November assigns future work to Laura, Marshall, and Ilham, with file-level ownership for the redistributed map/config/hazard/editor work in `TODO.md`.
 
   | Member | NIM | Area |
   | --- | --- | --- |
-  | Laura Paula Gosal | 18225060 | Core contracts, game loop, input, CLI, game flow, MVP, integration, GUI |
-  | Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer |
-  | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, Boss framework, Hades, creativity feature |
-  | Areli Matthew Widodo | 18225102 | Map loading and validation, Lava Tile, configuration, Map Maker, booklet, activity log |
+  | Laura Paula Gosal | 18225060 | Core/CLI/integration/GUI; base map, loader, reachability, warnings, config wiring, booklet manual |
+  | Marshall Farrell Attalla K | 18225062 | Bomb/block/power-up/score and multiplayer; entity factory, structural validation, lava cycle, config parser, README, editor UI |
+  | Muhammad Ilham Malik Amrullah | 18225022 | Enemy/boss/creativity; lava damage, help, technical booklet/final PDFs, activity-log compilation, editor IO |
+  | Areli Matthew Widodo | 18225102 | Original roster/credits retained; future assignments redistributed in TODO.md |
 
 - **AI coding agent** — Claude Code, working from `CLAUDE.md`, `WORKFLOW.md`, and `TODO.md`.
 
