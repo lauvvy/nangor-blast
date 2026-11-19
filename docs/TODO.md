@@ -2,7 +2,7 @@
 
 Local tracker for Laura, Marshall, and Ilham. IDs, owners, and due dates come from the Implementation Plan in [`ARCHITECTURE.md`](ARCHITECTURE.md), where each task's completion criteria are written.
 
-**Last updated** 19 November 2026 (assignment changes only)
+**Last updated** 19 November 2026
 
 ## Additional responsibilities
 
@@ -95,7 +95,7 @@ S-08 (activity log PDF) is assigned to Laura. M-06 stays intact as the existing 
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| M-01 | Map format, loader, entity factory | Laura | `feat/M-01-map-loader` | F00.2, F07.1, F07.2 | Pending | 15 Nov | Until C-01 lands, draw the class diagram for the map packages. |
+| M-01 | Map format, loader, entity factory | Laura | `feat/M-01-map-loader` | F00.2, F07.1, F07.2 | In progress | 15 Nov | 19 Nov: implemented UTF-8 file loading, structural parsing, and entity creation. `gradlew clean build test` passes on JDK 21 with `-Xlint:all -Werror`: 194 tests, including 53 mapio tests; no failures or skips. Verified every tile in the supplied Red Mountain layout, fresh worlds, malformed input, I/O errors, and factory contracts. Boss/lava tests use fixtures pending E-04/E-05 and M-03. Awaiting review/merge; application wiring remains C-09 and gameplay validation M-02. |
 | M-02 | Map validator | Laura | `feat/M-02-map-validator` | F00.3 | Pending | 19 Nov | Starts after M-01. |
 | M-03 | Tiles and Lava Tile cycle | Marshall | `feat/M-03-lava-cycle` | F07.3.3 | Pending | 21 Nov | Starts after C-01. ERUPTING duration awaits PRD open question 2. |
 | M-04 | Lava damage and warning tiles | Marshall | `feat/M-04-lava-damage` | F07.3.3, F01.2.2 | Pending | 23 Nov | Starts after M-03. |

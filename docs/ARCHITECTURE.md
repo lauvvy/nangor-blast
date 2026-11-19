@@ -363,6 +363,13 @@ Screens form a stack in `engine/GameFlow`, which runs on the game-loop thread: M
 
 It contains 1 player spawn, 5 Normal Enemy spawns, 1 boss spawn, 1 exit, 8 Lava Tiles, and 4 Destructible Blocks. Patrol paths, the split between Patrol and Chase enemies, and the guaranteed Remote Detonator are defined in `config/` by `M-05`.
 
+As built in `M-01`:
+
+- `mapio.MapLoader.load(Path)` reads UTF-8 (LF/CRLF, optional initial BOM) and creates a fresh `GameWorld`. `parse(String, List<String>)` supports in-memory maps; both have overloads taking the world's `Random`. File loads use the filename without its extension as `mapName`; `parse` takes an explicit name. Errors use `InvalidMapException`, with the file path or map name and one-based row/column where applicable.
+- `mapio.EntityFactory` creates the player, the three production block types (`#`, `D`, `R`), and a closed exit. Floor is implicit. It accepts player speed and explicit creation functions for Normal Enemies, bosses, and dormant lava. These functions must return fresh active entities at the requested position with the expected kind; enemies and bosses also implement `Hostile`. Missing domain classes have no production stand-ins in this factory.
+- The loader checks all text before constructing entities: nonempty rectangular rows, supported symbols, and exactly one player spawn. M-02 adds fixed dimensions, gameplay counts, and reachability; M-05 supplies configuration and movement choices. C-09 wires the real domain constructors into the application and removes `StandInMap`. No existing shared contract changes.
+- The file format and integration example are in [`config/maps/README.md`](../config/maps/README.md). Boss and lava objects used by M-01 tests are test-only fixtures pending E-04/E-05 and M-03.
+
 ### Technical requirement map
 
 This table is the source for the demo explanation and the booklet. Update it when a class is renamed.
