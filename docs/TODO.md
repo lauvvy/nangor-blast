@@ -10,11 +10,11 @@ The existing task IDs, descriptions, statuses, branches, dependencies, and deadl
 
 | Member | Added responsibility areas | Existing task IDs reassigned |
 | --- | --- | --- |
-| Laura | Map loading and validation; configuration | M-01, M-02, M-05 |
+| Laura | Map loading and validation; configuration; activity log PDF | M-01, M-02, M-05, S-08 |
 | Marshall | Lava Tile; Map Maker | M-03, M-04, X-03 |
-| Ilham | Booklet; activity log; related How to Play/README text | S-07, S-08, M-06 |
+| Ilham | Booklet; related How to Play/README text | S-07, M-06 |
 
-Each member receives three existing tasks. M-06 stays intact as the existing documentation task.
+S-08 (activity log PDF) is assigned to Laura. M-06 stays intact as the existing documentation task.
 
 ## How to use this file
 
@@ -48,7 +48,7 @@ Each member receives three existing tasks. M-06 stays intact as the existing doc
 | S-05 | Milestone 1 PDFs | Laura | `docs/S-05-milestone-1` | Milestone 1 | Pending | 17 Nov | Each owner draws the class diagram for their packages by 15 Nov. |
 | S-06 | Hold Asistensi 2 | Laura | No branch | Asistensi | Pending | 3 Dec | Book the session by 30 Nov. |
 | S-07 | Booklet, A5, at most 15 pages | Ilham | `docs/S-07-booklet` | Buklet | Pending | 3 Dec | Collect meeting screenshots and early sketches from now on for the development story. |
-| S-08 | Activity log PDF | Ilham | `docs/S-08-activity-log` | Log Activity | Pending | 4 Dec | Remind members to fill `docs/log-activity.md` weekly. |
+| S-08 | Activity log PDF | Laura | `docs/S-08-activity-log` | Log Activity | Pending | 4 Dec | Remind members to fill `docs/log-activity.md` weekly. |
 | S-09 | Release and public repository | Laura | Tag `v1.0` on `main` | Milestone 2 | Pending | 4 Dec | Waits for S-07, S-08, S-10. |
 | S-10 | Full integration test | All | `fix/<short-name>` per bug | Pedoman 10 | Pending | 2 Dec | Walk through every acceptance criterion in `PRD.md` section 4. |
 

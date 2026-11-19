@@ -34,9 +34,9 @@ Deliver a complete, demonstrable Nangor Blast for map type C (Red Mountain) and 
 
   | Member | NIM | Area |
   | --- | --- | --- |
-  | Laura Paula Gosal | 18225060 | Core contracts, game loop, input, CLI, game flow, MVP, integration, GUI; map loading and validation, configuration |
+  | Laura Paula Gosal | 18225060 | Core contracts, game loop, input, CLI, game flow, MVP, integration, GUI; map loading and validation, configuration, activity log PDF |
   | Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer; Lava Tile, Map Maker |
-  | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, Boss framework, Hades, creativity feature; booklet, activity log, How to Play/README text |
+  | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, Boss framework, Hades, creativity feature; booklet, How to Play/README text |
 
 - **AI coding agent** — Claude Code, working from `CLAUDE.md`, `WORKFLOW.md`, and `TODO.md`.
 

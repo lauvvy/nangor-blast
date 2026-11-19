@@ -412,7 +412,7 @@ Existing task dependencies remain unchanged. The reassigned map/validation/confi
 | S-05 | Produce the two Milestone 1 PDFs: task division and class diagram | Laura | Milestone 1 | C-01 | 17 Nov | Both PDFs are in `doc/` and submitted with the repository link before 20.10 WIB. Each owner supplied the diagram for their packages. |
 | S-06 | Hold Asistensi 2 | Laura | Asistensi | — | 3 Dec | Session held and every attending member's form submitted within 1 hour. |
 | S-07 | Write the booklet: A5, at most 15 pages, PDF | Ilham | Buklet | S-05 | 3 Dec | The PDF has the cover, user manual, roles, final class diagram, design patterns, and development story, and every member reviewed their section. |
-| S-08 | Compile the activity log into one PDF | Ilham | Log Activity | — | 4 Dec | `docs/log-activity.md` has entries for all three members and is exported to PDF. |
+| S-08 | Compile the activity log into one PDF | Laura | Log Activity | — | 4 Dec | `docs/log-activity.md` has entries for all three members and is exported to PDF. |
 | S-09 | Publish the release and make the repository public | Laura | Milestone 2 | S-07, S-08, S-10 | 4 Dec | A GitHub release containing the source, booklet, and activity log exists before 18.00 WIB, the repository is public, and the form is submitted. |
 | S-10 | Full integration test on `main` | All | Pedoman 10 | All `C`, `B`, `E`, `M` tasks | 2 Dec | Every acceptance criterion in `PRD.md` section 4 is checked by hand on the merged build, and each failure has a `TODO.md` row. |
 

@@ -7,7 +7,7 @@ Aturan pengisian:
 - Tambahkan satu baris di tabel milik sendiri setiap hari mengerjakan sesuatu.
 - **Kegiatan** menyebut ID task dari `TODO.md` bila ada. **Hasil** menyebut apa yang sudah jalan dan bug yang masih ada.
 - Jangan menyalin isi milik anggota lain.
-- Dokumen ini diekspor menjadi satu PDF pada task `S-08`.
+- Laura mengekspor dokumen ini menjadi satu PDF pada task `S-08`; setiap anggota tetap mengisi catatan kegiatannya sendiri.
 
 ## Laura Paula Gosal / 18225060
 
@@ -29,6 +29,7 @@ Aturan pengisian:
 | 17 November 2026 | `S-05` integrasi empat class diagram | Menggabungkan langsung diagram core/model/engine/input/CLI, enemy/boss, map/mapio, dan Markdown Marshall ke `docs/diagram/Class Diagram Nangor Blast.drawio`. Kelas bersama disatukan pada halaman keseluruhan; enam halaman detail menggunakan definisi yang sama. Kelas dan anggota yang belum ada di kode ditandai sebagai rancangan. Diagram sumber tetap disimpan. |
 | 17 November 2026 | `S-05` pemeriksaan ulang integrasi diagram | Mencocokkan atribut, signature method, generic, serta inheritance dengan hasil parsing Java. Memperbaiki kontrak strategi gerak dan pemisahan implementasi/rancangan; ScoreSystem tetap berbasis event. Memvalidasi XML, referensi relasi, konsistensi antarhalaman, dan batas kotak kelas. Menghapus file gabungan lama setelah integrasi ulang dari empat sumber. Atribut dan method ditampilkan pada halaman utama serta kelas referensi di halaman detail; ukuran kotak dan tata letak disesuaikan agar isinya terlihat. |
 | 19 November 2026 | Pembaruan pemilik tugas | Mengembalikan susunan tugas semula, lalu mengalihkan M-01/M-02/M-05 ke Laura, M-03/M-04/X-03 ke Marshall, dan M-06/S-07/S-08 ke Ilham. ID, isi, status, branch, dependency, dan deadline tugas tetap. Pembagian peran dan reviewer diselaraskan. |
+| 19 November 2026 | Koreksi penanggung jawab S-08 | Activity log PDF dialihkan ke Laura sesuai koreksi pembagian tugas. Tugas lain beserta ID, isi, status, branch, dan deadline tetap. |
 
 ## Marshall Farrell Attalla K / 18225062
 

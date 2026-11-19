@@ -85,7 +85,7 @@ Each member merges their branches in this order. Two tasks joined by "and" can b
 | Marshall | `B-01` and `B-03` → `B-02` → `B-04` → `B-05` → `B-06` → `B-07` → `B-08` → `X-02` → `X-04` |
 | Ilham | `E-01` → `E-02` → `E-03` → `E-04` → `E-05` → `E-06` and `E-07` → `X-05` |
 
-Additional responsibilities retain their existing branches and dependencies: Laura takes `M-01` → `M-02` and `M-05`; Marshall takes `M-03` → `M-04` and `X-03` after `M-02`; Ilham takes `M-06`, `S-07`, and `S-08`. The original lanes above remain unchanged.
+Additional responsibilities retain their existing branches and dependencies: Laura takes `M-01` → `M-02`, `M-05`, and `S-08`; Marshall takes `M-03` → `M-04` and `X-03` after `M-02`; Ilham takes `M-06` and `S-07`. The original lanes above remain unchanged.
 
 `E-04` and `M-03` need only `C-01`. Ilham can open `E-04` while `E-02` or `E-03` is in review, and Marshall can open `M-03` while waiting for Laura's `M-01`/`M-02` handoff.
 
