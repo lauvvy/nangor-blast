@@ -80,10 +80,9 @@ Logs are written to `logs/nangor-blast.log`, never to the screen.
 
 | Member | NIM | Responsibility |
 | --- | --- | --- |
-| Laura Paula Gosal | 18225060 | Core contracts, game loop and concurrency, input, CLI view, game flow, MVP, integration, GUI |
-| Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer |
-| Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, boss framework, Hades, creativity feature |
-| Areli Matthew Widodo | 18225102 | Map loading and validation, Lava Tile, configuration, Map Maker, booklet, activity log |
+| Laura Paula Gosal | 18225060 | Core contracts, game loop and concurrency, input, CLI view, game flow, MVP, integration, GUI; map loading and validation, configuration, activity log PDF |
+| Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer; Lava Tile, Map Maker |
+| Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, boss framework, Hades, creativity feature; booklet, How to Play/README text |
 
 Task-level detail is in [`TODO.md`](docs/TODO.md).
 

@@ -7,7 +7,7 @@ Aturan pengisian:
 - Tambahkan satu baris di tabel milik sendiri setiap hari mengerjakan sesuatu.
 - **Kegiatan** menyebut ID task dari `TODO.md` bila ada. **Hasil** menyebut apa yang sudah jalan dan bug yang masih ada.
 - Jangan menyalin isi milik anggota lain.
-- Dokumen ini diekspor menjadi satu PDF pada task `S-08`.
+- Laura mengekspor dokumen ini menjadi satu PDF pada task `S-08`; setiap anggota tetap mengisi catatan kegiatannya sendiri.
 
 ## Laura Paula Gosal / 18225060
 
@@ -28,6 +28,9 @@ Aturan pengisian:
 | 17 November 2026 | `S-05` class diagram bagian Laura | Membuat `docs/diagram/Class Diagram Core, Model, Engine, Input dan CLI.drawio` dengan empat halaman: model dasar dan tipe nilai, event dan exception, aplikasi dan engine, serta input dan tampilan CLI. Nama dan relasi dicocokkan dengan kode saat ini; GUI yang belum diimplementasikan tidak dimasukkan. |
 | 17 November 2026 | `S-05` integrasi empat class diagram | Menggabungkan langsung diagram core/model/engine/input/CLI, enemy/boss, map/mapio, dan Markdown Marshall ke `docs/diagram/Class Diagram Nangor Blast.drawio`. Kelas bersama disatukan pada halaman keseluruhan; enam halaman detail menggunakan definisi yang sama. Kelas dan anggota yang belum ada di kode ditandai sebagai rancangan. Diagram sumber tetap disimpan. |
 | 17 November 2026 | `S-05` pemeriksaan ulang integrasi diagram | Mencocokkan atribut, signature method, generic, serta inheritance dengan hasil parsing Java. Memperbaiki kontrak strategi gerak dan pemisahan implementasi/rancangan; ScoreSystem tetap berbasis event. Memvalidasi XML, referensi relasi, konsistensi antarhalaman, dan batas kotak kelas. Menghapus file gabungan lama setelah integrasi ulang dari empat sumber. Atribut dan method ditampilkan pada halaman utama serta kelas referensi di halaman detail; ukuran kotak dan tata letak disesuaikan agar isinya terlihat. |
+| 19 November 2026 | Pembaruan pemilik tugas | Mengembalikan susunan tugas semula, lalu mengalihkan M-01/M-02/M-05 ke Laura, M-03/M-04/X-03 ke Marshall, dan M-06/S-07/S-08 ke Ilham. ID, isi, status, branch, dependency, dan deadline tugas tetap. Pembagian peran dan reviewer diselaraskan. |
+| 19 November 2026 | Koreksi penanggung jawab S-08 | Activity log PDF dialihkan ke Laura sesuai koreksi pembagian tugas. Tugas lain beserta ID, isi, status, branch, dan deadline tetap. |
+| 19 November 2026 | `M-01` format map, MapLoader, dan EntityFactory (`feat/M-01-map-loader`) | Menambahkan file Red Mountain sesuai layout spesifikasi, pembacaan UTF-8, pemeriksaan struktur dan karakter, serta pembuatan entitas berdasarkan koordinat. Factory menerima pembuat enemy, boss, dan lava dari modul terkait; boss dan lava pada pengujian memakai fixture khusus tes karena kelas produksi belum tersedia. `gradlew clean build test` dengan JDK 21 dan `-Xlint:all -Werror` berhasil: 194 tes lulus, termasuk 53 tes mapio, tanpa gagal atau dilewati. Integrasi aplikasi mengikuti C-09; validasi gameplay mengikuti M-02. Menunggu review dan merge. |
 
 ## Marshall Farrell Attalla K / 18225062
 
@@ -47,9 +50,3 @@ Aturan pengisian:
 | 15 November 2026 | E-01 Patrol Enemy | `EnemySytem`, `GameFactory` |
 | 17 November 2026 | `S-05` class diagram paket enemy dan boss | Membuat dua class diagram di draw.io. Paket enemy: `Enemy`, `NormalEnemy`, `MovementBehavior`, `PatrolBehavior`, `ChaseBehavior`, `EnemySystem`. Paket boss: `Boss`, `Hades`, `BossPhase`, `BossSystem`, `AttackPattern` dengan empat serangan. Kontrak dari C-01 yang dipakai ikut digambar. Nama serangan, field, dan method masih rancangan dan bisa berubah saat implementasi. |
 | 17 November 2026 | `S-05` class diagram paket map dan mapio | Ilham membuat `docs/diagram/Class Diagram Map.drawio` dengan dua halaman: Map package dan Mapio package. File diagram ditambahkan ke folder diagram tanpa mengubah isinya. |
-
-## Areli Matthew Widodo / 18225102
-
-| Waktu | Kegiatan | Hasil |
-| --- | --- | --- |
-| | | |

@@ -11,7 +11,7 @@ This document condenses the course specification into the scope the team builds.
 
 IF2010 Object-Oriented Programming requires each group to build **Nangor Blast**, a real-time Bomberman game for the command line in Java. The game has to show seven OOP concepts, at least two design patterns, and at least three SOLID principles, and the team has to explain each of them during assistance sessions and the demo.
 
-Four people build the game in 24 days, with a first submission after 7 days. Without a shared scope, a stable set of interfaces, and one tracker, members block each other, features interact in untested ways, and the mandatory features are not finished before the bonus work starts.
+The team builds the game in 24 days, with a first submission after 7 days. Without a shared scope, a stable set of interfaces, and one tracker, members block each other, features interact in untested ways, and the mandatory features are not finished before the bonus work starts.
 
 ## 2. Goals
 
@@ -30,14 +30,13 @@ Deliver a complete, demonstrable Nangor Blast for map type C (Red Mountain) and 
 
 - **Player** — One person who controls Deeper from the keyboard. During the demo this is a team member or a course assistant.
 - **Course assistants** — They grade the game, the booklet, and the team's explanation of the design. They also answer specification questions.
-- **Team** — Four developers. Ownership is by package, so each member can work without waiting for another.
+- **Team** — Laura, Marshall, and Ilham. Ownership is by package, so each member can work without waiting for another.
 
   | Member | NIM | Area |
   | --- | --- | --- |
-  | Laura Paula Gosal | 18225060 | Core contracts, game loop, input, CLI, game flow, MVP, integration, GUI |
-  | Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer |
-  | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, Boss framework, Hades, creativity feature |
-  | Areli Matthew Widodo | 18225102 | Map loading and validation, Lava Tile, configuration, Map Maker, booklet, activity log |
+  | Laura Paula Gosal | 18225060 | Core contracts, game loop, input, CLI, game flow, MVP, integration, GUI; map loading and validation, configuration, activity log PDF |
+  | Marshall Farrell Attalla K | 18225062 | Bomb, Explosion, Block, Power-Up, Score, Bomb Kick, Local Multiplayer; Lava Tile, Map Maker |
+  | Muhammad Ilham Malik Amrullah | 18225022 | Normal Enemy, Boss framework, Hades, creativity feature; booklet, How to Play/README text |
 
 - **AI coding agent** — Claude Code, working from `CLAUDE.md`, `WORKFLOW.md`, and `TODO.md`.
 

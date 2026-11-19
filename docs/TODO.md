@@ -1,8 +1,20 @@
 # Project Tasks — Nangor Blast
 
-Local tracker for the four-person team. IDs, owners, and due dates come from the Implementation Plan in [`ARCHITECTURE.md`](ARCHITECTURE.md), where each task's completion criteria are written.
+Local tracker for Laura, Marshall, and Ilham. IDs, owners, and due dates come from the Implementation Plan in [`ARCHITECTURE.md`](ARCHITECTURE.md), where each task's completion criteria are written.
 
-**Last updated** 10 November 2026
+**Last updated** 19 November 2026
+
+## Additional responsibilities
+
+The existing task IDs, descriptions, statuses, branches, dependencies, and deadlines are retained. Existing assignments for Laura, Marshall, and Ilham stay in place; the following responsibilities are added.
+
+| Member | Added responsibility areas | Existing task IDs reassigned |
+| --- | --- | --- |
+| Laura | Map loading and validation; configuration; activity log PDF | M-01, M-02, M-05, S-08 |
+| Marshall | Lava Tile; Map Maker | M-03, M-04, X-03 |
+| Ilham | Booklet; related How to Play/README text | S-07, M-06 |
+
+S-08 (activity log PDF) is assigned to Laura. M-06 stays intact as the existing documentation task.
 
 ## How to use this file
 
@@ -35,8 +47,8 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 | S-04 | Hold Asistensi 1 | Laura | No branch | Asistensi | Pending | 16 Nov | Bring the twelve open questions in `PRD.md` section 8. |
 | S-05 | Milestone 1 PDFs | Laura | `docs/S-05-milestone-1` | Milestone 1 | Pending | 17 Nov | Each owner draws the class diagram for their packages by 15 Nov. |
 | S-06 | Hold Asistensi 2 | Laura | No branch | Asistensi | Pending | 3 Dec | Book the session by 30 Nov. |
-| S-07 | Booklet, A5, at most 15 pages | Areli | `docs/S-07-booklet` | Buklet | Pending | 3 Dec | Collect meeting screenshots and early sketches from now on for the development story. |
-| S-08 | Activity log PDF | Areli | `docs/S-08-activity-log` | Log Activity | Pending | 4 Dec | Remind members to fill `docs/log-activity.md` weekly. |
+| S-07 | Booklet, A5, at most 15 pages | Ilham | `docs/S-07-booklet` | Buklet | Pending | 3 Dec | Collect meeting screenshots and early sketches from now on for the development story. |
+| S-08 | Activity log PDF | Laura | `docs/S-08-activity-log` | Log Activity | Pending | 4 Dec | Remind members to fill `docs/log-activity.md` weekly. |
 | S-09 | Release and public repository | Laura | Tag `v1.0` on `main` | Milestone 2 | Pending | 4 Dec | Waits for S-07, S-08, S-10. |
 | S-10 | Full integration test | All | `fix/<short-name>` per bug | Pedoman 10 | Pending | 2 Dec | Walk through every acceptance criterion in `PRD.md` section 4. |
 
@@ -44,7 +56,7 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| C-01 | Core types and contracts | Laura | `feat/C-01-core-contracts` | F00.1 | Done | 12 Nov | 10 Nov: `make build` passes with `-Werror`, 35 tests green. Every contract except the plain interfaces `Renderer` and `InputSource` has a test. `TimerSystemTest` is the sample system test with no game loop. Signatures recorded in `ARCHITECTURE.md`. Needs review by Marshall, Ilham, and Areli. |
+| C-01 | Core types and contracts | Laura | `feat/C-01-core-contracts` | F00.1 | Done | 12 Nov | 10 Nov: `make build` passes with `-Werror`, 35 tests green. Every contract except the plain interfaces `Renderer` and `InputSource` has a test. `TimerSystemTest` is the sample system test with no game loop. Signatures recorded in `ARCHITECTURE.md`. Needs review by Marshall and Ilham. |
 | C-02 | Game loop and threads | Laura | `feat/C-02-game-loop` | F09.3 | Done | 13 Nov | 10 Nov: `GameLoopTest` with a fake clock and uneven 1–40 ms frames shows 300 real seconds give 300 ± 1 game seconds, and a 2-second stall runs 5 ticks. `KeyBindingsTest` refuses a key bound twice. `CliInputTest` turns keys from `config/keybindings.properties` into commands. `GameSessionTest` shows the threads `input`, `game-loop`, and `render`, a key reaching the loop through the queue, and every thread stopped within 1 second. Rerun 5 times, all green. Not run in a real terminal until C-05. |
 | C-03 | CLI renderer and HUD | Laura | `feat/C-03-cli-renderer` | F09.3, F07.2 | Done | 13 Nov | 10 Nov: `CliFrameTest` shows the `DESIGN.md` glyphs two characters per tile, the draw priority, and a HUD with lives, selected bomb, score, and a timer that turns red below 30 seconds. `CliRendererTest` on a JLine test terminal shows an identical frame writes nothing, a one-tile move rewrites two cells without clearing, a resize redraws everything, and a 40 × 10 terminal gets one message asking for 48 × 13. Not seen in a real terminal until C-05. |
 | C-04 | Player movement and collision | Laura | `feat/C-04-player-movement` | F01.2.1, F01.2.3 | Done | 14 Nov | 10 Nov: `PlayerSystemTest` shows a held move covering 40 ± 1 tiles in 10 seconds at speed 4 and 60 ± 1 at speed 6, one tile per step, movement stopped by a wall, an enemy, an active bomb, and the map edge, a move 0.15 seconds early kept and one 0.20 seconds early dropped, and stepping into an enemy costing one life with a `PlayerDamaged` event while the two never share a tile. Enemy and bomb are test stand-ins until E-01 and B-01. |
@@ -83,12 +95,12 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| M-01 | Map format, loader, entity factory | Areli | `feat/M-01-map-loader` | F00.2, F07.1, F07.2 | Pending | 15 Nov | Until C-01 lands, draw the class diagram for the map packages. |
-| M-02 | Map validator | Areli | `feat/M-02-map-validator` | F00.3 | Pending | 19 Nov | Starts after M-01. |
-| M-03 | Tiles and Lava Tile cycle | Areli | `feat/M-03-lava-cycle` | F07.3.3 | Pending | 21 Nov | Starts after C-01. ERUPTING duration awaits PRD open question 2. |
-| M-04 | Lava damage and warning tiles | Areli | `feat/M-04-lava-damage` | F07.3.3, F01.2.2 | Pending | 23 Nov | Starts after M-03. |
-| M-05 | Configuration files | Areli | `feat/M-05-config` | F05.2, F06.3 | Pending | 24 Nov | Starts after M-01. |
-| M-06 | How to Play text, README feature table | Areli | `feat/M-06-how-to-play` | F09.1.1 | Pending | 26 Nov | Can start any time. |
+| M-01 | Map format, loader, entity factory | Laura | `feat/M-01-map-loader` | F00.2, F07.1, F07.2 | In progress | 15 Nov | 19 Nov: implemented UTF-8 file loading, structural parsing, and entity creation. `gradlew clean build test` passes on JDK 21 with `-Xlint:all -Werror`: 194 tests, including 53 mapio tests; no failures or skips. Verified every tile in the supplied Red Mountain layout, fresh worlds, malformed input, I/O errors, and factory contracts. Boss/lava tests use fixtures pending E-04/E-05 and M-03. Awaiting review/merge; application wiring remains C-09 and gameplay validation M-02. |
+| M-02 | Map validator | Laura | `feat/M-02-map-validator` | F00.3 | Pending | 19 Nov | Starts after M-01. |
+| M-03 | Tiles and Lava Tile cycle | Marshall | `feat/M-03-lava-cycle` | F07.3.3 | Pending | 21 Nov | Starts after C-01. ERUPTING duration awaits PRD open question 2. |
+| M-04 | Lava damage and warning tiles | Marshall | `feat/M-04-lava-damage` | F07.3.3, F01.2.2 | Pending | 23 Nov | Starts after M-03. |
+| M-05 | Configuration files | Laura | `feat/M-05-config` | F05.2, F06.3 | Pending | 24 Nov | Starts after M-01. |
+| M-06 | How to Play text, README feature table | Ilham | `feat/M-06-how-to-play` | F09.1.1 | Pending | 26 Nov | Can start any time. |
 
 ## GUI (bonus B01)
 
@@ -105,6 +117,6 @@ Local tracker for the four-person team. IDs, owners, and due dates come from the
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | X-01 | Five design patterns documented | Laura | `docs/X-01-design-patterns` | B05 | Pending | 1 Dec | Keep the pattern table in `ARCHITECTURE.md` current as classes are written. |
 | X-02 | Bomb Kick | Marshall | `feat/X-02-bomb-kick` | B02 | Pending | 29 Nov | Starts after B-01. |
-| X-03 | Map Maker | Areli | `feat/X-03-map-maker` | B03 | Pending | 1 Dec | Starts after M-02. |
+| X-03 | Map Maker | Marshall | `feat/X-03-map-maker` | B03 | Pending | 1 Dec | Starts after M-02. |
 | X-04 | Local Multiplayer | Marshall | `feat/X-04-local-multiplayer` | B04 | Pending | 1 Dec | Starts after C-06 and B-07. |
 | X-05 | Creativity feature | Ilham | `feat/X-05-creativity` | BXX | Pending | 1 Dec | The team picks the feature by 20 Nov. |

@@ -1,6 +1,6 @@
 # WORKFLOW — Nangor Blast
 
-How the coding agent and the four team members work across sessions. Project rules are in [`CLAUDE.md`](../CLAUDE.md), scope in [`PRD.md`](PRD.md), the plan in [`ARCHITECTURE.md`](ARCHITECTURE.md), and status in [`TODO.md`](TODO.md).
+How the coding agent and the team members work across sessions. Project rules are in [`CLAUDE.md`](../CLAUDE.md), scope in [`PRD.md`](PRD.md), the plan in [`ARCHITECTURE.md`](ARCHITECTURE.md), and status in [`TODO.md`](TODO.md).
 
 ## Starting a session
 
@@ -84,22 +84,22 @@ Each member merges their branches in this order. Two tasks joined by "and" can b
 | Laura | `S-01` → `S-02` → `C-01` → `C-02` and `C-03` → `C-04` → `C-05` → `C-08` → `C-09` and `S-05` → `C-06` → `C-07` → `G-01` → `G-02` → `G-03` → `G-04` → `X-01` |
 | Marshall | `B-01` and `B-03` → `B-02` → `B-04` → `B-05` → `B-06` → `B-07` → `B-08` → `X-02` → `X-04` |
 | Ilham | `E-01` → `E-02` → `E-03` → `E-04` → `E-05` → `E-06` and `E-07` → `X-05` |
-| Areli | `M-01` → `M-02` → `M-03` → `M-04` → `M-05` → `M-06` → `X-03` → `S-07` → `S-08` |
 
-`E-04` and `M-03` need only `C-01`. Ilham can open `E-04` while `E-02` or `E-03` is in review, and Areli can open `M-03` while `M-01` or `M-02` is in review.
+Additional responsibilities retain their existing branches and dependencies: Laura takes `M-01` → `M-02`, `M-05`, and `S-08`; Marshall takes `M-03` → `M-04` and `X-03` after `M-02`; Ilham takes `M-06` and `S-07`. The original lanes above remain unchanged.
 
-Before Gate 1, Marshall, Ilham, and Areli have no code branch. They draw the class diagram for their packages, which goes into `S-05`.
+`E-04` and `M-03` need only `C-01`. Ilham can open `E-04` while `E-02` or `E-03` is in review, and Marshall can open `M-03` while waiting for Laura's `M-01`/`M-02` handoff.
+
+Before Gate 1, Marshall and Ilham have no code branch. They draw the class diagram for their packages, which goes into `S-05`.
 
 ### Reviews
 
 | Branches | Reviewer |
 | --- | --- |
-| `C-01` | Marshall, Ilham, and Areli, because all three build against it. Review on 12 Nov. |
+| `C-01` | Marshall and Ilham, because both build against it. Review on 12 Nov. |
 | Any change to a contract or to `app/GameFactory` | Laura |
 | Laura's other branches | Whichever member is free first |
 | Marshall's branches | Ilham |
-| Ilham's branches | Areli |
-| Areli's branches | Marshall |
+| Ilham's branches | Laura |
 
 Review within one day. A pull request that waits longer blocks the lane behind it.
 
