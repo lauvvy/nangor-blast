@@ -6,6 +6,7 @@ package nangorblast.core;
  * update DESIGN.md, the CLI mapping, and the GUI mapping in the same change.
  */
 public enum EntityKind {
+    FLOOR,
     INDESTRUCTIBLE_BLOCK,
     DESTRUCTIBLE_BLOCK,
     REINFORCED_BLOCK,

@@ -61,11 +61,27 @@ class CliFrameTest {
     }
 
     @Test
-    void everyEntityKindDrawsAboveTheFloor() {
+    void everyOccupantDrawsAboveTheFloorAndFloorKeepsItsOwnPriority() {
         for (EntityKind kind : EntityKind.values()) {
             CliFrame.Glyph glyph = CliFrame.glyph(kind);
-            assertTrue(glyph.priority() >= 1 && glyph.priority() <= 10, kind + " has a priority above floor");
+            if (kind == EntityKind.FLOOR) {
+                assertEquals(CliFrame.FLOOR, glyph);
+            } else {
+                assertTrue(glyph.priority() >= 1 && glyph.priority() <= 10, kind + " has a priority above floor");
+            }
         }
+    }
+
+    @Test
+    void anExplicitFloorSpriteUsesTheExistingFloorGlyphAndCannotHideAnOccupant() {
+        Position shared = new Position(1, 1);
+        CliFrame frame = compose(snapshot(List.of(
+                new Sprite(1, EntityKind.PLAYER, shared),
+                new Sprite(2, EntityKind.FLOOR, shared),
+                new Sprite(3, EntityKind.FLOOR, new Position(2, 1))), Set.of(), 300, GameState.PLAYING));
+        assertEquals('P', tile(frame, 1, 1));
+        assertEquals('.', tile(frame, 2, 1));
+        assertEquals(0x3B2A24, frame.cell(CliFrame.MAP_TOP + 1, 4).fg());
     }
 
     @Test

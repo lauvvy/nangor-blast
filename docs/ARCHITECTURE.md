@@ -134,7 +134,7 @@ record Position(int col, int row) { Position translate(Direction); int manhattan
 enum Direction { UP, DOWN, LEFT, RIGHT; int dCol(); int dRow(); }
 enum GameState { MENU, PLAYING, PAUSED, WIN, LOSE }
 enum BombType { NORMAL, PUMPED, REMOTE }          // in core: Player, HUD, and bombs share it
-enum EntityKind { INDESTRUCTIBLE_BLOCK, ..., POWER_UP_HEART }   // one per row in DESIGN.md
+enum EntityKind { FLOOR, INDESTRUCTIBLE_BLOCK, ..., POWER_UP_HEART }   // one per row in DESIGN.md
 final class Grid<T> { Grid(int w, int h, Function<Position, ? extends T> initial);
                       int width(); int height(); boolean inBounds(Position); T get(Position); void set(Position, T); }
 interface GameEvent {}
@@ -157,12 +157,22 @@ final class Player extends Entity implements Damageable { Player(Position spawn,
 final class Exit extends Entity { boolean isOpen(); void open(); }
 final class GameWorld {
   GameWorld(String mapName, int width, int height, Player player, double timeLimit, Random random);
+  GameWorld(GameMap map, Player player, double timeLimit, Random random); GameMap map();
   void add(Entity); List<Entity> entities(); <T extends Entity> List<T> entities(Class<T>);
   List<Entity> entitiesAt(Position); <T extends Entity> Optional<T> firstAt(Position, Class<T>);
   boolean inBounds(Position); boolean isBlockedFor(Entity mover, Position target); void removeInactive();
   void setWarnings(Object source, Set<Position>); void clearWarnings(Object source); Set<Position> warningTiles();
   Player player(); Random random(); EventBus bus(); int score(); void addScore(int);
   double timeLeft(); void reduceTime(double); GameState state(); void setState(GameState);
+}
+
+// model/map (M-01)
+abstract class Tile extends Entity { boolean isWalkable(); }   // fixed grid position
+final class FloorTile extends Tile { FloorTile(Position); EntityKind kind(); } // FLOOR
+final class GameMap {
+  GameMap(String name, int width, int height); String name(); int width(); int height();
+  Tile tileAt(Position); boolean isWalkable(Position); void setTile(Tile);
+  List<Tile> lavaTiles(); // List<LavaTile> once the concrete type is available in M-03
 }
 
 // engine
@@ -185,7 +195,7 @@ interface Renderer { void render(WorldSnapshot snapshot); }
 
 Rules that come with them:
 
-- **One entity list.** `GameWorld` keeps every entity in one list, and the F00.1 collections are typed queries: `world.entities(Bomb.class)`, `world.entities(Enemy.class)`, and so on. So `GameWorld` needs no import from another member's package. Queries return copies of the active entities, so a system may add entities while iterating.
+- **One gameplay entity list.** `GameWorld` keeps gameplay occupants in one list, and the F00.1 collections are typed queries: `world.entities(Bomb.class)`, `world.entities(Enemy.class)`, and so on. Queries return copies of the active entities, so a system may add entities while iterating. `GameMap` owns floor terrain separately; floor does not count as an occupant during respawn. Lava is shared by the grid and the entity list, so hazard systems can query it. `GameWorld` has no dependency on another member's concrete terrain classes.
 - **Blocks, lava, and the exit are entities too.** Each subclass answers `blocksMovementOf(mover)` according to the "Who blocks whom" table, and `GameWorld.isBlockedFor` asks every entity on the target tile. A new obstacle needs no change in `PlayerSystem` or `EnemySystem`.
 - **Warnings are owned by a source.** A boss attack or a Lava Tile calls `setWarnings(this, tiles)` and `clearWarnings(this)`. Renderers draw the union.
 - **Randomness** comes only from `world.random()`, which tests seed.
@@ -365,10 +375,12 @@ It contains 1 player spawn, 5 Normal Enemy spawns, 1 boss spawn, 1 exit, 8 Lava 
 
 As built in `M-01`:
 
-- `mapio.MapLoader.load(Path)` reads UTF-8 (LF/CRLF, optional initial BOM) and creates a fresh `GameWorld`. `parse(String, List<String>)` supports in-memory maps; both have overloads taking the world's `Random`. File loads use the filename without its extension as `mapName`; `parse` takes an explicit name. Errors use `InvalidMapException`, with the file path or map name and one-based row/column where applicable.
-- `mapio.EntityFactory` creates the player, the three production block types (`#`, `D`, `R`), and a closed exit. Floor is implicit. It accepts player speed and explicit creation functions for Normal Enemies, bosses, and dormant lava. These functions must return fresh active entities at the requested position with the expected kind; enemies and bosses also implement `Hostile`. Missing domain classes have no production stand-ins in this factory.
-- The loader checks all text before constructing entities: nonempty rectangular rows, supported symbols, and exactly one player spawn. M-02 adds fixed dimensions, gameplay counts, and reachability; M-05 supplies configuration and movement choices. C-09 wires the real domain constructors into the application and removes `StandInMap`. No existing shared contract changes.
-- The file format and integration example are in [`config/maps/README.md`](../config/maps/README.md). Boss and lava objects used by M-01 tests are test-only fixtures pending E-04/E-05 and M-03.
+- `mapio.MapLoader` follows the [Map class diagram](diagram/Class%20Diagram%20Map.drawio): it owns a `validator: MapValidator` and `factory: EntityFactory`, separates `readRows(Path)` from `parse(String, List<String>)`, and delegates placement to `factory.populate(world, rows)`. `load` and `parse` return a fresh `GameWorld` and have overloads taking its `Random`. File loads use the filename stem as `mapName`; `parse` accepts an explicit name. Input is UTF-8 with LF/CRLF and one optional initial BOM. Errors preserve path/map name and one-based row/column context.
+- `EntityFactory.create(char, Position)` returns `Entity`, including a real `FloorTile` for `.`. `populate(GameWorld, List<String>)` validates normalized rows and the initial player, prepares terrain and occupants, then installs them together. Creator failures leave the target world's collections unchanged. The player is inserted only once by the world constructor.
+- `model/map.GameMap` owns `name` and `Grid<Tile>`, with `width`, `height`, `tileAt`, `isWalkable`, and `lavaTiles`. `Tile` extends `Entity`, has a fixed position and terrain walkability, and `FloorTile` extends it with `EntityKind.FLOOR`. `GameWorld.map()` exposes the terrain, and an additional constructor accepts a `GameMap`; the existing constructor remains supported. Terrain walkability and occupying entities are checked separately, so floors do not prevent respawn. A lava object is shared by the map grid and the gameplay entity list.
+- `MapValidator.validate(rows)` currently performs M-01's structural checks: nonempty rectangular text, supported symbols, and exactly one `P`. Full dimensions, gameplay counts, reachability, `MapRule`, and rule-bearing exceptions remain M-02. `GameConfig`, the factory's `config` field, and `assignPatrolPaths` remain M-05. The factory accepts speed and explicit creator functions until that configuration lands.
+- Concrete boss and lava types remain E-04/E-05 and M-03; tests use fixtures implementing the existing contracts (`Hostile` for enemies/bosses and `Tile` for lava). `GameMap.lavaTiles()` temporarily returns `List<Tile>`; M-03 can specialize it to the diagram's `List<LavaTile>`. C-09 connects the loader to `GameFactory` and removes `StandInMap`.
+- The format and integration example are in [`config/maps/README.md`](../config/maps/README.md). `DESIGN.md` and the CLI glyph table include `FLOOR` with the existing floor color and lowest draw priority. There is no GUI renderer yet.
 
 ### Technical requirement map
 

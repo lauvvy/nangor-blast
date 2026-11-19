@@ -27,11 +27,16 @@ import nangorblast.core.EntityKind;
 import nangorblast.core.GameState;
 import nangorblast.core.InvalidMapException;
 import nangorblast.core.Position;
+import nangorblast.engine.LifeSystem;
+import nangorblast.model.Damage;
+import nangorblast.model.DamageSource;
 import nangorblast.model.Entity;
 import nangorblast.model.Exit;
 import nangorblast.model.GameWorld;
 import nangorblast.model.Player;
+import nangorblast.model.block.DestructibleBlock;
 import nangorblast.model.enemy.NormalEnemy;
+import nangorblast.model.map.FloorTile;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -91,6 +96,11 @@ class MapLoaderTest {
         assertEquals(5, world.entities(NormalEnemy.class).size());
         assertEquals(1, count(world, EntityKind.BOSS));
         assertEquals(8, count(world, EntityKind.LAVA_DORMANT));
+        assertEquals(8, world.map().lavaTiles().size());
+        for (Entity lava : world.map().lavaTiles()) {
+            assertSame(lava, world.entitiesAt(lava.position()).get(0));
+        }
+        assertInstanceOf(FloorTile.class, world.map().tileAt(world.player().spawn()));
         assertEquals(4, count(world, EntityKind.DESTRUCTIBLE_BLOCK));
         assertEquals(1, world.entities(Exit.class).size());
         assertEquals(0, world.score());
@@ -125,6 +135,28 @@ class MapLoaderTest {
     }
 
     @Test
+    void readRowsOnlyDecodesTheFileAndDoesNotConstructOrValidateEntities() throws IOException {
+        Path file = temporary.resolve("raw.txt");
+        Files.writeString(file, "\uFEFF?\r\ninvalid\r\n", StandardCharsets.UTF_8);
+        assertEquals(List.of("\uFEFF?", "invalid"), loader.readRows(file));
+        assertThrows(InvalidMapException.class, () -> loader.load(file));
+    }
+
+    @Test
+    void terrainDoesNotPreventRespawningOnTheNearestUnoccupiedFloor() {
+        GameWorld world = loader.parse("Respawn", List.of("PX.", "..."));
+        Player player = world.player();
+        world.add(new DestructibleBlock(player.spawn()));
+        player.takeDamage(new Damage(1, Damage.newActivationId(), DamageSource.ENEMY_CONTACT));
+        new LifeSystem().update(world, 0.05);
+        assertEquals(new Position(0, 1), player.position());
+        assertEquals(2, player.lives());
+        assertTrue(player.isInvulnerable());
+        assertInstanceOf(FloorTile.class, world.map().tileAt(player.position()));
+        assertEquals(List.of(player), world.entitiesAt(player.position()));
+    }
+
+    @Test
     void repeatedLoadsCreateFreshWorldsAndResetInitialState() throws IOException {
         Path file = temporary.resolve("restart.txt");
         Files.writeString(file, "PDEBHX\n", StandardCharsets.UTF_8);
@@ -139,6 +171,8 @@ class MapLoaderTest {
         GameWorld second = loader.load(file, new Random(7));
         assertNotSame(first, second);
         assertNotSame(first.player(), second.player());
+        assertNotSame(first.map(), second.map());
+        assertNotSame(first.map().tileAt(new Position(0, 0)), second.map().tileAt(new Position(0, 0)));
         assertNotSame(first.bus(), second.bus());
         assertEquals(new Position(0, 0), second.player().position());
         assertEquals(6, second.entities().size());
@@ -175,6 +209,7 @@ class MapLoaderTest {
                 arguments(List.of(), List.of("at least one row")),
                 arguments(List.of(""), List.of("nonempty first row")),
                 arguments(List.of("\uFEFF"), List.of("nonempty first row")),
+                arguments(List.of("\uFEFF\uFEFFP"), List.of("column 1", "U+FEFF")),
                 arguments(Arrays.asList("P", null), List.of("row 2", "null")),
                 arguments(List.of("P..", ".."), List.of("row 2", "width 2", "expected 3")),
                 arguments(List.of("P..", ""), List.of("row 2", "width 0")),
@@ -221,7 +256,7 @@ class MapLoaderTest {
         IllegalArgumentException cause = new IllegalArgumentException("No patrol path at this spawn");
         EntityFactory failing = new EntityFactory(4, position -> { throw cause; },
                 position -> new MapFixtures.TestHostile(position, EntityKind.BOSS),
-                position -> new MapFixtures.TestEntity(position, EntityKind.LAVA_DORMANT));
+                MapFixtures.TestLava::new);
         InvalidMapException error = assertThrows(InvalidMapException.class,
                 () -> new MapLoader(failing, 300).parse("Broken patrol", List.of("PE")));
         assertTrue(error.getMessage().contains("Broken patrol"));
@@ -235,7 +270,7 @@ class MapLoaderTest {
         NormalEnemy shared = MapFixtures.enemy(new Position(1, 0));
         EntityFactory reusing = new EntityFactory(4, position -> { shared.moveTo(position); return shared; },
                 position -> new MapFixtures.TestHostile(position, EntityKind.BOSS),
-                position -> new MapFixtures.TestEntity(position, EntityKind.LAVA_DORMANT));
+                MapFixtures.TestLava::new);
         InvalidMapException error = assertThrows(InvalidMapException.class,
                 () -> new MapLoader(reusing, 300).parse("Duplicate entity", List.of("PEE")));
         assertTrue(error.getMessage().contains("row 1, column 3"));
@@ -249,7 +284,7 @@ class MapLoaderTest {
             rows.set(0, "?");
             return MapFixtures.enemy(position);
         }, position -> new MapFixtures.TestHostile(position, EntityKind.BOSS),
-                position -> new MapFixtures.TestEntity(position, EntityKind.LAVA_DORMANT));
+                MapFixtures.TestLava::new);
         GameWorld world = new MapLoader(changing, 300).parse("Snapshot", rows);
         assertEquals(5, world.width());
         assertEquals(5, world.entities().size());

@@ -7,6 +7,7 @@ import nangorblast.model.Entity;
 import nangorblast.model.Hostile;
 import nangorblast.model.enemy.NormalEnemy;
 import nangorblast.model.enemy.PatrolBehavior;
+import nangorblast.model.map.Tile;
 
 /** Test-only boss and lava fixtures until E-04/E-05 and M-03 supply production classes. */
 final class MapFixtures {
@@ -17,7 +18,7 @@ final class MapFixtures {
     static EntityFactory factory(double playerSpeed) {
         return new EntityFactory(playerSpeed, MapFixtures::enemy,
                 position -> new TestHostile(position, EntityKind.BOSS),
-                position -> new TestEntity(position, EntityKind.LAVA_DORMANT));
+                TestLava::new);
     }
 
     static NormalEnemy enemy(Position position) {
@@ -46,6 +47,17 @@ final class MapFixtures {
         @Override
         public boolean blocksMovementOf(Entity mover) {
             return mover != this;
+        }
+    }
+
+    static final class TestLava extends Tile {
+        TestLava(Position position) {
+            super(position);
+        }
+
+        @Override
+        public EntityKind kind() {
+            return EntityKind.LAVA_DORMANT;
         }
     }
 }

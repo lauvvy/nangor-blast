@@ -12,22 +12,22 @@ import java.util.Set;
 import nangorblast.core.EventBus;
 import nangorblast.core.GameState;
 import nangorblast.core.Position;
+import nangorblast.model.map.GameMap;
 
 /**
  * Everything in one game: the F00.1 attributes, the warning tiles, and the event bus.
  * Only the game-loop thread touches it.
  *
- * <p>Entities of every type share one list, and each collection from F00.1 is a typed
+ * <p>Gameplay occupants share one list, and each collection from F00.1 is a typed
  * query: {@code entities(Bomb.class)} is the bombs, {@code entities(Enemy.class)} the
  * enemies, and so on. The queries return copies, so a system may add entities while it
  * iterates. Inactive entities stay in the list until {@link #removeInactive()} runs at the
- * end of the tick.
+ * end of the tick. Floor terrain belongs to {@link GameMap} and does not occupy a cell
+ * for respawn purposes. Lava is shared by the terrain grid and the gameplay list.
  */
 public final class GameWorld {
 
-    private final String mapName;
-    private final int width;
-    private final int height;
+    private final GameMap map;
     private final Player player;
     private final Random random;
     private final EventBus bus = new EventBus();
@@ -42,12 +42,12 @@ public final class GameWorld {
      * @param random the only source of randomness in the game; pass a seeded one in tests
      */
     public GameWorld(String mapName, int width, int height, Player player, double timeLimit, Random random) {
-        if (width <= 0 || height <= 0) {
-            throw new IllegalArgumentException("World size must be positive, got " + width + "x" + height);
-        }
-        this.mapName = Objects.requireNonNull(mapName, "mapName");
-        this.width = width;
-        this.height = height;
+        this(new GameMap(mapName, width, height), player, timeLimit, random);
+    }
+
+    /** Keeps terrain in the map, and gameplay occupants in the entity list. */
+    public GameWorld(GameMap map, Player player, double timeLimit, Random random) {
+        this.map = Objects.requireNonNull(map, "map");
         this.player = Objects.requireNonNull(player, "player");
         this.random = Objects.requireNonNull(random, "random");
         this.timeLeft = timeLimit;
@@ -58,20 +58,24 @@ public final class GameWorld {
     }
 
     public String mapName() {
-        return mapName;
+        return map.name();
+    }
+
+    public GameMap map() {
+        return map;
     }
 
     public int width() {
-        return width;
+        return map.width();
     }
 
     public int height() {
-        return height;
+        return map.height();
     }
 
     public boolean inBounds(Position position) {
-        return position.col() >= 0 && position.col() < width
-                && position.row() >= 0 && position.row() < height;
+        return position.col() >= 0 && position.col() < width()
+                && position.row() >= 0 && position.row() < height();
     }
 
     public Player player() {
@@ -116,7 +120,7 @@ public final class GameWorld {
 
     /** True if {@code mover} cannot step onto {@code target}: outside the map, or an entity there blocks it. */
     public boolean isBlockedFor(Entity mover, Position target) {
-        if (!inBounds(target)) {
+        if (!map.isWalkable(target)) {
             return true;
         }
         for (Entity other : entities) {

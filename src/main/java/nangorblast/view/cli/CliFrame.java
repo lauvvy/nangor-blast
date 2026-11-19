@@ -44,6 +44,7 @@ final class CliFrame {
     /** The exhaustive switch makes a new {@link EntityKind} fail to compile until it has a glyph. */
     static Glyph glyph(EntityKind kind) {
         return switch (kind) {
+            case FLOOR -> FLOOR;
             case EXPLOSION -> new Glyph('*', 0xFFD54F, 1);
             case PLAYER -> new Glyph('P', 0x4FC3F7, 3);
             case BOSS -> new Glyph('B', 0xE53935, 4);
