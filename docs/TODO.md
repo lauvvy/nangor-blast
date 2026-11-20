@@ -2,7 +2,7 @@
 
 Local tracker for Laura, Marshall, and Ilham. IDs, owners, and due dates come from the Implementation Plan in [`ARCHITECTURE.md`](ARCHITECTURE.md), where each task's completion criteria are written.
 
-**Last updated** 19 November 2026
+**Last updated** 20 November 2026
 
 ## Additional responsibilities
 
@@ -73,7 +73,7 @@ S-08 (activity log PDF) is assigned to Laura. M-06 stays intact as the existing 
 | B-01 | Bomb base and Normal Bomb | Marshall | `feat/B-01-normal-bomb` | F02.1, F02.2.1, F02.3, F01.2.5 | Done | 15 Nov | 12 Nov: `make build` passes with `-Werror`, 114 tests green. `BombSystemTest` shows a 3-second fuse, placement refused at full capacity, on a tile with a bomb, and outside PLAYING, capacity returned, blast range fixed at placement, and the player leaving the bomb tile but not re-entering it. Capacity returns when the bomb goes off; B-02 moves it to the end of the explosion. Reviewed by Ilham in PR #11. |
 | B-02 | Explosion spread and damage | Marshall | `feat/B-02-explosion` | F03 | Done | 16 Nov | 15 Nov: `make build` passes with `-Werror`, 133 tests green. `ExplosionSystemTest` shows the center and four arms, arms stopping at the map edge and at each block type (Destructible destroyed, Reinforced only by a Pumped Bomb, neither tile in the area), a 0.5-second duration, power-ups unaffected, `takeDamage` called once per target, the owner not immune, an invulnerable player unhurt, capacity returned when the explosion ends, and another bomb in the area triggered. Power-up drops from blocks come in B-07, bounded chains in B-06. Reviewed by Marshall with Ilham, pairing in person. Merged in PR #15. |
 | B-03 | Three block types | Marshall | `feat/B-03-blocks` | F04 | Done | 15 Nov | 12 Nov: `make build` passes with `-Werror`, 122 tests green. `BlockTest` shows every type blocking every mover, Indestructible never destroyed, Destructible destroyed by every bomb, Reinforced only by a Pumped Bomb, a destroyed block's tile walkable again, and no bomb on an Indestructible tile. `TestWorlds` now builds `#` as an `IndestructibleBlock`. The power-up a Destructible Block may release comes in B-07. Reviewed by Marshall with Ilham, pairing in person. |
-| B-04 | Pumped Bomb and type selection | Marshall | `feat/B-04-pumped-bomb` | F02.2.2, F02.3.2 | Pending | 20 Nov | Starts after B-01, B-02, B-03. |
+| B-04 | Pumped Bomb and type selection | Marshall | `feat/B-04-pumped-bomb` | F02.2.2, F02.3.2 | In progress | 20 Nov | 20 Nov: behavior came in with the spec 1.2 bomb revision (`601bebe`). `PumpedBombTest` (7 tests) drives the real `PlayerSystem`, `BombSystem`, and `ExplosionSystem`: no explosion at 4.45 s and one at 4.5 s, arms reaching `blastRange + 2`, range capped at 7, a Reinforced Block destroyed, 2 damage to a target, selection changing only later bombs, and selection ignored while paused. On Ubuntu with JDK 21, `gradlew build -x test` passes with `-Werror` and 179 tests in core, model, engine, mapio, and input pass. `CliInputTest` hangs and `CliRendererTest` fails 3 tests on Linux; both are unchanged by this branch; Laura needs to check them on Linux. Awaiting review by Ilham. |
 | B-05 | Remote Bomb and detonate | Marshall | `feat/B-05-remote-bomb` | F02.2.3, F02.3.3 | Pending | 21 Nov | Starts after B-01. |
 | B-06 | Bounded chain reactions | Marshall | `feat/B-06-chain-reaction` | F02.3.7, F03.2.6 | Pending | 23 Nov | Starts after B-02. |
 | B-07 | Power-ups | Marshall | `feat/B-07-powerups` | F06 | Pending | 25 Nov | Starts after B-03. |

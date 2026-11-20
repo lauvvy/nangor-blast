@@ -41,6 +41,7 @@ Aturan pengisian:
 | 15 Nov 2026 | S-02 terminal spike dan class diagram S-05 (`docs/marshall-spike-class-diagram`) | Spike jalan di terminal Claude desktop (`xterm-256color`): key terbaca tanpa Enter, tidak flicker, key release tidak dilaporkan, dua key ditahan hanya key terakhir yang berulang. Class diagram package bomb, explosion, block, power-up ditulis di `docs/diagram/class-diagram-marshall.md`. |
 | 15 Nov 2026 | B-02 Explosion (`feat/B-02-explosion`) | `Explosion` dan `ExplosionSystem` selesai: pusat dan empat lengan, durasi 0,5 detik, berhenti di block, damage sekali per target, bomb lain ikut terpicu. Kapasitas bomb sekarang kembali saat ledakan selesai. 12 test lulus. |
 | 15 Nov 2026 | Update progres dokumen (`docs/marshall-progress`) | B-02 ditandai Done setelah merge PR #15. F04 dicentang di `CLAUDE.md`. Catatan "As built" untuk B-01, B-03, dan B-02 ditambahkan di `ARCHITECTURE.md`. |
+| 20 Nov 2026 | B-04 Pumped Bomb dan pemilihan jenis bomb (`feat/B-04-pumped-bomb`) | Perilaku Pumped Bomb dan pemilihan jenis bomb sudah masuk lewat revisi bomb spesifikasi 1.2. Menambahkan `PumpedBombTest` (7 test) lewat `PlayerSystem`, `BombSystem`, dan `ExplosionSystem` asli: fuse 4,5 detik, jangkauan `blastRange + 2` maksimal 7, Reinforced Block hancur, damage 2, pemilihan hanya berlaku untuk bomb berikutnya, dan diabaikan saat pause. 179 test core/model/engine/mapio/input lulus di Ubuntu dengan JDK 21. `CliInputTest` hang dan 3 test `CliRendererTest` gagal di Linux (bukan dari branch ini). |
 
 ## Muhammad Ilham Malik Amrullah / 18225022
 
