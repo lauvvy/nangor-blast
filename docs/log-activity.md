@@ -51,3 +51,4 @@ Aturan pengisian:
 | 15 November 2026 | E-01 Patrol Enemy | `EnemySytem`, `GameFactory` |
 | 17 November 2026 | `S-05` class diagram paket enemy dan boss | Membuat dua class diagram di draw.io. Paket enemy: `Enemy`, `NormalEnemy`, `MovementBehavior`, `PatrolBehavior`, `ChaseBehavior`, `EnemySystem`. Paket boss: `Boss`, `Hades`, `BossPhase`, `BossSystem`, `AttackPattern` dengan empat serangan. Kontrak dari C-01 yang dipakai ikut digambar. Nama serangan, field, dan method masih rancangan dan bisa berubah saat implementasi. |
 | 17 November 2026 | `S-05` class diagram paket map dan mapio | Ilham membuat `docs/diagram/Class Diagram Map.drawio` dengan dua halaman: Map package dan Mapio package. File diagram ditambahkan ke folder diagram tanpa mengubah isinya. |
+| 22 November 2026 | `E-02` Chase Enemy dan tes | Menambah `ChaseBehavior` dengan BFS, `ChaseState`, dan `ChaseBehaviorTest`. Tes hijau. Belum direview dan belum dicoba di terminal sungguhan. |
