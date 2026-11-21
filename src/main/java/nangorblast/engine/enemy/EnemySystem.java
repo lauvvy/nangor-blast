@@ -10,6 +10,7 @@ public final class EnemySystem implements GameSystem {
     public void update(GameWorld world, double dt) {
         for (NormalEnemy enemy : world.entities(NormalEnemy.class)) {
             enemy.tick(dt);
+            enemy.getBehavior().update(enemy, world, dt);
             if (!enemy.isReadyToMove()) {
                 continue;
             }

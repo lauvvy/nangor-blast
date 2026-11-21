@@ -83,8 +83,8 @@ S-08 (activity log PDF) is assigned to Laura. M-06 stays intact as the existing 
 
 | ID | Task | Owner | Branch | Spec | Status | Due | Next step or verification |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| E-01 | Enemy base and Patrol Enemy | Ilham | `feat/E-01-patrol-enemy` | F05.1, F05.2 | In Progress | 15 Nov | 15 Nov: `make build` lolos dengan `-Werror`. `EnemySystemTest` berisi 3 tes yang hijau: musuh mengikuti jalur dan berbalik di ujung, berbalik saat tile berikutnya tembok, dan tidak berbagi tile dengan musuh lain. Asumsi kerja: patroli bolak-balik, berbalik saat terblokir. Belum direview dan belum dilihat di terminal sungguhan. |
-| E-02 | Chase Enemy | Ilham | `feat/E-02-chase-enemy` | F05.2 | Pending | 19 Nov | Starts after E-01. |
+| E-01 | Enemy base and Patrol Enemy | Ilham | `feat/E-01-patrol-enemy` | F05.1, F05.2 | Done | 15 Nov | 15 Nov: `make build` lolos dengan `-Werror`. `EnemySystemTest` berisi 3 tes yang hijau: musuh mengikuti jalur dan berbalik di ujung, berbalik saat tile berikutnya tembok, dan tidak berbagi tile dengan musuh lain. Asumsi kerja: patroli bolak-balik, berbalik saat terblokir. Belum direview dan belum dilihat di terminal sungguhan. |
+| E-02 | Chase Enemy | Ilham | `feat/E-02-chase-enemy` | F05.2 | Done | 19 Nov | 22 Nov: `ChaseBehaviorTest` hijau (5 tes): pindah ke CHASE di jarak 3 atau kurang, memutari blok, jalur dihitung ulang hanya saat player pindah tile, kembali ke patroli di luar jarak 3, dan kembali ke patroli setelah 1 detik tanpa jalur. `make test` lolos. Belum direview dan belum dicoba di terminal sungguhan. |
 | E-03 | Contact damage and enemy defeat | Ilham | `feat/E-03-enemy-contact` | F01.2.2, F03.2.5 | Pending | 20 Nov | Starts after E-01. |
 | E-04 | Boss framework | Ilham | `feat/E-04-boss-framework` | F05.3.1 | Pending | 22 Nov | Starts after C-01. Can run in parallel with E-02. |
 | E-05 | Hades phase 1 attacks | Ilham | `feat/E-05-hades-phase1` | F05.3.4 | Pending | 24 Nov | Starts after E-04. |
