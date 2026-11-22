@@ -1,15 +1,24 @@
 package nangorblast.engine.enemy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import nangorblast.TestWorlds;
+import nangorblast.core.EnemyDefeated;
 import nangorblast.core.Position;
+import nangorblast.model.Damage;
+import nangorblast.model.DamageSource;
 import nangorblast.model.GameWorld;
+import nangorblast.model.Player;
 import nangorblast.model.enemy.NormalEnemy;
 import nangorblast.model.enemy.PatrolBehavior;
-import org.junit.jupiter.api.Test;
 
 class EnemySystemTest {
     private static final double DT = 0.05;
@@ -71,5 +80,52 @@ class EnemySystemTest {
             run(system, world, 1);
             assertNotEquals(a.position(), b.position());
         }
+    }
+
+    @Test
+    void enemyStepsIntoPlayerCostOneLifeWithoutSharingTile() {
+        GameWorld world = TestWorlds.fromAscii("P.");
+        Position at = new Position(1, 0);
+        NormalEnemy enemy = new NormalEnemy(at,
+                new PatrolBehavior(List.of(at, world.player().position())));
+        world.add(enemy);
+
+        new EnemySystem().update(world, DT);
+
+        assertEquals(Player.START_LIVES - 1, world.player().lives());
+        assertNotEquals(world.player().position(), enemy.position());
+    }
+
+    @Test 
+    void defeatedEnemyIsDeactivatedByTheSystem() {
+        GameWorld world = TestWorlds.fromAscii("P...");
+        Position at = new Position(3, 0);
+        NormalEnemy enemy = new NormalEnemy(at, new PatrolBehavior(List.of(at)));
+        world.add(enemy);
+
+        assertTrue(enemy.takeDamage(new Damage(1, Damage.newActivationId(), DamageSource.EXPLOSION)));
+        assertTrue(enemy.isActive());
+
+        new EnemySystem().update(world, DT);
+        assertFalse(enemy.isActive());
+    }
+
+    @Test
+    void enemyDefeatedEventIsPublishedOnce() {
+        GameWorld world = TestWorlds.fromAscii("P...");
+        Position at = new Position(3, 0);
+        NormalEnemy enemy = new NormalEnemy(at, new PatrolBehavior(List.of(at)));
+        world.add(enemy);
+        EnemySystem system = new EnemySystem();
+
+        List<EnemyDefeated> events = new ArrayList<>();
+        world.bus().subscribe(EnemyDefeated.class, events::add);
+
+        enemy.takeDamage(new Damage(1, Damage.newActivationId(), DamageSource.EXPLOSION));
+        run(system, world, 3);
+
+        assertEquals(1, events.size());
+        assertEquals(NormalEnemy.SCORE_VALUE, events.get(0).scoreValue());
+        assertFalse(events.get(0).boss());
     }
 }
