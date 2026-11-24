@@ -53,3 +53,4 @@ Aturan pengisian:
 | 17 November 2026 | `S-05` class diagram paket map dan mapio | Ilham membuat `docs/diagram/Class Diagram Map.drawio` dengan dua halaman: Map package dan Mapio package. File diagram ditambahkan ke folder diagram tanpa mengubah isinya. |
 | 22 November 2026 | `E-02` Chase Enemy dan tes | Menambah `ChaseBehavior` dengan BFS, `ChaseState`, dan `ChaseBehaviorTest`. Tes hijau. Belum direview dan belum dicoba di terminal sungguhan. |
 | 22 November 2026 | `E-03` kontak musuh dan kekalahan musuh | Menambah `Damageable`, `health`, dan `takeDamage` ke `NormalEnemy`. `EnemySystem` melukai player saat musuh melangkah ke tilenya, menonaktifkan musuh yang kalah, dan mengirim `EnemyDefeated` sekali. 6 tes `EnemySystemTest` hijau. Belum direview dan belum dicoba di terminal sungguhan. |
+| 24 November 2026 | `E-04` Boss Framework | Menambah `Boss`, `AttackPattern`, `BossPhase`, dan `BossAttackState` dan sudah lolos `compileJava`. |
