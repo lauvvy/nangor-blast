@@ -64,7 +64,7 @@ public abstract class Boss extends Entity implements Hostile, Damageable {
 
     @Override
     public boolean takeDamage(Damage damage) {
-        if (isDefeated() || isVulnerable() || !hitBy.add(damage.activationId())) {
+        if (isDefeated() || !isVulnerable() || !hitBy.add(damage.activationId())) {
             return false;
         }
         health = Math.max(0, health - damage.amount());

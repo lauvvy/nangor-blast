@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import nangorblast.engine.CommandHandler;
+import nangorblast.engine.enemy.EnemySystem;
+import nangorblast.engine.enemy.BossSystem;
 import nangorblast.engine.GameFlow;
 import nangorblast.engine.GameLoop;
 import nangorblast.engine.GameSystem;
@@ -17,7 +19,7 @@ import nangorblast.engine.bomb.BombSystem;
 import nangorblast.engine.bomb.ExplosionSystem;
 import nangorblast.input.Command;
 import nangorblast.model.GameWorld;
-import nangorblast.engine.enemy.EnemySystem;
+
 
 /** The composition root. Each member registers a system with one line in {@link #systems}. */
 public final class GameFactory {
@@ -52,7 +54,8 @@ public final class GameFactory {
     public static List<GameSystem> systems(PlayerSystem players) {
         return List.of(
                 players, // 1
-                new EnemySystem(), // 2 (BossSystem comes with E-04)
+                new EnemySystem(),
+                new BossSystem(),
                 new BombSystem(), // 3, then ExplosionSystem
                 new ExplosionSystem(),
                 // 4. HazardSystem
