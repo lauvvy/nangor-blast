@@ -38,6 +38,7 @@ public final class BossSystem implements GameSystem {
         if (!boss.isTimerDone()) {
             return;
         }
+        boss.faceTowards(world.player().position());
         AttackPattern next = choose(world, boss);
         if (next == null) {
             return;
