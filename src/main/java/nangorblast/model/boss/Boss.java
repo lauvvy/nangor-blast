@@ -3,6 +3,8 @@ package nangorblast.model.boss;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import nangorblast.core.Direction;
 import nangorblast.core.EntityKind;
 import nangorblast.core.Position;
 import nangorblast.model.Damage;
@@ -30,6 +32,7 @@ public abstract class Boss extends Entity implements Hostile, Damageable {
     private AttackPattern last;
     private Set<Position> tiles = Set.of();
     private long activationId;
+    private Direction facing = Direction.DOWN;
 
     protected Boss(Position position, List<AttackPattern> patterns) {
         super(position);
@@ -48,6 +51,27 @@ public abstract class Boss extends Entity implements Hostile, Damageable {
 
     public int health() {
         return health;
+    }
+
+    public Direction facing() {
+        return facing;
+    }
+
+    public void face(Direction direction) {
+        this.facing = direction;
+    }
+
+    public void faceTowards(Position target) {
+        int dCol = target.col() - position().col();
+        int dRow = target.row() - position().row();
+        if (dCol == 0 && dRow == 0) {
+            return;
+        }
+        if (Math.abs(dCol) >= Math.abs(dRow)) {
+            facing = dCol > 0 ? Direction.RIGHT : Direction.LEFT;
+        } else {
+            facing = dRow > 0 ? Direction.DOWN : Direction.UP;
+        }
     }
 
     public boolean isDefeated() {
