@@ -18,9 +18,10 @@ public final class SpinAttack implements AttackPattern {
 
     @Override
     public Set<Position> tiles(Boss boss, GameWorld world, BossPhase phase) {
+        int radius = phase == BossPhase.PHASE_TWO ? 2 : 1;
         Set<Position> tiles = new LinkedHashSet<>();
-        for (int dCol = -1; dCol <= 1; dCol++) {
-            for (int dRow = -1; dRow <= 1; dRow++) {
+        for (int dCol = -radius; dCol <= radius; dCol++) {
+            for (int dRow = -radius; dRow <= radius; dRow++) {
                 Position tile = new Position(boss.position().col() + dCol, boss.position().row() + dRow);
                 if ((dCol != 0 || dRow != 0) && world.inBounds(tile)) {
                     tiles.add(tile);

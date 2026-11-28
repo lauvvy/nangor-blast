@@ -18,8 +18,9 @@ public final class GroundSlam implements AttackPattern {
 
     @Override
     public Set<Position> tiles(Boss boss, GameWorld world, BossPhase phase) {
+        int depth = phase == BossPhase.PHASE_TWO ? 4 : 3;
         Set<Position> tiles = new LinkedHashSet<>();
-        for (int ahead = 1; ahead <= 3; ahead++) {
+        for (int ahead = 1; ahead <= depth; ahead++) {
             for (int aside = -1; aside <= 1; aside++) {
                 Position tile = AttackTiles.relative(boss, ahead, aside);
                 if (world.inBounds(tile)) {
