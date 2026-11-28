@@ -44,6 +44,14 @@ class HadesAttackTest {
         return tiles;
     }
 
+    private static Set<Position> union(Set<Position> base, Position... extra) {
+        Set<Position> tiles = new HashSet<>(base);
+        tiles.addAll(Set.of(extra));
+        return tiles;
+    }
+
+
+    // PHASE 1
     @Test
     void heavyPunchHitsThreeTilesAheadInEveryDirection() {
         Map<Direction, Set<Position>> expected = Map.of(
@@ -131,5 +139,71 @@ class HadesAttackTest {
         world.player().moveTo(new Position(10, 5));
         hades.faceTowards(world.player().position());
         assertEquals(Direction.RIGHT, hades.facing());
+    }
+
+    // PHASE 2
+    @Test
+    void heavyPunchPhaseTwoAddsACrossbarBesideTheEndTile() {
+        Map<Direction, Set<Position>> expected = Map.of(
+            Direction.UP, union(rect(5, 5, 2, 4), new Position(4, 2), new Position(6, 2)),
+            Direction.DOWN, union(rect(5, 5, 6, 8), new Position(4, 8), new Position(6, 8)),
+            Direction.LEFT, union(rect(2, 4, 5, 5), new Position(2, 4), new Position(2, 6)),
+            Direction.RIGHT, union(rect(6, 8, 5, 5), new Position(8, 4), new Position(8, 6)));
+        GameWorld world = worldWithPlayerAt(0, 0);
+        Hades hades = hadesIn(world);
+        AttackPattern punch = new HeavyPunch();
+
+        for (Map.Entry<Direction, Set<Position>> entry : expected.entrySet()) {
+            hades.face(entry.getKey());
+            assertEquals(entry.getValue(), punch.tiles(hades, world, BossPhase.PHASE_TWO), entry.getKey().name());
+        }
+        assertEquals(1.0, punch.duration(BossPhase.PHASE_TWO), 1e-9);
+    }
+
+    @Test
+    void spinAttackPhaseTwoHasRadiusTwo() {
+        Set<Position> around = rect(3, 7, 3, 7);
+        around.remove(HADES_AT);
+        GameWorld world = worldWithPlayerAt(0, 0);
+        Hades hades = hadesIn(world);
+        AttackPattern spin = new SpinAttack();
+
+        for (Direction direction : Direction.values()) {
+            hades.face(direction);
+            assertEquals(around, spin.tiles(hades, world, BossPhase.PHASE_TWO), direction.name());
+        }
+        assertEquals(24, around.size());
+        assertEquals(1.0, spin.duration(BossPhase.PHASE_TWO), 1e-9);
+    }
+
+    @Test
+    void groundSlamPhaseTwoIsThreeByFour() {
+        Map<Direction, Set<Position>> expected = Map.of(
+            Direction.UP, rect(4, 6, 1, 4),
+            Direction.DOWN, rect(4, 6, 6, 9),
+            Direction.LEFT, rect(1, 4, 4, 6),
+            Direction.RIGHT, rect(6, 9, 4, 6));
+        GameWorld world = worldWithPlayerAt(0, 0);
+        Hades hades = hadesIn(world);
+        AttackPattern slam = new GroundSlam();
+
+        for (Map.Entry<Direction, Set<Position>> entry : expected.entrySet()) {
+            hades.face(entry.getKey());
+            assertEquals(entry.getValue(), slam.tiles(hades, world, BossPhase.PHASE_TWO), entry.getKey().name());
+        }
+        assertEquals(1.5, slam.duration(BossPhase.PHASE_TWO), 1e-9);
+    }
+
+    @Test
+    void beamPhaseTwoHitsThreeAdjacentRowsOrColumns() {
+        GameWorld world = worldWithPlayerAt(2, 7);
+        Hades hades = hadesIn(world);
+        AttackPattern beam = new BeamAttack();
+
+        hades.face(Direction.LEFT);
+        assertEquals(rect(0, 10, 6, 8), beam.tiles(hades, world, BossPhase.PHASE_TWO));
+        hades.face(Direction.UP);
+        assertEquals(rect(1, 3, 0, 10), beam.tiles(hades, world, BossPhase.PHASE_TWO));
+        assertEquals(1.0, beam.duration(BossPhase.PHASE_TWO), 1e-9);
     }
 }

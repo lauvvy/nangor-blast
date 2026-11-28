@@ -21,10 +21,21 @@ public final class BeamAttack implements AttackPattern {
     public Set<Position> tiles(Boss boss, GameWorld world, BossPhase phase) {
         Position player = world.player().position();
         boolean horizontal = boss.facing() == Direction.LEFT || boss.facing() == Direction.RIGHT;
+        Direction one = horizontal ? Direction.LEFT : Direction.UP;
+        Direction two = horizontal ? Direction.RIGHT : Direction.DOWN;
+        int spread = phase == BossPhase.PHASE_TWO ? 1 : 0;
         Set<Position> tiles = new LinkedHashSet<>();
-        tiles.add(player);
-        tiles.addAll(AttackTiles.ray(world, player, horizontal ? Direction.LEFT : Direction.UP, Integer.MAX_VALUE));
-        tiles.addAll(AttackTiles.ray(world, player, horizontal ? Direction.RIGHT : Direction.DOWN, Integer.MAX_VALUE));
+        for (int offset = -spread; offset <= spread; offset++) {
+            Position center = horizontal
+                ? new Position(player.col(), player.row() + offset)
+                : new Position(player.col() + offset, player.row());
+            if (!world.inBounds(center) || (offset != 0 && AttackTiles.isBlock(world, center))) {
+                continue;
+            }
+            tiles.add(center);
+            tiles.addAll(AttackTiles.ray(world, center, one, Integer.MAX_VALUE));
+            tiles.addAll(AttackTiles.ray(world, center, two, Integer.MAX_VALUE));
+        }
         return tiles;
     }
 
